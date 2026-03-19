@@ -52,7 +52,7 @@ export default function Register() {
         >
           <div className="auth__logo">
             <Diamond weight="fill" size={32} />
-            <span>Collecto</span>
+            <span>Vaulted</span>
           </div>
 
           <h1 className="auth__title">Create account</h1>

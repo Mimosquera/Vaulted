@@ -1,7 +1,7 @@
 {
-  "name": "collection-app-backend",
+  "name": "vaulted-backend",
   "version": "1.0.0",
-  "description": "Backend API for Collection App - PostgreSQL + Express + Node.js",
+  "description": "Backend API for Vaulted - PostgreSQL + Express + Node.js",
   "main": "server.js",
   "type": "module",
   "scripts": {

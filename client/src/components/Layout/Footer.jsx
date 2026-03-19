@@ -9,7 +9,7 @@ export default function Footer() {
       <div className="footer__inner">
         <div className="footer__brand">
           <Diamond weight="fill" size={20} className="footer__icon" />
-          <span className="footer__name">Collecto</span>
+          <span className="footer__name">Vaulted</span>
         </div>
 
         <p className="footer__tagline">
@@ -18,7 +18,7 @@ export default function Footer() {
 
         <div className="footer__bottom">
           <span className="footer__copy">
-            &copy; {new Date().getFullYear()} Collecto
+            &copy; {new Date().getFullYear()} Vaulted
           </span>
         </div>
       </div>

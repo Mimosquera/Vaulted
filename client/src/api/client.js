@@ -1,14 +1,14 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
 function getToken() {
-  return localStorage.getItem('collecto-token');
+  return localStorage.getItem('vaulted-token');
 }
 
 function setToken(token) {
   if (token) {
-    localStorage.setItem('collecto-token', token);
+    localStorage.setItem('vaulted-token', token);
   } else {
-    localStorage.removeItem('collecto-token');
+    localStorage.removeItem('vaulted-token');
   }
 }
 

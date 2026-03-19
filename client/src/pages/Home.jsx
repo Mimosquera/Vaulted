@@ -180,7 +180,7 @@ export default function Home() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
           >
-            Why <span className="gradient-text">Collecto</span>?
+            Why <span className="gradient-text">Vaulted</span>?
           </motion.h2>
 
           <div className="home__features-grid">

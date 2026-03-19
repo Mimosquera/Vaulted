@@ -68,7 +68,7 @@ export default function Navbar() {
             <Diamond weight="fill" size={28} />
           </motion.div>
           <span className="navbar__logo-text">
-            Collecto
+            Vaulted
           </span>
         </Link>
 

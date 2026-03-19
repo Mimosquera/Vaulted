@@ -17,8 +17,8 @@ import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
 
 import * as api from '../api/client';
 
-const imageStore = localforage.createInstance({ name: 'collecto-images' });
-const dataStore = localforage.createInstance({ name: 'collecto-data' });
+const imageStore = localforage.createInstance({ name: 'vaulted-images' });
+const dataStore = localforage.createInstance({ name: 'vaulted-data' });
 
 const CATEGORIES = [
   { id: 'trading-cards', label: 'Trading Cards', Icon: Stack },
