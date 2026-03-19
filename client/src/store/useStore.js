@@ -253,17 +253,17 @@ const useStore = create((set, get) => ({
               name: c.name,
               category: c.category,
               description: c.description || '',
-              coverColor: c.cover_color || '#7c3aed',
-              coverImageUrl: c.cover_image_url || null,
+              coverColor: c.coverColor || c.cover_color || '#7c3aed',
+              coverImageUrl: c.coverImageUrl || c.cover_image_url || null,
               items: (cloudItems || []).map((item) => ({
                 id: item.id,
                 name: item.name,
                 note: item.note || '',
-                imageUrl: item.image_url || null,
-                createdAt: Number(item.created_at) || Date.now(),
+                imageUrl: item.imageUrl || item.image_url || null,
+                createdAt: Number(item.createdAt || item.created_at) || Date.now(),
               })),
-              isPublic: c.is_public || false,
-              createdAt: Number(c.created_at) || Date.now(),
+              isPublic: c.isPublic || c.is_public || false,
+              createdAt: Number(c.createdAt || c.created_at) || Date.now(),
               itemCount: cloudItems?.length || 0,
             };
           })
