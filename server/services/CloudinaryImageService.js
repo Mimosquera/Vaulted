@@ -1,4 +1,4 @@
-import cloudinary from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import ImageService from './imageService.js';
 
 cloudinary.config({
@@ -17,7 +17,7 @@ class CloudinaryImageService extends ImageService {
         cloudName: process.env.CLOUDINARY_CLOUD_NAME ? 'SET' : 'MISSING',
       });
 
-      const uploadStream = cloudinary.v2.uploader.upload_stream(
+      const uploadStream = cloudinary.uploader.upload_stream(
         {
           public_id: imageId,
           resource_type: 'auto',
@@ -39,7 +39,7 @@ class CloudinaryImageService extends ImageService {
 
   async delete(imageId) {
     try {
-      return await cloudinary.v2.uploader.destroy(imageId);
+      return await cloudinary.uploader.destroy(imageId);
     } catch (error) {
       console.error('Error deleting image from Cloudinary:', error);
       throw error;
@@ -47,7 +47,7 @@ class CloudinaryImageService extends ImageService {
   }
 
   getUrl(imageId) {
-    return cloudinary.v2.url(imageId, {
+    return cloudinary.url(imageId, {
       secure: true,
       transformation: [{ fetch_format: 'auto' }],
     });
