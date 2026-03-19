@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
@@ -13,6 +13,13 @@ export default function Explore() {
   const collections = useStore((s) => s.collections);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const publicCollections = useMemo(() => {
     let result = collections.filter((c) => c.isPublic);
@@ -35,7 +42,7 @@ export default function Explore() {
 
         <motion.div
           className="explore__header"
-          initial={{ opacity: 0, y: 20 }}
+          initial={isMobile ? {} : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <h1>
@@ -47,9 +54,9 @@ export default function Explore() {
 
         <motion.div
           className="explore__toolbar"
-          initial={{ opacity: 0, y: 15 }}
+          initial={isMobile ? {} : { opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={isMobile ? {} : { delay: 0.1 }}
         >
           <div className="explore__search">
             <MagnifyingGlass weight="bold" size={18} />
@@ -85,7 +92,7 @@ export default function Explore() {
         ) : (
           <motion.div
             className="explore__empty"
-            initial={{ opacity: 0 }}
+            initial={isMobile ? {} : { opacity: 0 }}
             animate={{ opacity: 1 }}
           >
             <Sparkle weight="thin" size={64} />

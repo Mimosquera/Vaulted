@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { EnvelopeSimpleIcon as EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
@@ -16,6 +16,13 @@ export default function Login() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -37,9 +44,9 @@ export default function Login() {
       <div className="auth__container">
         <motion.div
           className="auth__card"
-          initial={{ opacity: 0, y: 20, scale: 0.97 }}
+          initial={isMobile ? {} : { opacity: 0, y: 20, scale: 0.97 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 100, damping: 20 }}
+          transition={isMobile ? {} : { type: 'spring', stiffness: 100, damping: 20 }}
         >
           <div className="auth__logo">
             <Diamond weight="fill" size={32} />
@@ -52,8 +59,8 @@ export default function Login() {
           {error && (
             <motion.div
               className="auth__error"
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={isMobile ? {} : { opacity: 0, y: -8 }}
+              animate={isMobile ? {} : { opacity: 1, y: 0 }}
             >
               {error}
             </motion.div>

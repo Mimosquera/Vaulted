@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
@@ -22,6 +22,13 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const filtered = useMemo(() => {
     let result = collections;
@@ -63,9 +70,9 @@ export default function Dashboard() {
         {/* ── Header ── */}
         <motion.div
           className="dashboard__header"
-          initial={{ opacity: 0, y: 20 }}
+          initial={isMobile ? {} : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
+          transition={isMobile ? {} : { delay: 0.1 }}
         >
           <div className="dashboard__title-row">
             <div>
@@ -102,9 +109,9 @@ export default function Dashboard() {
         {/* ── Search & Filter ── */}
         <motion.div
           className="dashboard__toolbar"
-          initial={{ opacity: 0, y: 15 }}
+          initial={isMobile ? {} : { opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
+          transition={isMobile ? {} : { delay: 0.2 }}
         >
           <div className="dashboard__search">
             <MagnifyingGlass weight="bold" size={18} />
@@ -141,7 +148,7 @@ export default function Dashboard() {
         ) : (
           <motion.div
             className="dashboard__empty"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={isMobile ? {} : { opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
             <Folder weight="thin" size={64} />

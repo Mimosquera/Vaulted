@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
@@ -20,6 +20,13 @@ export default function Profile() {
   const { username, setUsername, collections, user, syncing, lastSynced, syncToCloud } = useStore();
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState(username);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   const stats = useMemo(() => {
     const totalItems = collections.reduce((sum, c) => sum + (c.items?.length || 0), 0);
@@ -46,7 +53,7 @@ export default function Profile() {
 
         <motion.div
           className="profile__header"
-          initial={{ opacity: 0, y: 20 }}
+          initial={isMobile ? {} : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <motion.div
@@ -103,9 +110,9 @@ export default function Profile() {
         {/* ── Stats Cards ── */}
         <motion.div
           className="profile__stats"
-          initial={{ opacity: 0, y: 15 }}
+          initial={isMobile ? {} : { opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.15 }}
+          transition={isMobile ? {} : { delay: 0.15 }}
         >
           <div className="profile__stat-card">
             <div className="profile__stat-icon" style={{ color: '#7c3aed', background: 'rgba(124,58,237,0.1)' }}>
@@ -145,9 +152,9 @@ export default function Profile() {
         {/* ── Collection Breakdown ── */}
         <motion.div
           className="profile__breakdown"
-          initial={{ opacity: 0, y: 15 }}
+          initial={isMobile ? {} : { opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.25 }}
+          transition={isMobile ? {} : { delay: 0.25 }}
         >
           <h2>Collection Breakdown</h2>
           <div className="profile__breakdown-list">
@@ -156,9 +163,9 @@ export default function Profile() {
                 <motion.div
                   key={col.id}
                   className="profile__breakdown-item"
-                  initial={{ opacity: 0, x: -15 }}
+                  initial={isMobile ? {} : { opacity: 0, x: -15 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 + i * 0.05 }}
+                  transition={isMobile ? {} : { delay: 0.3 + i * 0.05 }}
                 >
                   <div className="profile__breakdown-info">
                     <span className="profile__breakdown-icon"><CategoryIcon category={col.category} size={18} /></span>
