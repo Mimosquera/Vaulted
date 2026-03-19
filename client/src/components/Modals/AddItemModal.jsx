@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon as X } from '@phosphor-icons/react/X';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
