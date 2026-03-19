@@ -1,0 +1,123 @@
+@use '../styles/variables' as *;
+
+.explore {
+  position: relative;
+  padding-bottom: $space-3xl;
+
+  &__header {
+    padding: $space-2xl 0;
+    text-align: center;
+
+    h1 {
+      font-size: $fs-3xl;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $space-sm;
+      margin-bottom: $space-sm;
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: $fs-lg;
+    }
+  }
+
+  &__icon {
+    color: $accent-tertiary;
+  }
+
+  &__toolbar {
+    margin-bottom: $space-2xl;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-md;
+  }
+
+  &__search {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    padding: $space-sm $space-md;
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-lg;
+    width: 100%;
+    max-width: 450px;
+    transition: border-color $transition-fast;
+
+    &:focus-within {
+      border-color: rgba($accent-secondary, 0.4);
+    }
+
+    svg {
+      color: $text-muted;
+    }
+
+    input {
+      flex: 1;
+      background: none;
+      border: none;
+      padding: $space-xs 0;
+
+      &:focus {
+        box-shadow: none;
+      }
+    }
+  }
+
+  &__filters {
+    display: flex;
+    gap: $space-sm;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  &__filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: $space-xs $space-md;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-full;
+    font-size: $fs-sm;
+    color: $text-secondary;
+    transition: all $transition-fast;
+    white-space: nowrap;
+
+    &:hover {
+      border-color: rgba($accent-primary, 0.3);
+      background: rgba($accent-primary, 0.06);
+    }
+
+    &--active {
+      background: rgba($accent-primary, 0.15);
+      border-color: rgba($accent-primary, 0.4);
+      color: $accent-primary;
+    }
+  }
+
+  &__empty {
+    text-align: center;
+    padding: $space-3xl $space-lg;
+    color: $text-muted;
+
+    svg {
+      margin-bottom: $space-md;
+      opacity: 0.4;
+    }
+
+    h3 {
+      font-size: $fs-xl;
+      color: $text-secondary;
+      margin-bottom: $space-sm;
+    }
+
+    p {
+      max-width: 400px;
+      margin: 0 auto;
+    }
+  }
+}

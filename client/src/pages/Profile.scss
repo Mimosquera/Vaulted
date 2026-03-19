@@ -1,0 +1,214 @@
+@use '../styles/variables' as *;
+
+.profile {
+  position: relative;
+  padding-bottom: $space-3xl;
+
+  &__header {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: $space-2xl 0;
+    text-align: center;
+  }
+
+  &__avatar {
+    color: $accent-secondary;
+    margin-bottom: $space-md;
+    cursor: pointer;
+  }
+
+  &__name-row {
+    margin-bottom: $space-sm;
+  }
+
+  &__name-display {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    h1 {
+      font-size: $fs-3xl;
+    }
+  }
+
+  &__name-edit-btn {
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $text-primary;
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  &__name-edit {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+
+    input {
+      font-size: $fs-xl;
+      font-family: $font-display;
+      font-weight: 700;
+      text-align: center;
+      max-width: 250px;
+    }
+  }
+
+  &__name-save {
+    width: 36px;
+    height: 36px;
+    border-radius: $radius-sm;
+    background: rgba($accent-green, 0.15);
+    color: $accent-green;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: rgba($accent-green, 0.25);
+    }
+  }
+
+  &__tagline {
+    color: $text-muted;
+    font-size: $fs-sm;
+  }
+
+  &__account {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-sm;
+    margin-top: $space-md;
+  }
+
+  &__email {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    font-size: $fs-sm;
+    color: $text-secondary;
+  }
+
+  &__stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: $space-md;
+    margin-bottom: $space-2xl;
+  }
+
+  &__stat-card {
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-lg;
+    padding: $space-xl;
+    text-align: center;
+    transition: border-color $transition-base, transform $transition-base;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-4px);
+    }
+  }
+
+  &__stat-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto $space-md;
+  }
+
+  &__stat-value {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    font-weight: 700;
+    margin-bottom: $space-xs;
+  }
+
+  &__stat-label {
+    font-size: $fs-xs;
+    color: $text-muted;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  &__breakdown {
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-lg;
+    padding: $space-xl;
+
+    h2 {
+      font-size: $fs-lg;
+      margin-bottom: $space-lg;
+    }
+  }
+
+  &__breakdown-list {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+  }
+
+  &__breakdown-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-sm $space-md;
+    border-radius: $radius-sm;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  &__breakdown-info {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__breakdown-icon {
+    display: flex;
+    align-items: center;
+    color: $accent-primary;
+  }
+
+  &__breakdown-name {
+    font-weight: 500;
+  }
+
+  &__breakdown-public {
+    padding: 1px 6px;
+    background: rgba($accent-green, 0.12);
+    color: $accent-green;
+    border-radius: $radius-full;
+    font-size: 10px;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  &__breakdown-count {
+    font-size: $fs-sm;
+    color: $text-muted;
+  }
+
+  &__breakdown-empty {
+    color: $text-muted;
+    text-align: center;
+    padding: $space-xl;
+  }
+}

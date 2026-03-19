@@ -1,0 +1,246 @@
+@use '../styles/variables' as *;
+
+.home {
+  overflow-x: hidden;
+
+  // ── Hero ──
+  &__hero {
+    position: relative;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 120px $space-lg $space-3xl;
+    overflow: hidden;
+  }
+
+  &__floating-item {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.35;
+    z-index: 0;
+    filter: drop-shadow(0 0 8px currentColor);
+  }
+
+  &__hero-content {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+    max-width: 700px;
+  }
+
+  &__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-xs $space-md;
+    background: rgba($accent-primary, 0.1);
+    border: 1px solid rgba($accent-primary, 0.25);
+    border-radius: $radius-full;
+    color: $neon-violet;
+    font-size: $fs-sm;
+    font-weight: 500;
+    margin-bottom: $space-xl;
+
+    svg {
+      color: $accent-primary;
+    }
+  }
+
+  &__title {
+    font-size: $fs-hero;
+    font-weight: 800;
+    line-height: 1.1;
+    margin-bottom: $space-lg;
+    letter-spacing: -0.02em;
+  }
+
+  &__subtitle {
+    font-size: $fs-lg;
+    color: $text-secondary;
+    max-width: 540px;
+    margin: 0 auto $space-2xl;
+    line-height: 1.6;
+  }
+
+  &__cta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-md;
+    flex-wrap: wrap;
+    margin-bottom: $space-3xl;
+  }
+
+  &__stats {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-lg;
+    padding: $space-sm $space-xl;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: $radius-lg;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    opacity: 0.6;
+  }
+
+  &__stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+
+    &-value {
+      font-family: $font-display;
+      font-size: $fs-lg;
+      font-weight: 600;
+      color: $text-secondary;
+    }
+
+    &-label {
+      font-size: 10px;
+      color: $text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    &-divider {
+      width: 1px;
+      height: 24px;
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  // ── Scrolling categories ──
+  &__categories {
+    padding: $space-xl 0;
+    overflow: hidden;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  &__categories-track {
+    overflow: hidden;
+  }
+
+  &__categories-scroll {
+    display: flex;
+    gap: $space-md;
+    white-space: nowrap;
+    width: max-content;
+  }
+
+  &__category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-sm $space-lg;
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-full;
+    color: $text-secondary;
+    font-size: $fs-sm;
+    font-weight: 500;
+    text-transform: capitalize;
+    white-space: nowrap;
+  }
+
+  // ── Features ──
+  &__features {
+    padding: $space-3xl 0;
+  }
+
+  &__section-title {
+    font-size: $fs-3xl;
+    text-align: center;
+    margin-bottom: $space-3xl;
+  }
+
+  &__features-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: $space-lg;
+  }
+
+  &__feature-card {
+    padding: $space-2xl;
+    background: $bg-card;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-lg;
+    transition: border-color $transition-base;
+
+    &:hover {
+      border-color: rgba(255, 255, 255, 0.12);
+    }
+
+    h3 {
+      font-size: $fs-lg;
+      margin: $space-md 0 $space-sm;
+    }
+
+    p {
+      color: $text-secondary;
+      font-size: $fs-sm;
+      line-height: 1.6;
+    }
+  }
+
+  &__feature-icon {
+    width: 56px;
+    height: 56px;
+    border-radius: $radius-md;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  // ── Bottom CTA ──
+  &__bottom-cta {
+    position: relative;
+    padding: $space-3xl 0;
+    overflow: hidden;
+
+    &-content {
+      text-align: center;
+      position: relative;
+      z-index: 1;
+
+      h2 {
+        font-size: $fs-3xl;
+        margin-bottom: $space-md;
+      }
+
+      p {
+        color: $text-secondary;
+        font-size: $fs-lg;
+        margin-bottom: $space-2xl;
+      }
+    }
+  }
+
+  // ── Responsive ──
+  @media (max-width: $bp-md) {
+    &__title {
+      font-size: clamp(2rem, 8vw, 3.5rem);
+    }
+
+    &__subtitle {
+      font-size: $fs-md;
+    }
+
+    &__stats {
+      flex-direction: row;
+      gap: $space-sm;
+      padding: $space-sm;
+    }
+
+    &__stat-divider {
+      width: 1px;
+      height: 20px;
+    }
+
+    &__floating-item {
+      display: none;
+    }
+  }
+}

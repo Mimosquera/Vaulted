@@ -1,0 +1,234 @@
+@use '../../styles/variables' as *;
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: $z-sticky;
+  padding: $space-md $space-lg;
+  transition: background $transition-base, box-shadow $transition-base, padding $transition-base;
+
+  &--scrolled {
+    background: rgba($bg-primary, 0.85);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04), $shadow-md;
+    padding: $space-sm $space-lg;
+  }
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    color: $text-primary;
+    text-decoration: none;
+    z-index: 10;
+
+    &-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: $accent-primary;
+    }
+
+    &-text {
+      font-family: $font-display;
+      font-size: $fs-xl;
+      font-weight: 700;
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  &__links {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+
+    @media (max-width: $bp-md) {
+      display: none;
+    }
+  }
+
+  &__link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-sm $space-md;
+    color: $text-secondary;
+    text-decoration: none;
+    font-size: $fs-sm;
+    font-weight: 500;
+    border-radius: $radius-sm;
+    transition: color $transition-fast;
+
+    svg {
+      font-size: 1.2rem;
+    }
+
+    &:hover {
+      color: $text-primary;
+    }
+
+    &--active {
+      color: $text-primary;
+    }
+
+    &-indicator {
+      position: absolute;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 20px;
+      height: 2px;
+      background: $gradient-primary;
+      border-radius: $radius-full;
+    }
+  }
+
+  &__auth {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    margin-left: $space-md;
+    padding-left: $space-md;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    height: 32px;
+  }
+
+  &__user {
+    display: flex;
+    align-items: center;
+    &-name {
+      font-size: $fs-sm;
+      color: $text-secondary;
+      font-weight: 500;
+      max-width: 110px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  }
+
+  &__sync,
+  &__logout {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-sm;
+    color: $text-secondary;
+    background: transparent;
+    cursor: pointer;
+    transition: all $transition-fast;
+    flex-shrink: 0;
+
+    &:hover {
+      color: $text-primary;
+      border-color: rgba($accent-primary, 0.3);
+      background: rgba($accent-primary, 0.1);
+    }
+
+    &:active {
+      transform: scale(0.95);
+    }
+  }
+
+  &__login-btn {
+    display: flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-sm $space-md;
+    margin-left: $space-sm;
+    background: rgba($accent-primary, 0.15);
+    border: 1px solid rgba($accent-primary, 0.3);
+    border-radius: $radius-sm;
+    color: $accent-primary;
+    text-decoration: none;
+    font-size: $fs-sm;
+    font-weight: 600;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: rgba($accent-primary, 0.25);
+      border-color: rgba($accent-primary, 0.5);
+      color: $accent-primary;
+    }
+
+    &:visited {
+      color: $accent-primary;
+    }
+  }
+
+  &__hamburger {
+    display: none;
+    z-index: 10;
+
+    @media (max-width: $bp-md) {
+      display: block;
+    }
+  }
+
+  &__mobile {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: rgba($bg-primary, 0.95);
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: $space-md $space-lg;
+    overflow: hidden;
+
+    &-link {
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+      padding: $space-md;
+      color: $text-secondary;
+      text-decoration: none;
+      font-size: $fs-md;
+      font-weight: 500;
+      border-radius: $radius-sm;
+      transition: all $transition-fast;
+      background: none;
+      border: none;
+      cursor: pointer;
+      width: 100%;
+
+      svg {
+        font-size: 1.3rem;
+      }
+
+      &:hover,
+      &--active {
+        color: $text-primary;
+        background: rgba(255, 255, 255, 0.04);
+      }
+
+      &--active {
+        color: $accent-primary;
+      }
+    }
+  }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}

@@ -1,0 +1,164 @@
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+// eslint-disable-next-line no-unused-vars
+import { motion } from 'framer-motion';
+import Tilt from 'react-parallax-tilt';
+import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
+import { DotsThreeIcon as DotsThree } from '@phosphor-icons/react/DotsThree';
+import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
+import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
+import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { timeAgo } from '../../utils/helpers';
+import CategoryIcon from '../UI/CategoryIcon';
+import EditCollectionModal from '../Modals/EditCollectionModal';
+import useStore from '../../store/useStore';
+import './CollectionCard.scss';
+
+export default function CollectionCard({ collection, index = 0 }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [coverUrl, setCoverUrl] = useState(null);
+  const togglePublic = useStore((s) => s.togglePublic);
+  const deleteCollection = useStore((s) => s.deleteCollection);
+  const updateCollection = useStore((s) => s.updateCollection);
+  const getImageUrl = useStore((s) => s.getImageUrl);
+
+  useEffect(() => {
+    let url = null;
+    const firstImage = collection.coverImageUrl || collection.items?.find((i) => i.imageUrl);
+    if (firstImage) {
+      getImageUrl(firstImage).then((u) => {
+        url = u;
+        setCoverUrl(u);
+      });
+    }
+    return () => {
+      if (url) URL.revokeObjectURL(url);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collection.items, collection.coverImageUrl]);
+
+  const handleDelete = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    deleteCollection(collection.id);
+    setMenuOpen(false);
+  };
+
+  const handleTogglePublic = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    togglePublic(collection.id);
+    setMenuOpen(false);
+  };
+
+  const handleEditClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setEditModalOpen(true);
+    setMenuOpen(false);
+  };
+
+  const handleUpdateCollection = (collectionData) => {
+    updateCollection(collection.id, collectionData);
+    setEditModalOpen(false);
+  };
+
+  return (
+    <>
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.9 }}
+        transition={{ delay: index * 0.06, type: 'spring', stiffness: 100 }}
+      >
+        <Tilt
+          tiltMaxAngleX={8}
+          tiltMaxAngleY={8}
+          glareEnable
+          glareMaxOpacity={0.1}
+          glarePosition="all"
+          scale={1.02}
+          transitionSpeed={400}
+        >
+          <Link to={`/collection/${collection.id}`} className="collection-card">
+          <div
+            className="collection-card__cover"
+            style={{
+              backgroundImage: coverUrl ? `url(${coverUrl})` : 'none',
+              backgroundColor: coverUrl ? 'transparent' : collection.coverColor,
+            }}
+          >
+            {!coverUrl && (
+              <span className="collection-card__cover-icon">
+                <CategoryIcon category={collection.category} size={40} />
+              </span>
+            )}
+            <div className="collection-card__cover-overlay" />
+
+            <div className="collection-card__badges">
+              {collection.isPublic && (
+                <span className="collection-card__badge collection-card__badge--public">
+                  <Eye weight="bold" size={12} /> Public
+                </span>
+              )}
+            </div>
+
+            <button
+              className="collection-card__menu-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setMenuOpen(!menuOpen);
+              }}
+            >
+              <DotsThree weight="bold" size={20} />
+            </button>
+
+            {menuOpen && (
+              <motion.div
+                className="collection-card__menu"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                onClick={(e) => e.preventDefault()}
+              >
+                <button onClick={handleEditClick}>
+                  <PencilSimple size={16} /> Edit
+                </button>
+                <button onClick={handleTogglePublic}>
+                  {collection.isPublic ? <EyeSlash size={16} /> : <Eye size={16} />}
+                  {collection.isPublic ? 'Make Private' : 'Make Public'}
+                </button>
+                <button className="collection-card__menu-danger" onClick={handleDelete}>
+                  <Trash size={16} /> Delete
+                </button>
+              </motion.div>
+            )}
+          </div>
+
+          <div className="collection-card__info">
+            <h3 className="collection-card__name">{collection.name}</h3>
+            <div className="collection-card__meta">
+              <span>
+                <CategoryIcon category={collection.category} size={14} /> {collection.items?.length || 0} items
+              </span>
+              <span>{timeAgo(collection.createdAt)}</span>
+            </div>
+            {collection.description && (
+              <p className="collection-card__desc">{collection.description}</p>
+            )}
+          </div>
+        </Link>
+      </Tilt>
+    </motion.div>
+
+    <EditCollectionModal
+      isOpen={editModalOpen}
+      onClose={() => setEditModalOpen(false)}
+      onUpdate={handleUpdateCollection}
+      collection={collection}
+    />
+    </>
+  );
+}

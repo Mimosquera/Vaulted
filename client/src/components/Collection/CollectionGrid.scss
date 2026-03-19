@@ -1,0 +1,14 @@
+@use '../../styles/variables' as *;
+
+.collection-grid {
+  display: flex;
+  gap: $space-lg;
+  width: 100%;
+
+  &__column {
+    display: flex;
+    flex-direction: column;
+    gap: $space-lg;
+    background-clip: padding-box;
+  }
+}

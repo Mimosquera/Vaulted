@@ -1,0 +1,133 @@
+@use 'sass:color';
+@use '../styles/variables' as *;
+
+.auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding-top: 80px;
+
+  &__container {
+    width: 100%;
+    max-width: 440px;
+    padding: $space-lg;
+  }
+
+  &__card {
+    background: rgba($bg-secondary, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-xl;
+    padding: $space-2xl;
+    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(20px);
+  }
+
+  &__logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-sm;
+    margin-bottom: $space-xl;
+    color: $accent-primary;
+
+    span {
+      font-family: $font-display;
+      font-size: $fs-xl;
+      font-weight: 700;
+      background: $gradient-primary;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+  }
+
+  &__title {
+    font-family: $font-display;
+    font-size: $fs-2xl;
+    font-weight: 700;
+    text-align: center;
+    margin-bottom: $space-xs;
+  }
+
+  &__subtitle {
+    text-align: center;
+    color: $text-secondary;
+    font-size: $fs-sm;
+    margin-bottom: $space-xl;
+  }
+
+  &__error {
+    background: rgba($accent-secondary, 0.1);
+    border: 1px solid rgba($accent-secondary, 0.3);
+    color: #fca5a5;
+    font-size: $fs-sm;
+    padding: $space-sm $space-md;
+    border-radius: $radius-sm;
+    margin-bottom: $space-md;
+    text-align: center;
+  }
+
+  &__form {
+    display: flex;
+    flex-direction: column;
+    gap: $space-lg;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+
+    label {
+      font-size: $fs-sm;
+      font-weight: 500;
+      color: $text-secondary;
+      display: flex;
+      align-items: center;
+      gap: $space-xs;
+    }
+
+    input {
+      width: 100%;
+      font-size: $fs-md;
+    }
+  }
+
+  &__optional {
+    font-weight: 400;
+    color: $text-muted;
+    font-size: $fs-xs;
+  }
+
+  &__submit {
+    width: 100%;
+    margin-top: $space-sm;
+  }
+
+  &__switch {
+    text-align: center;
+    color: $text-secondary;
+    font-size: $fs-sm;
+    margin-top: $space-xl;
+
+    a {
+      color: $accent-primary;
+      text-decoration: none;
+      font-weight: 600;
+      transition: all $transition-fast;
+
+      &:hover,
+      &:focus {
+        color: $accent-primary;
+        text-decoration: underline;
+        text-decoration-color: $accent-primary;
+        text-underline-offset: 3px;
+      }
+
+      &:visited {
+        color: $accent-primary;
+      }
+    }
+  }
+}

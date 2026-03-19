@@ -1,0 +1,198 @@
+@use '../../styles/variables' as *;
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal-backdrop;
+  background: rgba(0, 0, 0, 0.6);
+  -webkit-backdrop-filter: blur(6px);
+  backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-lg;
+}
+
+.modal {
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+  background: $bg-secondary;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: $radius-xl;
+  box-shadow: $shadow-lg;
+
+  &--sm {
+    max-width: 440px;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-lg $space-xl;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+
+    h2 {
+      font-size: $fs-lg;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+    }
+  }
+
+  &__close {
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-sm;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-muted;
+    transition: all $transition-fast;
+
+    &:hover {
+      color: $text-primary;
+      border-color: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.06);
+    }
+  }
+
+  &__body {
+    padding: $space-xl;
+    display: flex;
+    flex-direction: column;
+    gap: $space-lg;
+  }
+
+  &__field {
+    display: flex;
+    flex-direction: column;
+    gap: $space-sm;
+
+    label {
+      font-size: $fs-sm;
+      font-weight: 500;
+      color: $text-secondary;
+      display: flex;
+      align-items: center;
+      gap: $space-xs;
+    }
+
+    input, textarea {
+      width: 100%;
+      font-size: $fs-md;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+  }
+
+  &__optional {
+    font-weight: 400;
+    color: $text-muted;
+    font-size: $fs-xs;
+  }
+
+  &__categories {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-sm;
+  }
+
+  &__category-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-xs;
+    padding: $space-xs $space-md;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: $radius-full;
+    font-size: $fs-sm;
+    color: $text-secondary;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      border-color: rgba($accent-primary, 0.3);
+      background: rgba($accent-primary, 0.06);
+    }
+
+    &--active {
+      background: rgba($accent-primary, 0.15);
+      border-color: rgba($accent-primary, 0.4);
+      color: $accent-primary;
+    }
+  }
+
+  &__colors {
+    display: flex;
+    gap: $space-sm;
+    flex-wrap: wrap;
+  }
+
+  &__color {
+    width: 32px;
+    height: 32px;
+    border-radius: $radius-full;
+    border: 2px solid transparent;
+    transition: all $transition-fast;
+    cursor: pointer;
+
+    &:hover {
+      transform: scale(1.15);
+    }
+
+    &--active {
+      border-color: white;
+      box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+      transform: scale(1.15);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    padding-top: $space-md;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  &__share-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: $space-md;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: $radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  &__visibility {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: $fs-sm;
+    color: $text-muted;
+
+    &--public {
+      color: $accent-green;
+    }
+  }
+
+  &__copy-row {
+    display: flex;
+    gap: $space-sm;
+
+    input {
+      flex: 1;
+      font-family: $font-mono;
+      font-size: $fs-xs;
+    }
+  }
+}

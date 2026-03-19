@@ -1,0 +1,63 @@
+@use '../../styles/variables' as *;
+
+.footer {
+  position: relative;
+  margin-top: auto;
+  padding: $space-2xl $space-lg $space-lg;
+  text-align: center;
+  overflow: hidden;
+
+  &__glow {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 300px;
+    height: 1px;
+    background: $gradient-primary;
+    opacity: 0.4;
+    filter: blur(1px);
+  }
+
+  &__inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $space-md;
+  }
+
+  &__brand {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+  }
+
+  &__icon {
+    color: $accent-primary;
+  }
+
+  &__name {
+    font-family: $font-display;
+    font-weight: 700;
+    font-size: $fs-lg;
+    background: $gradient-primary;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  &__tagline {
+    color: $text-muted;
+    font-size: $fs-sm;
+  }
+
+  &__bottom {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    color: $text-muted;
+    font-size: $fs-xs;
+  }
+}

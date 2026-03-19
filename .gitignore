@@ -1,0 +1,59 @@
+# Dependencies
+node_modules
+client/node_modules
+server/node_modules
+
+# Build outputs
+dist
+dist-ssr
+client/dist
+server/build
+.parcel-cache
+.cache
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+server/.env
+server/.env.local
+
+# Database files
+*.sqlite
+*.sqlite3
+*.db
+
+# IDE and editor files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+.eslintcache
+
+# OS files
+Thumbs.db
+.DS_Store
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Testing
+coverage/
+.nyc_output/
+
