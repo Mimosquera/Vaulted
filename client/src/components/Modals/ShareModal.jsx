@@ -24,7 +24,7 @@ export default function ShareModal({ isOpen, onClose, collection }) {
 
   if (!collection) return null;
 
-  const shareUrl = `${window.location.origin}/collection/${collection.id}`;
+  const shareUrl = `${window.location.origin}/explore/${collection.id}`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(shareUrl);

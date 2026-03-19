@@ -108,9 +108,9 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.2, duration: 0.4 }}
           >
             <Sparkle weight="fill" size={14} />
             <span>Organize your collections</span>
@@ -118,9 +118,9 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.35, duration: 0.5, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.35, duration: 0.5 }}
           >
             Curate Your
             <br />
@@ -129,9 +129,9 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
             Upload photos, organize, and share with the world.
@@ -139,9 +139,9 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.65, duration: 0.4, ease: 'easeOut' }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.65, duration: 0.4 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <Rocket weight="fill" />
