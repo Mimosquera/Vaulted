@@ -72,8 +72,8 @@
     position: absolute;
     top: $space-sm;
     right: $space-sm;
-    width: 28px;
-    height: 28px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-full;
     background: rgba(0, 0, 0, 0.6);
     -webkit-backdrop-filter: blur(8px);
@@ -87,5 +87,40 @@
     &:hover {
       background: rgba($accent-primary, 0.8);
     }
+  }
+
+  &__overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    border-radius: $radius-md;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: $space-sm;
+  }
+
+  &__progress {
+    width: 100px;
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: $radius-full;
+    overflow: hidden;
+  }
+
+  &__progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, $accent-primary, $accent-secondary);
+    border-radius: $radius-full;
+    transition: width 0.3s ease;
+  }
+
+  &__uploading-text {
+    font-size: $fs-xs;
+    color: white;
+    font-weight: 600;
   }
 }

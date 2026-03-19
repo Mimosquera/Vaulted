@@ -14,6 +14,8 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
   const [description, setDescription] = useState('');
   const [coverColor, setCoverColor] = useState('#7c3aed');
   const [coverImage, setCoverImage] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -24,16 +26,28 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !category) return;
-    onCreate({ name: name.trim(), category, description: description.trim(), coverColor, coverImage });
-    setName('');
-    setCategory('');
-    setDescription('');
-    setCoverColor('#7c3aed');
-    setCoverImage(null);
-    onClose();
+    if (!name.trim() || !category || isUploading) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      await onCreate(
+        { name: name.trim(), category, description: description.trim(), coverColor, coverImage },
+        (progress) => setUploadProgress(progress)
+      );
+      setName('');
+      setCategory('');
+      setDescription('');
+      setCoverColor('#7c3aed');
+      setCoverImage(null);
+      onClose();
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   return (
@@ -62,7 +76,11 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
             </div>
 
             <form onSubmit={handleSubmit} className="modal__body">
-              <ImageUploader onFileSelect={setCoverImage} />
+              <ImageUploader
+                onFileSelect={setCoverImage}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+              />
 
               <div className="modal__field">
                 <label>Name</label>
@@ -125,10 +143,10 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  disabled={!name.trim() || !category}
+                  disabled={!name.trim() || !category || isUploading}
                 >
                   <Plus weight="bold" />
-                  Create Collection
+                  {isUploading ? 'Creating...' : 'Create Collection'}
                 </button>
               </div>
             </form>

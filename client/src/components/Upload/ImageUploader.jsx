@@ -7,7 +7,7 @@ import { XIcon as X } from '@phosphor-icons/react/X';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import './ImageUploader.scss';
 
-export default function ImageUploader({ onFileSelect, currentPreview = null }) {
+export default function ImageUploader({ onFileSelect, currentPreview = null, isUploading = false, uploadProgress = 0 }) {
   const [preview, setPreview] = useState(currentPreview);
 
   const onDrop = useCallback((acceptedFiles) => {
@@ -24,7 +24,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
     accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'] },
     maxFiles: 1,
     multiple: false,
-    maxSize: 50 * 1024 * 1024,
+    maxSize: 20 * 1024 * 1024,
   });
 
   const removeImage = (e) => {
@@ -52,9 +52,22 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
               exit={{ opacity: 0, scale: 0.9 }}
             >
               <img src={preview} alt="Preview" />
-              <button className="image-uploader__remove" onClick={removeImage}>
-                <X weight="bold" size={16} />
-              </button>
+              {isUploading && (
+                <div className="image-uploader__overlay">
+                  <div className="image-uploader__progress">
+                    <div
+                      className="image-uploader__progress-bar"
+                      style={{ width: `${uploadProgress}%` }}
+                    />
+                  </div>
+                  <span className="image-uploader__uploading-text">{uploadProgress}%</span>
+                </div>
+              )}
+              {!isUploading && (
+                <button className="image-uploader__remove" onClick={removeImage}>
+                  <X weight="bold" size={16} />
+                </button>
+              )}
             </motion.div>
           ) : (
             <motion.div
@@ -73,7 +86,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
               <p className="image-uploader__text">
                 {isDragActive ? 'Drop it here!' : 'Drag & drop or click to upload'}
               </p>
-              <span className="image-uploader__hint">PNG, JPG, WebP up to 50MB</span>
+              <span className="image-uploader__hint">PNG, JPG, WebP, GIF up to 20MB</span>
             </motion.div>
           )}
         </AnimatePresence>

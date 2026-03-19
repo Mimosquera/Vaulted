@@ -10,6 +10,8 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (item) {
@@ -28,11 +30,23 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    onUpdate({ name: name.trim(), note: note.trim(), imageFile });
-    onClose();
+    if (!name.trim() || isUploading) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      await onUpdate(
+        { name: name.trim(), note: note.trim(), imageFile },
+        (progress) => setUploadProgress(progress)
+      );
+      onClose();
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   if (!item) return null;
@@ -63,7 +77,11 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
             </div>
 
             <form onSubmit={handleSubmit} className="modal__body">
-              <ImageUploader onFileSelect={setImageFile} />
+              <ImageUploader
+                onFileSelect={setImageFile}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+              />
 
               <div className="modal__field">
                 <label>Name</label>
@@ -95,10 +113,10 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  disabled={!name.trim()}
+                  disabled={!name.trim() || isUploading}
                 >
                   <Check weight="bold" />
-                  Save Changes
+                  {isUploading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

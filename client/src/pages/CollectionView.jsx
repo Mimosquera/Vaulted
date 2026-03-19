@@ -79,14 +79,14 @@ export default function CollectionView() {
     setEditItemModalOpen(true);
   };
 
-  const handleUpdateItem = (itemData) => {
-    updateItem(collection.id, editingItem.id, itemData);
+  const handleUpdateItem = (itemData, onProgress) => {
+    updateItem(collection.id, editingItem.id, itemData, onProgress);
     setEditingItem(null);
     setEditItemModalOpen(false);
   };
 
-  const handleUpdateCollection = (collectionData) => {
-    updateCollection(collection.id, collectionData);
+  const handleUpdateCollection = (collectionData, onProgress) => {
+    updateCollection(collection.id, collectionData, onProgress);
     setEditCollectionModalOpen(false);
   };
 
@@ -242,7 +242,7 @@ export default function CollectionView() {
       <AddItemModal
         isOpen={addModalOpen}
         onClose={() => setAddModalOpen(false)}
-        onAdd={(data) => addItem(collection.id, data)}
+        onAdd={(data, onProgress) => addItem(collection.id, data, onProgress)}
       />
 
       <EditItemModal

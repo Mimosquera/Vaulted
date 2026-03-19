@@ -46,8 +46,8 @@
   }
 
   &__action {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-sm;
     background: rgba(0, 0, 0, 0.6);
     -webkit-backdrop-filter: blur(8px);
@@ -64,6 +64,12 @@
 
     &--danger:hover {
       background: rgba($accent-primary, 0.8);
+    }
+  }
+
+  @media (hover: none) {
+    &__actions {
+      opacity: 1 !important;
     }
   }
 
@@ -108,13 +114,13 @@
     }
 
     &__note {
-      font-size: 11px;
+      font-size: $fs-xs;
       -webkit-line-clamp: 1;
       line-clamp: 1;
     }
 
     &__time {
-      font-size: 10px;
+      font-size: $fs-xs;
     }
   }
 }

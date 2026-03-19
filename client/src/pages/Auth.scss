@@ -130,4 +130,24 @@
       }
     }
   }
+
+  @media (max-width: $bp-md) {
+    padding-top: $space-2xl;
+
+    &__container {
+      padding: $space-sm;
+    }
+
+    &__card {
+      padding: $space-lg;
+    }
+
+    &__title {
+      font-size: $fs-xl;
+    }
+
+    &__form {
+      gap: $space-md;
+    }
+  }
 }

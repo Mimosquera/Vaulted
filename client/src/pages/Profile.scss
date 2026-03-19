@@ -33,8 +33,8 @@
   }
 
   &__name-edit-btn {
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-sm;
     display: flex;
     align-items: center;
@@ -63,8 +63,8 @@
   }
 
   &__name-save {
-    width: 36px;
-    height: 36px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-sm;
     background: rgba($accent-green, 0.15);
     color: $accent-green;
@@ -196,7 +196,7 @@
     background: rgba($accent-green, 0.12);
     color: $accent-green;
     border-radius: $radius-full;
-    font-size: 10px;
+    font-size: $fs-xs;
     font-weight: 600;
     text-transform: uppercase;
   }
@@ -210,5 +210,40 @@
     color: $text-muted;
     text-align: center;
     padding: $space-xl;
+  }
+
+  @media (max-width: $bp-md) {
+    &__header {
+      padding: $space-lg 0;
+    }
+
+    &__name-display h1 {
+      font-size: $fs-2xl;
+    }
+
+    &__stats {
+      gap: $space-md;
+    }
+
+    &__stat {
+      min-width: 100%;
+    }
+
+    &__stat-value {
+      font-size: $fs-2xl;
+    }
+
+    &__stat-label {
+      font-size: $fs-xs;
+    }
+
+    &__breakdown-public {
+      font-size: $fs-xs;
+      padding: 1px 4px;
+    }
+
+    &__breakdown-count {
+      font-size: $fs-xs;
+    }
   }
 }

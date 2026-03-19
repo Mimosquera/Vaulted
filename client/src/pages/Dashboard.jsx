@@ -43,8 +43,8 @@ export default function Dashboard() {
     [collections]
   );
 
-  const handleCreate = async (data) => {
-    await createCollection(data);
+  const handleCreate = async (data, onProgress) => {
+    await createCollection(data, onProgress);
     if (window.innerWidth >= 768) {
       confetti({
         particleCount: 80,

@@ -9,6 +9,8 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [imageFile, setImageFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
   useEffect(() => {
     if (isOpen) {
@@ -19,14 +21,26 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim()) return;
-    onAdd({ name: name.trim(), note: note.trim(), imageFile });
-    setName('');
-    setNote('');
-    setImageFile(null);
-    onClose();
+    if (!name.trim() || isUploading) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      await onAdd(
+        { name: name.trim(), note: note.trim(), imageFile },
+        (progress) => setUploadProgress(progress)
+      );
+      setName('');
+      setNote('');
+      setImageFile(null);
+      onClose();
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   return (
@@ -55,7 +69,11 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
             </div>
 
             <form onSubmit={handleSubmit} className="modal__body">
-              <ImageUploader onFileSelect={setImageFile} />
+              <ImageUploader
+                onFileSelect={setImageFile}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+              />
 
               <div className="modal__field">
                 <label>Name</label>
@@ -87,10 +105,10 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  disabled={!name.trim()}
+                  disabled={!name.trim() || isUploading}
                 >
                   <Plus weight="bold" />
-                  Add Item
+                  {isUploading ? 'Adding...' : 'Add Item'}
                 </button>
               </div>
             </form>

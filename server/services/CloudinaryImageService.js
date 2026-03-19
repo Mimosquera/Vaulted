@@ -1,0 +1,45 @@
+import cloudinary from 'cloudinary';
+import ImageService from './imageService.js';
+
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
+
+class CloudinaryImageService extends ImageService {
+  async upload(imageId, fileBuffer, mimeType) {
+    return new Promise((resolve, reject) => {
+      const uploadStream = cloudinary.v2.uploader.upload_stream(
+        {
+          public_id: imageId,
+          resource_type: 'auto',
+          folder: 'collection-app',
+        },
+        (error, result) => {
+          if (error) reject(error);
+          else resolve(result);
+        }
+      );
+      uploadStream.end(fileBuffer);
+    });
+  }
+
+  async delete(imageId) {
+    try {
+      return await cloudinary.v2.uploader.destroy(imageId);
+    } catch (error) {
+      console.error('Error deleting image from Cloudinary:', error);
+      throw error;
+    }
+  }
+
+  getUrl(imageId) {
+    return cloudinary.v2.url(imageId, {
+      secure: true,
+      transformation: [{ fetch_format: 'auto' }],
+    });
+  }
+}
+
+export default CloudinaryImageService;

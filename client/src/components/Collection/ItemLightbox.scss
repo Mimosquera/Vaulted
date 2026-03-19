@@ -10,15 +10,16 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: $space-xl;
+  padding: max($space-xl, env(safe-area-inset-top)) max($space-xl, env(safe-area-inset-right)) max($space-xl, env(safe-area-inset-bottom)) max($space-xl, env(safe-area-inset-left));
+  overscroll-behavior: contain;
 
   &__close {
     position: absolute;
     top: $space-lg;
     right: $space-lg;
     z-index: 2;
-    width: 40px;
-    height: 40px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-full;
     background: rgba(255, 255, 255, 0.1);
     border: 1px solid rgba(255, 255, 255, 0.15);
@@ -73,8 +74,6 @@
     &__close {
       top: $space-md;
       right: $space-md;
-      width: 36px;
-      height: 36px;
     }
 
     &__image {

@@ -16,6 +16,8 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
   const [coverColor, setCoverColor] = useState('#7c3aed');
   const [coverImage, setCoverImage] = useState(null);
   const [currentCoverUrl, setCurrentCoverUrl] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const getImageUrl = useStore((s) => s.getImageUrl);
 
   useEffect(() => {
@@ -44,11 +46,23 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
     return () => document.body.classList.remove('modal-open');
   }, [isOpen]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!name.trim() || !category) return;
-    onUpdate({ name: name.trim(), category, description: description.trim(), coverColor, coverImage });
-    onClose();
+    if (!name.trim() || !category || isUploading) return;
+
+    setIsUploading(true);
+    setUploadProgress(0);
+
+    try {
+      await onUpdate(
+        { name: name.trim(), category, description: description.trim(), coverColor, coverImage },
+        (progress) => setUploadProgress(progress)
+      );
+      onClose();
+    } finally {
+      setIsUploading(false);
+      setUploadProgress(0);
+    }
   };
 
   if (!collection) return null;
@@ -79,7 +93,11 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
             </div>
 
             <form onSubmit={handleSubmit} className="modal__body">
-              <ImageUploader onFileSelect={setCoverImage} />
+              <ImageUploader
+                onFileSelect={setCoverImage}
+                isUploading={isUploading}
+                uploadProgress={uploadProgress}
+              />
 
               {currentCoverUrl && (
                 <div className="modal__field">
@@ -149,10 +167,10 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
                 <button
                   type="submit"
                   className="btn btn--primary"
-                  disabled={!name.trim() || !category}
+                  disabled={!name.trim() || !category || isUploading}
                 >
                   <Check weight="bold" />
-                  Save Changes
+                  {isUploading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>
             </form>

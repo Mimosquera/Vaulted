@@ -73,8 +73,8 @@
     top: $space-sm;
     right: $space-sm;
     z-index: 2;
-    width: 32px;
-    height: 32px;
+    width: 44px;
+    height: 44px;
     border-radius: $radius-sm;
     background: rgba(0, 0, 0, 0.4);
     -webkit-backdrop-filter: blur(8px);
@@ -87,8 +87,16 @@
     transition: opacity $transition-fast;
   }
 
-  &:hover &__menu-btn {
-    opacity: 1;
+  @media (hover: hover) {
+    &:hover &__menu-btn {
+      opacity: 1;
+    }
+  }
+
+  @media (hover: none) {
+    &__menu-btn {
+      opacity: 1;
+    }
   }
 
   &__menu {
@@ -174,7 +182,7 @@
     }
 
     &__meta {
-      font-size: 11px;
+      font-size: $fs-xs;
     }
 
     &__desc {

@@ -284,7 +284,7 @@ const useStore = create((set, get) => ({
   },
 
   // ── Collection CRUD ──
-  createCollection: async ({ name, category, description, coverColor, coverImage }) => {
+  createCollection: async ({ name, category, description, coverColor, coverImage }, onProgress) => {
     let coverImageUrl = null;
     if (coverImage) {
       const imageId = `cover-${nanoid()}`;
@@ -294,12 +294,8 @@ const useStore = create((set, get) => ({
       // Upload cover image to server if authenticated
       if (get().isAuthenticated) {
         try {
-          const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(coverImage);
-          });
-          await api.uploadImageAPI(imageId, base64, coverImage.type);
+          const uploadResult = await api.uploadImageAPI(coverImage, onProgress);
+          coverImageUrl = uploadResult.url;
         } catch (err) { /* empty */ }
       }
     }
@@ -344,7 +340,7 @@ const useStore = create((set, get) => ({
     return newCollection.id;
   },
 
-  updateCollection: async (id, updates) => {
+  updateCollection: async (id, updates, onProgress) => {
     // Save old state for rollback
     const oldCollection = get().collections.find((c) => c.id === id);
     if (!oldCollection) return;
@@ -357,12 +353,8 @@ const useStore = create((set, get) => ({
       // Upload cover image to server if authenticated
       if (get().isAuthenticated) {
         try {
-          const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(updates.coverImage);
-          });
-          await api.uploadImageAPI(imageId, base64, updates.coverImage.type);
+          const uploadResult = await api.uploadImageAPI(updates.coverImage, onProgress);
+          updates.coverImageUrl = uploadResult.url;
         } catch (err) { /* empty */ }
       }
       delete updates.coverImage;
@@ -457,7 +449,7 @@ const useStore = create((set, get) => ({
   },
 
   // ── Item CRUD ──
-  addItem: async (collectionId, { name, note, imageFile }) => {
+  addItem: async (collectionId, { name, note, imageFile }, onProgress) => {
     let imageUrl = null;
     if (imageFile) {
       const imageId = `img-${nanoid()}`;
@@ -467,12 +459,8 @@ const useStore = create((set, get) => ({
       // Upload image to server if authenticated
       if (get().isAuthenticated) {
         try {
-          const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(imageFile);
-          });
-          await api.uploadImageAPI(imageId, base64, imageFile.type);
+          const uploadResult = await api.uploadImageAPI(imageFile, onProgress);
+          imageUrl = uploadResult.url;
         } catch (err) { /* empty */ }
       }
     }
@@ -519,7 +507,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  updateItem: async (collectionId, itemId, updates) => {
+  updateItem: async (collectionId, itemId, updates, onProgress) => {
     // Save old item for rollback
     const col = get().collections.find((c) => c.id === collectionId);
     const oldItem = col?.items.find((i) => i.id === itemId);
@@ -533,12 +521,8 @@ const useStore = create((set, get) => ({
       // Upload image to server if authenticated
       if (get().isAuthenticated) {
         try {
-          const base64 = await new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onload = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(updates.imageFile);
-          });
-          await api.uploadImageAPI(imageId, base64, updates.imageFile.type);
+          const uploadResult = await api.uploadImageAPI(updates.imageFile, onProgress);
+          updates.imageUrl = uploadResult.url;
         } catch (err) { /* empty */ }
       }
       delete updates.imageFile;

@@ -1,4 +1,13 @@
 import pool from '../config/database.js';
+import imageService from '../services/imageServiceFactory.js';
+
+// Helper to extract Cloudinary public_id from secure_url
+const extractCloudinaryPublicId = (url) => {
+  if (!url) return null;
+  // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{ext}
+  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.\w+$/);
+  return match ? match[1] : null;
+};
 
 // Helper to convert snake_case DB response to camelCase
 const toCamelCase = (obj) => {
@@ -152,10 +161,38 @@ export const deleteCollection = async (req, res) => {
     const { id } = req.params;
 
     // Verify ownership
-    const ownership = await pool.query('SELECT user_id FROM collections WHERE id = $1', [id]);
+    const ownership = await pool.query('SELECT user_id, cover_image_url FROM collections WHERE id = $1', [id]);
     if (ownership.rows.length === 0 || ownership.rows[0].user_id !== userId) {
       return res.status(403).json({ error: 'Not authorized to delete this collection' });
     }
+
+    // Get all items to clean up their images
+    const items = await pool.query('SELECT image_url FROM items WHERE collection_id = $1', [id]);
+    const imageIdsToDelete = [];
+
+    // Add collection cover image if it exists
+    if (ownership.rows[0].cover_image_url) {
+      imageIdsToDelete.push(ownership.rows[0].cover_image_url);
+    }
+
+    // Add all item images
+    items.rows.forEach((item) => {
+      if (item.image_url) {
+        imageIdsToDelete.push(item.image_url);
+      }
+    });
+
+    // Delete images from cloud storage (non-blocking)
+    imageIdsToDelete.forEach((imageUrl) => {
+      if (imageUrl) {
+        const publicId = extractCloudinaryPublicId(imageUrl);
+        if (publicId) {
+          imageService.delete(publicId).catch(() => {
+            // Log cloud deletion failures but continue
+          });
+        }
+      }
+    });
 
     await pool.query('DELETE FROM collections WHERE id = $1 AND user_id = $2', [id, userId]);
 

@@ -129,14 +129,71 @@ export async function syncData(payload) {
 }
 
 // ── Images ──
-export async function uploadImageAPI(id, base64Data, mimeType) {
-  return request('/api/images', {
-    method: 'POST',
-    body: JSON.stringify({ id, data: base64Data, mimeType }),
+export async function uploadImageAPI(file, onProgress) {
+  const token = getToken();
+  const headers = {};
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const formData = new FormData();
+  formData.append('image', file);
+
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+
+    // Track upload progress
+    if (onProgress) {
+      xhr.upload.addEventListener('progress', (event) => {
+        if (event.lengthComputable) {
+          const percentComplete = Math.round((event.loaded / event.total) * 100);
+          onProgress(percentComplete);
+        }
+      });
+    }
+
+    xhr.addEventListener('load', () => {
+      if (xhr.status >= 200 && xhr.status < 300) {
+        try {
+          const response = JSON.parse(xhr.responseText);
+          resolve(response);
+        } catch (e) {
+          reject(new Error('Invalid response format'));
+        }
+      } else if (xhr.status === 401) {
+        setToken(null);
+        window.dispatchEvent(new CustomEvent('auth:expired'));
+        reject(new Error('Unauthorized'));
+      } else {
+        try {
+          const error = JSON.parse(xhr.responseText);
+          reject(new Error(error.message || xhr.statusText));
+        } catch (e) {
+          reject(new Error(xhr.statusText || 'Upload failed'));
+        }
+      }
+    });
+
+    xhr.addEventListener('error', () => {
+      reject(new Error('Network error during upload'));
+    });
+
+    xhr.addEventListener('abort', () => {
+      reject(new Error('Upload cancelled'));
+    });
+
+    xhr.open('POST', `${API_URL}/api/images`);
+    for (const [key, value] of Object.entries(headers)) {
+      xhr.setRequestHeader(key, value);
+    }
+    xhr.send(formData);
   });
 }
 
 export function getImageUrl(id) {
+  // If it's already a full URL (from cloud storage), return it directly
+  if (id && (id.startsWith('http://') || id.startsWith('https://'))) {
+    return id;
+  }
+  // Otherwise treat it as a local imageId and use API endpoint
   return `${API_URL}/api/images/${id}`;
 }
 

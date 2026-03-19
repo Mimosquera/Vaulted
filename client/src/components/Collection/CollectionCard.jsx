@@ -14,6 +14,7 @@ import { timeAgo } from '../../utils/helpers';
 import CategoryIcon from '../UI/CategoryIcon';
 import EditCollectionModal from '../Modals/EditCollectionModal';
 import useStore from '../../store/useStore';
+import useHasHover from '../../hooks/useHasHover';
 import { getImageUrl as getImageUrlDirect } from '../../api/client';
 import './CollectionCard.scss';
 
@@ -21,6 +22,7 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
   const [menuOpen, setMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
+  const hasHover = useHasHover();
   const togglePublic = useStore((s) => s.togglePublic);
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
@@ -85,11 +87,12 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
         <Tilt
           tiltMaxAngleX={8}
           tiltMaxAngleY={8}
-          glareEnable
+          glareEnable={hasHover}
           glareMaxOpacity={0.1}
           glarePosition="all"
           scale={1.02}
           transitionSpeed={400}
+          tiltEnable={hasHover}
         >
           <Link to={linkTo} className="collection-card">
           <div

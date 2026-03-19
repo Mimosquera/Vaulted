@@ -6,6 +6,7 @@ import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
 import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import useStore from '../../store/useStore';
+import useHasHover from '../../hooks/useHasHover';
 import { timeAgo } from '../../utils/helpers';
 import './ItemCard.scss';
 
@@ -14,6 +15,7 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpa
   const [hovering, setHovering] = useState(false);
   const deleteItem = useStore((s) => s.deleteItem);
   const getImageUrl = useStore((s) => s.getImageUrl);
+  const hasHover = useHasHover();
 
   useEffect(() => {
     let url = null;
@@ -44,10 +46,11 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpa
       <Tilt
         tiltMaxAngleX={6}
         tiltMaxAngleY={6}
-        glareEnable
+        glareEnable={hasHover}
         glareMaxOpacity={0.08}
         scale={1.02}
         transitionSpeed={300}
+        tiltEnable={hasHover}
       >
         <div
           className="item-card"

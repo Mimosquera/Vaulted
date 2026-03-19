@@ -120,4 +120,39 @@
       margin: 0 auto;
     }
   }
+
+  @media (max-width: $bp-md) {
+    &__header {
+      padding: $space-lg 0;
+
+      h1 {
+        font-size: $fs-2xl;
+      }
+
+      p {
+        font-size: $fs-md;
+      }
+    }
+
+    &__search {
+      max-width: 100%;
+    }
+
+    &__filter-chip {
+      font-size: $fs-xs;
+      padding: $space-xs $space-sm;
+    }
+
+    &__empty {
+      padding: $space-2xl $space-lg;
+
+      h3 {
+        font-size: $fs-lg;
+      }
+
+      p {
+        max-width: 100%;
+      }
+    }
+  }
 }
