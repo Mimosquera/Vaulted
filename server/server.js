@@ -11,6 +11,7 @@ import imageRoutes from './routes/images.js';
 
 // Middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
+import { initDatabase } from './config/initDatabase.js';
 
 dotenv.config();
 
@@ -58,7 +59,12 @@ app.use(notFoundHandler);
 app.use(errorHandler);
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`✓ Collection App Backend running on http://localhost:${PORT}`);
-  console.log(`✓ CORS enabled for ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
+initDatabase().then(() => {
+  app.listen(PORT, () => {
+    console.log(`✓ Collection App Backend running on http://localhost:${PORT}`);
+    console.log(`✓ CORS enabled for ${process.env.CORS_ORIGIN || 'http://localhost:5173'}`);
+  });
+}).catch((err) => {
+  console.error('Failed to initialize database:', err);
+  process.exit(1);
 });
