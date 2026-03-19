@@ -11,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Dashboard from './pages/Dashboard';
 import CollectionView from './pages/CollectionView';
+import PublicCollectionView from './pages/PublicCollectionView';
 import Explore from './pages/Explore';
 import Profile from './pages/Profile';
 import Login from './pages/Login';
@@ -37,6 +38,7 @@ function AnimatedRoutes() {
           <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
           <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
           <Route path="/explore" element={<Explore />} />
+          <Route path="/explore/:id" element={<PublicCollectionView />} />
           <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
         </Routes>
       </motion.div>

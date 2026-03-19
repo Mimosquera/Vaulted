@@ -97,6 +97,22 @@
     color: $text-muted;
   }
 
+  &__visitor-meta {
+    display: flex;
+    align-items: center;
+    gap: $space-md;
+    margin-top: $space-xs;
+  }
+
+  &__owner {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: $fs-sm;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+
   &__actions {
     display: flex;
     gap: $space-sm;

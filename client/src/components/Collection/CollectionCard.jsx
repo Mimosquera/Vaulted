@@ -9,13 +9,15 @@ import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
 import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
 import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { UserIcon as User } from '@phosphor-icons/react/User';
 import { timeAgo } from '../../utils/helpers';
 import CategoryIcon from '../UI/CategoryIcon';
 import EditCollectionModal from '../Modals/EditCollectionModal';
 import useStore from '../../store/useStore';
+import { getImageUrl as getImageUrlDirect } from '../../api/client';
 import './CollectionCard.scss';
 
-export default function CollectionCard({ collection, index = 0 }) {
+export default function CollectionCard({ collection, index = 0, isVisitor = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
@@ -26,18 +28,23 @@ export default function CollectionCard({ collection, index = 0 }) {
 
   useEffect(() => {
     let url = null;
-    const firstImage = collection.coverImageUrl || collection.items?.find((i) => i.imageUrl);
-    if (firstImage) {
-      getImageUrl(firstImage).then((u) => {
-        url = u;
-        setCoverUrl(u);
-      });
+    const imageRef = collection.coverImageUrl || collection.items?.find((i) => i.imageUrl);
+    const imageId = typeof imageRef === 'string' ? imageRef : imageRef?.imageUrl;
+    if (imageId) {
+      if (isVisitor) {
+        setCoverUrl(getImageUrlDirect(imageId));
+      } else {
+        getImageUrl(imageId).then((u) => {
+          url = u;
+          setCoverUrl(u);
+        });
+      }
     }
     return () => {
       if (url) URL.revokeObjectURL(url);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [collection.items, collection.coverImageUrl]);
+  }, [collection.items, collection.coverImageUrl, isVisitor]);
 
   const handleDelete = (e) => {
     e.preventDefault();
@@ -65,6 +72,8 @@ export default function CollectionCard({ collection, index = 0 }) {
     setEditModalOpen(false);
   };
 
+  const linkTo = isVisitor ? `/explore/${collection.id}` : `/collection/${collection.id}`;
+
   return (
     <>
       <motion.div
@@ -82,7 +91,7 @@ export default function CollectionCard({ collection, index = 0 }) {
           scale={1.02}
           transitionSpeed={400}
         >
-          <Link to={`/collection/${collection.id}`} className="collection-card">
+          <Link to={linkTo} className="collection-card">
           <div
             className="collection-card__cover"
             style={{
@@ -105,18 +114,20 @@ export default function CollectionCard({ collection, index = 0 }) {
               )}
             </div>
 
-            <button
-              className="collection-card__menu-btn"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setMenuOpen(!menuOpen);
-              }}
-            >
-              <DotsThree weight="bold" size={20} />
-            </button>
+            {!isVisitor && (
+              <button
+                className="collection-card__menu-btn"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setMenuOpen(!menuOpen);
+                }}
+              >
+                <DotsThree weight="bold" size={20} />
+              </button>
+            )}
 
-            {menuOpen && (
+            {!isVisitor && menuOpen && (
               <motion.div
                 className="collection-card__menu"
                 initial={{ opacity: 0, scale: 0.9 }}
@@ -141,9 +152,13 @@ export default function CollectionCard({ collection, index = 0 }) {
             <h3 className="collection-card__name">{collection.name}</h3>
             <div className="collection-card__meta">
               <span>
-                <CategoryIcon category={collection.category} size={14} /> {collection.items?.length || 0} items
+                <CategoryIcon category={collection.category} size={14} /> {collection.itemCount ?? collection.items?.length ?? 0} items
               </span>
-              <span>{timeAgo(collection.createdAt)}</span>
+              {isVisitor && collection.username ? (
+                <span><User weight="bold" size={12} /> {collection.username}</span>
+              ) : (
+                <span>{timeAgo(collection.createdAt)}</span>
+              )}
             </div>
             {collection.description && (
               <p className="collection-card__desc">{collection.description}</p>
@@ -153,12 +168,14 @@ export default function CollectionCard({ collection, index = 0 }) {
       </Tilt>
     </motion.div>
 
-    <EditCollectionModal
-      isOpen={editModalOpen}
-      onClose={() => setEditModalOpen(false)}
-      onUpdate={handleUpdateCollection}
-      collection={collection}
-    />
+    {!isVisitor && (
+      <EditCollectionModal
+        isOpen={editModalOpen}
+        onClose={() => setEditModalOpen(false)}
+        onUpdate={handleUpdateCollection}
+        collection={collection}
+      />
+    )}
     </>
   );
 }

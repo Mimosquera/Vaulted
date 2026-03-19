@@ -52,6 +52,38 @@ export const getPublicCollections = async (req, res) => {
   }
 };
 
+export const getPublicCollection = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `SELECT c.id, c.name, c.category, c.description, c.cover_color, c.cover_image_url, c.created_at,
+              u.username
+       FROM collections c
+       JOIN users u ON c.user_id = u.id
+       WHERE c.id = $1 AND c.is_public = true`,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'Collection not found or not public' });
+    }
+
+    const items = await pool.query(
+      'SELECT id, name, note, image_url, created_at FROM items WHERE collection_id = $1 ORDER BY created_at DESC',
+      [id]
+    );
+
+    const collection = toCamelCase(result.rows[0]);
+    collection.items = items.rows.map(toCamelCase);
+
+    res.json(collection);
+  } catch (err) {
+    console.error('Get public collection error:', err);
+    res.status(500).json({ error: 'Failed to fetch collection' });
+  }
+};
+
 export const createCollection = async (req, res) => {
   try {
     const { userId } = req;

@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getCollections,
   getPublicCollections,
+  getPublicCollection,
   createCollection,
   updateCollection,
   deleteCollection,
@@ -12,6 +13,7 @@ import { authMiddleware, optionalAuth } from '../middleware/auth.js';
 const router = express.Router();
 
 router.get('/public', getPublicCollections);
+router.get('/public/:id', getPublicCollection);
 router.get('/', authMiddleware, getCollections);
 router.post('/', authMiddleware, createCollection);
 router.put('/:id', authMiddleware, updateCollection);

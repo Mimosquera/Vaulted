@@ -9,7 +9,7 @@ const BREAKPOINT_COLS = {
   700: 1,
 };
 
-export default function CollectionGrid({ collections }) {
+export default function CollectionGrid({ collections, isVisitor = false }) {
   return (
     <AnimatePresence mode="popLayout">
       <Masonry
@@ -18,7 +18,7 @@ export default function CollectionGrid({ collections }) {
         columnClassName="collection-grid__column"
       >
         {collections.map((col, i) => (
-          <CollectionCard key={col.id} collection={col} index={i} />
+          <CollectionCard key={col.id} collection={col} index={i} isVisitor={isVisitor} />
         ))}
       </Masonry>
     </AnimatePresence>

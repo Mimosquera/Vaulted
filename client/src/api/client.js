@@ -71,6 +71,10 @@ export async function fetchPublicCollections() {
   return request('/api/collections/public');
 }
 
+export async function fetchPublicCollection(id) {
+  return request(`/api/collections/public/${id}`);
+}
+
 export async function createCollectionAPI(collection) {
   return request('/api/collections', {
     method: 'POST',

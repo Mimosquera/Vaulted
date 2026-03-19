@@ -92,7 +92,7 @@ export default function Explore() {
         </motion.div>
 
         {publicCollections.length > 0 ? (
-          <CollectionGrid collections={publicCollections} />
+          <CollectionGrid collections={publicCollections} isVisitor />
         ) : (
           <motion.div
             className="explore__empty"
