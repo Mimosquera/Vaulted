@@ -1,9 +1,8 @@
 import { useState, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
+import { Edit2, Check } from 'lucide-react';
 import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
-import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
-import { CheckIcon as Check } from '@phosphor-icons/react/Check';
 import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { PackageIcon as Package } from '@phosphor-icons/react/Package';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
@@ -69,14 +68,14 @@ export default function Profile() {
                   onKeyDown={(e) => e.key === 'Enter' && handleSaveName()}
                 />
                 <button className="profile__name-save" onClick={handleSaveName}>
-                  <Check weight="bold" size={18} />
+                  <Check strokeWidth={2} size={14} />
                 </button>
               </div>
             ) : (
               <div className="profile__name-display">
                 <h1>{username}</h1>
                 <button className="profile__name-edit-btn" onClick={() => setEditing(true)}>
-                  <PencilSimple weight="bold" size={16} />
+                  <Edit2 strokeWidth={2} size={14} />
                 </button>
               </div>
             )}

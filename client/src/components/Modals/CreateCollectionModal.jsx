@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XIcon as X } from '@phosphor-icons/react/X';
-import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
+import { X, Plus } from 'lucide-react';
 import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
 import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
@@ -71,7 +70,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
             <div className="modal__header">
               <h2>New Collection</h2>
               <button className="modal__close" onClick={onClose}>
-                <X weight="bold" size={20} />
+                <X strokeWidth={2} size={14} />
               </button>
             </div>
 
@@ -145,7 +144,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
                   className="btn btn--primary"
                   disabled={!name.trim() || !category || isUploading}
                 >
-                  <Plus weight="bold" />
+                  <Plus strokeWidth={2} size={16} />
                   {isUploading ? 'Creating...' : 'Create Collection'}
                 </button>
               </div>

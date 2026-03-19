@@ -57,3 +57,6 @@ temp/
 coverage/
 .nyc_output/
 
+# Documentation (reference files)
+LUCIDE_ICONS.md
+ICON_SWAP_ANALYSIS.md

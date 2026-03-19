@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XIcon as X } from '@phosphor-icons/react/X';
-import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
+import { X, Plus } from 'lucide-react';
 import ImageUploader from '../Upload/ImageUploader';
 import './Modal.scss';
 
@@ -64,7 +63,7 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
             <div className="modal__header">
               <h2>Add Item</h2>
               <button className="modal__close" onClick={onClose}>
-                <X weight="bold" size={20} />
+                <X strokeWidth={2} size={14} />
               </button>
             </div>
 
@@ -107,7 +106,7 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
                   className="btn btn--primary"
                   disabled={!name.trim() || isUploading}
                 >
-                  <Plus weight="bold" />
+                  <Plus strokeWidth={2} size={16} />
                   {isUploading ? 'Adding...' : 'Add Item'}
                 </button>
               </div>

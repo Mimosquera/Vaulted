@@ -3,12 +3,11 @@ import { Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
+import { Trash2, Edit2 } from 'lucide-react';
 import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { DotsThreeIcon as DotsThree } from '@phosphor-icons/react/DotsThree';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
-import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
-import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import { UserIcon as User } from '@phosphor-icons/react/User';
 import { timeAgo } from '../../utils/helpers';
 import CategoryIcon from '../UI/CategoryIcon';
@@ -138,14 +137,14 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
                 onClick={(e) => e.preventDefault()}
               >
                 <button onClick={handleEditClick}>
-                  <PencilSimple size={16} /> Edit
+                  <Edit2 strokeWidth={2} size={14} /> Edit
                 </button>
                 <button onClick={handleTogglePublic}>
                   {collection.isPublic ? <EyeSlash size={16} /> : <Eye size={16} />}
                   {collection.isPublic ? 'Make Private' : 'Make Public'}
                 </button>
                 <button className="collection-card__menu-danger" onClick={handleDelete}>
-                  <Trash size={16} /> Delete
+                  <Trash2 strokeWidth={2} size={14} /> Delete
                 </button>
               </motion.div>
             )}

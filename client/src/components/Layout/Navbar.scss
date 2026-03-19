@@ -136,8 +136,6 @@
 
     &:hover {
       .navbar__logo-text {
-        text-shadow: 0 0 20px rgba(124, 58, 237, 0.8), 0 0 40px rgba(168, 85, 247, 0.6);
-        filter: drop-shadow(0 0 12px rgba(124, 58, 237, 0.8));
       }
     }
 
@@ -226,15 +224,10 @@
       }
 
       &:hover {
-        transform: scale(1.03);
-
-        &::before {
-          opacity: 1;
-        }
-
-        &::after {
-          opacity: 0.4;
-        }
+        background: linear-gradient(135deg, #7c3aed 0%, #a855f7 50%, #ec4899 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
       }
     }
   }

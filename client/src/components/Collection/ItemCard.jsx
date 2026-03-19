@@ -2,8 +2,7 @@ import { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
-import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
-import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
+import { Trash2, Edit2 } from 'lucide-react';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import useStore from '../../store/useStore';
 import useHasHover from '../../hooks/useHasHover';
@@ -74,14 +73,14 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpa
             >
               {onEdit && (
                 <button className="item-card__action" onClick={(e) => { e.stopPropagation(); onEdit(item); }}>
-                  <PencilSimple weight="bold" size={16} />
+                  <Edit2 strokeWidth={2} size={14} />
                 </button>
               )}
               <button
                 className="item-card__action item-card__action--danger"
                 onClick={(e) => { e.stopPropagation(); deleteItem(collectionId, item.id); }}
               >
-                <Trash weight="bold" size={16} />
+                <Trash2 strokeWidth={2} size={14} />
               </button>
             </motion.div>
           </div>

@@ -3,14 +3,12 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
+import { Plus, Trash2, Edit2 } from 'lucide-react';
 import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
-import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
-import { TrashIcon as Trash } from '@phosphor-icons/react/Trash';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
-import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import useStore from '../store/useStore';
 import ItemCard from '../components/Collection/ItemCard';
 import ItemLightbox from '../components/Collection/ItemLightbox';
@@ -143,14 +141,14 @@ export default function CollectionView() {
               className="btn btn--secondary"
               onClick={() => setEditCollectionModalOpen(true)}
             >
-              <PencilSimple weight="bold" />
+              <Edit2 strokeWidth={2} />
               Edit
             </button>
             <button
               className="btn btn--primary"
               onClick={() => setAddModalOpen(true)}
             >
-              <Plus weight="bold" />
+              <Plus strokeWidth={2} size={16} />
               Add Item
             </button>
             <button
@@ -168,7 +166,7 @@ export default function CollectionView() {
               {collection.isPublic ? 'Private' : 'Public'}
             </button>
             <button className="btn btn--danger btn--sm" onClick={handleDelete}>
-              <Trash weight="bold" />
+              <Trash2 strokeWidth={2} />
               Delete
             </button>
           </div>
@@ -230,7 +228,7 @@ export default function CollectionView() {
               <p>{search ? 'Try a different search.' : 'Add your first item to this collection!'}</p>
               {!search && (
                 <button className="btn btn--primary" onClick={() => setAddModalOpen(true)}>
-                  <Plus weight="bold" />
+                  <Plus strokeWidth={2} size={16} />
                   Add Your First Item
                 </button>
               )}

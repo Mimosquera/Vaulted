@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { XIcon as X } from '@phosphor-icons/react/X';
-import { CheckIcon as Check } from '@phosphor-icons/react/Check';
+import { X, Check } from 'lucide-react';
 import ImageUploader from '../Upload/ImageUploader';
 import './Modal.scss';
 
@@ -72,7 +71,7 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
             <div className="modal__header">
               <h2>Edit Item</h2>
               <button className="modal__close" onClick={onClose}>
-                <X weight="bold" size={20} />
+                <X strokeWidth={2} size={14} />
               </button>
             </div>
 
@@ -115,7 +114,7 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
                   className="btn btn--primary"
                   disabled={!name.trim() || isUploading}
                 >
-                  <Check weight="bold" />
+                  <Check strokeWidth={2} size={14} />
                   {isUploading ? 'Saving...' : 'Save Changes'}
                 </button>
               </div>

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { XIcon as X } from '@phosphor-icons/react/X';
-import { CopyIcon as Copy } from '@phosphor-icons/react/Copy';
-import { CheckIcon as Check } from '@phosphor-icons/react/Check';
+import { X, Copy, Check } from 'lucide-react';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
@@ -57,7 +55,7 @@ export default function ShareModal({ isOpen, onClose, collection }) {
             <div className="modal__header">
               <h2><ShareNetwork weight="duotone" size={22} /> Share Collection</h2>
               <button className="modal__close" onClick={onClose}>
-                <X weight="bold" size={20} />
+                <X strokeWidth={2} size={14} />
               </button>
             </div>
 
@@ -86,7 +84,7 @@ export default function ShareModal({ isOpen, onClose, collection }) {
                     className={`btn btn--sm ${copied ? 'btn--primary' : 'btn--secondary'}`}
                     onClick={handleCopy}
                   >
-                    {copied ? <Check weight="bold" /> : <Copy weight="bold" />}
+                    {copied ? <Check strokeWidth={2} size={16} /> : <Copy strokeWidth={2} size={16} />}
                     {copied ? 'Copied!' : 'Copy'}
                   </button>
                 </div>

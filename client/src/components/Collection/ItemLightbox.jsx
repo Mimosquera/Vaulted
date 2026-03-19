@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
-import { XIcon as X } from '@phosphor-icons/react/X';
+import { X } from 'lucide-react';
 import './ItemLightbox.scss';
 
 export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
@@ -29,7 +29,7 @@ export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
           onClick={onClose}
         >
           <button className="item-lightbox__close" onClick={onClose}>
-            <X weight="bold" size={20} />
+            <X strokeWidth={2} size={14} />
           </button>
 
           <motion.div

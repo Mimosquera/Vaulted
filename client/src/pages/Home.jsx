@@ -2,7 +2,6 @@ import { useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
-import { RocketIcon as Rocket } from '@phosphor-icons/react/Rocket';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { CameraIcon as Camera } from '@phosphor-icons/react/Camera';
@@ -19,6 +18,7 @@ import { CurrencyCircleDollarIcon as CurrencyCircleDollar } from '@phosphor-icon
 import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
 
 import { useInitialLoad } from '../contexts/InitialLoadContext';
+import VaultLogo from '../components/VaultLogo';
 import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import './Home.scss';
@@ -146,7 +146,7 @@ export default function Home() {
             transition={isInitialLoad ? { delay: 0.65, duration: 0.4 } : { duration: 0 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
-              <Rocket weight="fill" />
+              <VaultLogo size={18} />
               Start Collecting
             </Link>
             <Link to="/explore" className="btn btn--secondary btn--lg">

@@ -7,12 +7,12 @@ import { HouseIcon as House } from '@phosphor-icons/react/House';
 import { VaultIcon as Vault } from '@phosphor-icons/react/Vault';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
 import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
-import { DiamondIcon as Diamond } from '@phosphor-icons/react/Diamond';
 import { SignInIcon as SignIn } from '@phosphor-icons/react/SignIn';
 import { SignOutIcon as SignOut } from '@phosphor-icons/react/SignOut';
 import { WarningIcon as Warning } from '@phosphor-icons/react/Warning';
 import { useInitialLoad } from '../../contexts/InitialLoadContext';
 import useStore from '../../store/useStore';
+import VaultLogo from '../VaultLogo';
 import './Navbar.scss';
 
 export default function Navbar() {
@@ -111,7 +111,7 @@ export default function Navbar() {
               transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             >
               <div className="navbar__logo-icon-glow"></div>
-              <Diamond weight="fill" size={28} />
+              <VaultLogo size={28} />
             </motion.div>
             <motion.span
               className="navbar__logo-text"

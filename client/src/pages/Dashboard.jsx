@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 // eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
-import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
+import { Plus } from 'lucide-react';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { VaultIcon as Vault } from '@phosphor-icons/react/Vault';
@@ -92,7 +92,7 @@ export default function Dashboard() {
                 className="btn btn--primary"
                 onClick={() => setModalOpen(true)}
               >
-                <Plus weight="bold" />
+                <Plus strokeWidth={2} size={16} />
                 New Collection
               </button>
             </div>
@@ -156,7 +156,7 @@ export default function Dashboard() {
                 className="btn btn--primary"
                 onClick={() => setModalOpen(true)}
               >
-                <Plus weight="bold" />
+                <Plus strokeWidth={2} size={16} />
                 Create Collection
               </button>
             )}

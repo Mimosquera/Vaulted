@@ -2,8 +2,8 @@ import { useState, useCallback } from 'react';
 import { useDropzone } from 'react-dropzone';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
+import { X } from 'lucide-react';
 import { CloudArrowUpIcon as CloudArrowUp } from '@phosphor-icons/react/CloudArrowUp';
-import { XIcon as X } from '@phosphor-icons/react/X';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import './ImageUploader.scss';
 
@@ -65,7 +65,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
               )}
               {!isUploading && (
                 <button className="image-uploader__remove" onClick={removeImage}>
-                  <X weight="bold" size={16} />
+                  <X strokeWidth={2} size={14} />
                 </button>
               )}
             </motion.div>
