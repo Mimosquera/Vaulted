@@ -15,6 +15,7 @@ html {
   -moz-osx-font-smoothing: grayscale;
   touch-action: manipulation;
   -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
 }
 
 body {
@@ -25,12 +26,16 @@ body {
   overflow-x: hidden;
   line-height: 1.6;
   overscroll-behavior-y: none;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 // ── Scrollbar ──
@@ -67,9 +72,16 @@ a {
   color: $accent-tertiary;
   text-decoration: none;
   transition: color $transition-fast;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 
   &:hover {
     color: $accent-primary;
+  }
+
+  &:active {
+    outline: none;
   }
 }
 
@@ -107,6 +119,8 @@ h1, h2, h3, h4, h5, h6 {
   font-family: $font-display;
   font-weight: 700;
   line-height: 1.2;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 // ── Buttons ──
@@ -117,6 +131,13 @@ button {
   font-family: $font-body;
   color: $text-primary;
   touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+
+  &:active {
+    outline: none;
+  }
 }
 
 // ── Inputs ──
@@ -196,5 +217,17 @@ input, textarea, select {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+// ── Mobile: Remove all :active highlights on touch devices ──
+@media (hover: none) {
+  button:active,
+  a:active {
+    outline: none;
+  }
+
+  *:active {
+    outline: none !important;
   }
 }

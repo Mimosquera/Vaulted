@@ -53,6 +53,7 @@ const useStore = create((set, get) => ({
   syncingVisible: false,
   lastSynced: null,
   syncInterval: null,
+  syncError: null,
 
   // ── Initialize from storage ─
   init: async () => {
@@ -193,13 +194,24 @@ const useStore = create((set, get) => ({
     }
   },
 
+  clearSyncError: () => {
+    set({ syncError: null });
+  },
+
   // ── Sync Actions ──
   syncToCloud: async () => {
     if (!get().isAuthenticated || get().syncing) return;
-    set({ syncing: true, syncingVisible: true });
+    set({ syncing: true, syncingVisible: true, syncError: null });
 
     try {
       const { collections } = get();
+
+      // Helper to check if URL is a cloud URL (not a local-only ID)
+      const isCloudUrl = (url) => {
+        if (!url) return true; // null/undefined is ok
+        // Check if it's a full HTTP(S) URL or Cloudinary CDN
+        return url.startsWith('http://') || url.startsWith('https://');
+      };
 
       const syncCollections = collections.map((c) => ({
         id: c.id,
@@ -207,7 +219,8 @@ const useStore = create((set, get) => ({
         category: c.category,
         description: c.description,
         coverColor: c.coverColor,
-        coverImageUrl: c.coverImageUrl,
+        // Only sync cover image if it's a cloud URL, not a local-only ID
+        coverImageUrl: isCloudUrl(c.coverImageUrl) ? c.coverImageUrl : null,
         isPublic: c.isPublic,
         createdAt: c.createdAt,
         updatedAt: Date.now(),
@@ -219,7 +232,8 @@ const useStore = create((set, get) => ({
           collectionId: c.id,
           name: item.name,
           note: item.note,
-          imageUrl: item.imageUrl,
+          // Only sync image if it's a cloud URL, not a local-only ID
+          imageUrl: isCloudUrl(item.imageUrl) ? item.imageUrl : null,
           createdAt: item.createdAt,
           updatedAt: Date.now(),
         }))
@@ -233,17 +247,25 @@ const useStore = create((set, get) => ({
       });
 
       set({ lastSynced: Date.now() });
-    } catch (err) { /* empty */ } finally {
+    } catch (err) {
+      set({ syncError: 'Sync failed. Check your connection and try again.' });
+    } finally {
       set({ syncing: false, syncingVisible: false });
     }
   },
 
   syncFromCloud: async () => {
     if (!get().isAuthenticated || get().syncing) return;
-    set({ syncing: true });
+    set({ syncing: true, syncError: null });
 
     try {
       const cloudCollections = await api.fetchCollections();
+
+      // Helper to check if URL is a cloud URL (not a local-only ID)
+      const isCloudUrl = (url) => {
+        if (!url) return true; // null/undefined is ok
+        return url.startsWith('http://') || url.startsWith('https://');
+      };
 
       if (cloudCollections && cloudCollections.length > 0) {
         const localCollections = await Promise.all(
@@ -255,12 +277,14 @@ const useStore = create((set, get) => ({
               category: c.category,
               description: c.description || '',
               coverColor: c.coverColor || c.cover_color || '#7c3aed',
-              coverImageUrl: c.coverImageUrl || c.cover_image_url || null,
+              // Filter out local-only cover images
+              coverImageUrl: isCloudUrl(c.coverImageUrl || c.cover_image_url) ? (c.coverImageUrl || c.cover_image_url) : null,
               items: (cloudItems || []).map((item) => ({
                 id: item.id,
                 name: item.name,
                 note: item.note || '',
-                imageUrl: item.imageUrl || item.image_url || null,
+                // Filter out local-only item images
+                imageUrl: isCloudUrl(item.imageUrl || item.image_url) ? (item.imageUrl || item.image_url) : null,
                 createdAt: Number(item.createdAt || item.created_at) || Date.now(),
               })),
               isPublic: c.isPublic || c.is_public || false,
@@ -278,7 +302,9 @@ const useStore = create((set, get) => ({
       }
 
       set({ lastSynced: Date.now() });
-    } catch (err) { /* empty */ } finally {
+    } catch (err) {
+      set({ syncError: 'Failed to sync collections. Check your connection and try again.' });
+    } finally {
       set({ syncing: false });
     }
   },
@@ -618,6 +644,44 @@ const useStore = create((set, get) => ({
     const blob = await imageStore.getItem(imageId);
     if (!blob) return null;
     return URL.createObjectURL(blob);
+  },
+
+  // ── Clean up local-only images not synced to cloud ──
+  removeItemsWithBrokenImages: async (collectionId) => {
+    const col = get().collections.find((c) => c.id === collectionId);
+    if (!col) return;
+
+    const isCloudUrl = (url) => {
+      if (!url) return true;
+      return url.startsWith('http://') || url.startsWith('https://');
+    };
+
+    // Filter out items with local-only image IDs
+    const validItems = col.items.filter((item) => !item.imageUrl || isCloudUrl(item.imageUrl));
+    const brokenItems = col.items.filter((item) => item.imageUrl && !isCloudUrl(item.imageUrl));
+
+    if (brokenItems.length > 0) {
+      set((state) => ({
+        collections: state.collections.map((c) =>
+          c.id === collectionId
+            ? { ...c, items: validItems, itemCount: validItems.length }
+            : c
+        ),
+      }));
+      await get()._persist();
+
+      // If authenticated, sync the removal
+      if (get().isAuthenticated) {
+        try {
+          for (const item of brokenItems) {
+            await api.deleteItemAPI(item.id);
+          }
+          await get().syncToCloud();
+        } catch (err) {
+          // Silent fail - items are already removed locally
+        }
+      }
+    }
   },
 }));
 

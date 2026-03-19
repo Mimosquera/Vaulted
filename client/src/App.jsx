@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import useStore from './store/useStore';
+import { InitialLoadProvider } from './contexts/InitialLoadContext';
 import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
@@ -46,7 +47,7 @@ function AnimatedRoutes() {
   );
 }
 
-export default function App() {
+function AppContent() {
   const init = useStore((s) => s.init);
 
   useEffect(() => {
@@ -76,3 +77,12 @@ export default function App() {
     </ErrorBoundary>
   );
 }
+
+export default function App() {
+  return (
+    <InitialLoadProvider>
+      <AppContent />
+    </InitialLoadProvider>
+  );
+}
+

@@ -9,10 +9,16 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   overflow: hidden;
   transition: border-color $transition-base, box-shadow $transition-base;
+  -webkit-user-select: none;
+  user-select: none;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.12);
-    box-shadow: $shadow-md;
+    border-color: rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 24px rgba(37, 99, 235, 0.2), 0 0 48px rgba(220, 38, 38, 0.1), $shadow-md;
+  }
+
+  @media (max-width: $bp-md) {
+    border-color: rgba(37, 99, 235, 0.2);
   }
 
   &__cover {
@@ -23,6 +29,19 @@
     display: flex;
     align-items: center;
     justify-content: center;
+
+    &::before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, rgba(37, 99, 235, 0) 0%, rgba(37, 99, 235, 0.6) 50%, rgba(220, 38, 38, 0) 100%);
+      opacity: 0.3;
+      transition: opacity $transition-base;
+      z-index: 3;
+    }
 
     &-icon {
       color: rgba(255, 255, 255, 0.9);
@@ -37,6 +56,10 @@
       inset: 0;
       background: linear-gradient(to top, rgba($bg-card, 0.8) 0%, transparent 60%);
     }
+  }
+
+  &:hover .collection-card__cover::before {
+    opacity: 1;
   }
 
   &__badges {

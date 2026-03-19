@@ -22,6 +22,9 @@
   letter-spacing: 0.02em;
   text-transform: none;
   transition: box-shadow 0.35s ease, border-color 0.35s ease, transform 0.2s ease;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 
   &__bg {
     position: absolute;
@@ -256,9 +259,90 @@
     }
   }
 
+  &--blue {
+    color: white;
+    border-color: rgba($accent-tertiary, 0.8);
+
+    .glow-btn__bg {
+      background: linear-gradient(135deg, #0c2d6b, $accent-tertiary, #1e40af, $accent-tertiary, #0c2d6b);
+      background-size: 300% 300%;
+      animation: btn-gradient-shift 6s ease infinite;
+    }
+
+    &::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.15) 0%,
+        rgba(255, 255, 255, 0.03) 40%,
+        rgba(255, 255, 255, 0) 60%
+      );
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: -2px;
+      border-radius: inherit;
+      background: linear-gradient(135deg, $accent-tertiary, #0c2d6b);
+      z-index: -2;
+      opacity: 0;
+      filter: blur(18px);
+      transition: opacity 0.35s ease;
+    }
+
+    .glow-btn__bg::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        105deg,
+        transparent 20%,
+        rgba(255, 255, 255, 0.08) 40%,
+        rgba(255, 255, 255, 0.13) 50%,
+        rgba(255, 255, 255, 0.08) 60%,
+        transparent 80%
+      );
+      background-size: 200% 100%;
+      border-radius: inherit;
+      animation: btn-shimmer 4s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    &:hover {
+      box-shadow:
+        0 4px 24px rgba($accent-tertiary, 0.4),
+        0 0 50px rgba($accent-tertiary, 0.15);
+    }
+
+    &:hover::after {
+      opacity: 0.6;
+    }
+  }
+
   &:disabled {
     opacity: 0.4;
     cursor: not-allowed;
     pointer-events: none;
+  }
+}
+
+// ── Mobile: Disable :active states on touch devices ──
+@media (hover: none) {
+  .glow-btn {
+    &:active::after {
+      opacity: 0 !important;
+    }
+
+    &.glow-btn--primary:active::after,
+    &.glow-btn--danger:active::after,
+    &.glow-btn--blue:active::after {
+      opacity: 0 !important;
+    }
   }
 }

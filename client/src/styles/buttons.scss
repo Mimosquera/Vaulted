@@ -15,6 +15,8 @@
   transition: all $transition-fast;
   text-decoration: none;
   white-space: nowrap;
+  -webkit-user-select: none;
+  user-select: none;
 
   &:disabled {
     opacity: 0.5;
@@ -96,4 +98,14 @@
 .btn--lg {
   padding: $space-md $space-lg;
   font-size: $fs-md;
+}
+
+// ── Mobile: Disable :active states on touch devices ──
+@media (hover: none) {
+  .btn--primary:active,
+  .btn--secondary:active,
+  .btn--ghost:active,
+  .btn--danger:active {
+    transform: none;
+  }
 }

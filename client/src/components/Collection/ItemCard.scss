@@ -5,10 +5,17 @@
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: $radius-md;
   overflow: hidden;
-  transition: border-color $transition-base;
+  transition: border-color $transition-base, box-shadow $transition-base;
+  -webkit-user-select: none;
+  user-select: none;
 
   &:hover {
-    border-color: rgba(255, 255, 255, 0.12);
+    border-color: rgba(37, 99, 235, 0.4);
+    box-shadow: 0 0 20px rgba(37, 99, 235, 0.15), 0 0 40px rgba(220, 38, 38, 0.08);
+  }
+
+  @media (max-width: $bp-md) {
+    border-color: rgba(37, 99, 235, 0.2);
   }
 
   &__image {

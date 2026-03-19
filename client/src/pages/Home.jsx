@@ -18,6 +18,7 @@ import { GameControllerIcon as GameController } from '@phosphor-icons/react/Game
 import { CurrencyCircleDollarIcon as CurrencyCircleDollar } from '@phosphor-icons/react/CurrencyCircleDollar';
 import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
 
+import { useInitialLoad } from '../contexts/InitialLoadContext';
 import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import './Home.scss';
@@ -66,6 +67,7 @@ const CATEGORIES_SHOWCASE = [
 
 export default function Home() {
   const heroRef = useRef(null);
+  const { isInitialLoad } = useInitialLoad();
 
   // Scroll parallax for hero
   const { scrollYProgress } = useScroll();
@@ -108,9 +110,9 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={{ opacity: 0 }}
+            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.2, duration: 0.4 }}
+            transition={isInitialLoad ? { delay: 0.2, duration: 0.4 } : { duration: 0 }}
           >
             <Sparkle weight="fill" size={14} />
             <span>Organize your collections</span>
@@ -118,9 +120,9 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={{ opacity: 0 }}
+            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.35, duration: 0.5 }}
+            transition={isInitialLoad ? { delay: 0.35, duration: 0.5 } : { duration: 0 }}
           >
             Curate Your
             <br />
@@ -129,9 +131,9 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={{ opacity: 0 }}
+            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.5, duration: 0.4 }}
+            transition={isInitialLoad ? { delay: 0.5, duration: 0.4 } : { duration: 0 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
             Upload photos, organize, and share with the world.
@@ -139,9 +141,9 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={{ opacity: 0 }}
+            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
             animate={{ opacity: 1 }}
-            transition={{ delay: 0.65, duration: 0.4 }}
+            transition={isInitialLoad ? { delay: 0.65, duration: 0.4 } : { duration: 0 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <Rocket weight="fill" />
