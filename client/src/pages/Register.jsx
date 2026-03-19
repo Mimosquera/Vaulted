@@ -8,6 +8,7 @@ import { UserPlusIcon as UserPlus } from '@phosphor-icons/react/UserPlus';
 import { DiamondIcon as Diamond } from '@phosphor-icons/react/Diamond';
 import useStore from '../store/useStore';
 import BlobBackground from '../components/UI/BlobBackground';
+import { getUserFriendlyError } from '../constants/errorMessages';
 import './Auth.scss';
 
 export default function Register() {
@@ -24,8 +25,19 @@ export default function Register() {
     e.preventDefault();
     setError('');
 
+    // Validation
+    if (!email || !username || !password || !confirmPassword) {
+      setError('Please fill in all fields.');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters.');
+      return;
+    }
+
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError('Passwords do not match.');
       return;
     }
 
@@ -34,7 +46,8 @@ export default function Register() {
       await registerAction(email, password, username);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      const userMessage = getUserFriendlyError(err);
+      setError(userMessage);
     } finally {
       setLoading(false);
     }

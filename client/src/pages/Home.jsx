@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useTransform } from 'framer-motion';
 
@@ -68,11 +68,20 @@ const CATEGORIES_SHOWCASE = [
 export default function Home() {
   const heroRef = useRef(null);
   const { isInitialLoad } = useInitialLoad();
+  const [isMobile, setIsMobile] = useState(false);
 
   // Scroll parallax for hero
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+
+  // Check if mobile on mount and window resize
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   return (
     <div className="home">
@@ -92,12 +101,10 @@ export default function Home() {
             className="home__floating-item"
             style={{ left: item.x, top: item.y, color: item.color }}
             animate={{
-              y: [0, -20, 0, 15, 0],
-              rotate: [0, 10, -5, 8, 0],
-              scale: [1, 1.1, 0.95, 1.05, 1],
+              y: [0, -15, 0],
             }}
             transition={{
-              duration: 8,
+              duration: 6 + item.delay,
               delay: item.delay,
               repeat: Infinity,
               ease: 'easeInOut',
@@ -110,9 +117,9 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={isInitialLoad ? { delay: 0.2, duration: 0.4 } : { duration: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 10 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={isInitialLoad ? { delay: 0.2, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             <Sparkle weight="fill" size={14} />
             <span>Organize your collections</span>
@@ -120,9 +127,9 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={isInitialLoad ? { delay: 0.35, duration: 0.5 } : { duration: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 20 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={isInitialLoad ? { delay: 0.35, duration: 0.7, ease: 'easeOut' } : { duration: 0 }}
           >
             Curate Your
             <br />
@@ -131,9 +138,9 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={isInitialLoad ? { delay: 0.5, duration: 0.4 } : { duration: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={isInitialLoad ? { delay: 0.5, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
             Upload photos, organize, and share with the world.
@@ -141,9 +148,9 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={isInitialLoad ? { opacity: 0 } : { opacity: 1 }}
-            animate={{ opacity: 1 }}
-            transition={isInitialLoad ? { delay: 0.65, duration: 0.4 } : { duration: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15 } : { opacity: 1, y: 0 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={isInitialLoad ? { delay: 0.7, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <VaultLogo size={18} />

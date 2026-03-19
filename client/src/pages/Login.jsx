@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { EnvelopeSimpleIcon as EnvelopeSimple } from '@phosphor-icons/react/EnvelopeSimple';
@@ -7,25 +7,43 @@ import { SignInIcon as SignIn } from '@phosphor-icons/react/SignIn';
 import { DiamondIcon as Diamond } from '@phosphor-icons/react/Diamond';
 import useStore from '../store/useStore';
 import BlobBackground from '../components/UI/BlobBackground';
+import { getUserFriendlyError } from '../constants/errorMessages';
 import './Auth.scss';
 
 export default function Login() {
   const navigate = useNavigate();
   const loginAction = useStore((s) => s.login);
+  const authExpiredMessage = useStore((s) => s.authExpiredMessage);
+  const clearAuthExpiredMessage = useStore((s) => s.clearAuthExpiredMessage);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (authExpiredMessage) {
+      setError(authExpiredMessage);
+      clearAuthExpiredMessage();
+    }
+  }, [authExpiredMessage, clearAuthExpiredMessage]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Basic validation
+    if (!email || !password) {
+      setError('Please enter both email and password.');
+      return;
+    }
+
     setError('');
     setLoading(true);
     try {
       await loginAction(email, password);
       navigate('/dashboard');
     } catch (err) {
-      setError(err.message);
+      const userMessage = getUserFriendlyError(err);
+      setError(userMessage);
     } finally {
       setLoading(false);
     }

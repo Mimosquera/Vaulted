@@ -20,6 +20,7 @@
     opacity: 0.35;
     z-index: 0;
     filter: drop-shadow(0 0 8px currentColor);
+    will-change: transform;
   }
 
   &__hero-content {
@@ -41,6 +42,7 @@
     font-size: $fs-sm;
     font-weight: 500;
     margin-bottom: $space-xl;
+    will-change: transform;
 
     svg {
       color: $accent-primary;
@@ -53,6 +55,7 @@
     line-height: 1.1;
     margin-bottom: $space-lg;
     letter-spacing: -0.02em;
+    will-change: transform;
   }
 
   &__subtitle {
@@ -61,6 +64,7 @@
     max-width: 540px;
     margin: 0 auto $space-2xl;
     line-height: 1.6;
+    will-change: transform;
   }
 
   &__cta {
@@ -70,6 +74,7 @@
     gap: $space-md;
     flex-wrap: wrap;
     margin-bottom: $space-3xl;
+    will-change: transform;
   }
 
   &__stats {

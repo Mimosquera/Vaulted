@@ -54,6 +54,7 @@ const useStore = create((set, get) => ({
   lastSynced: null,
   syncInterval: null,
   syncError: null,
+  authExpiredMessage: null,
 
   // ── Initialize from storage ─
   init: async () => {
@@ -149,12 +150,35 @@ const useStore = create((set, get) => ({
       isAuthenticated: false,
       collections: [],
       loaded: false,
+      authExpiredMessage: null,
     });
     dataStore.removeItem('user');
     dataStore.removeItem('username');
     dataStore.removeItem('collections');
     imageStore.clear();
     get().init();
+  },
+
+  logoutWithMessage: (message) => {
+    api.logout();
+    get().stopSyncPolling();
+    set({
+      user: null,
+      token: null,
+      isAuthenticated: false,
+      collections: [],
+      loaded: false,
+      authExpiredMessage: message,
+    });
+    dataStore.removeItem('user');
+    dataStore.removeItem('username');
+    dataStore.removeItem('collections');
+    imageStore.clear();
+    get().init();
+  },
+
+  clearAuthExpiredMessage: () => {
+    set({ authExpiredMessage: null });
   },
 
   // ── Public Collections ──
@@ -688,7 +712,9 @@ const useStore = create((set, get) => ({
 // Listen for auth expiration events
 if (typeof window !== 'undefined') {
   window.addEventListener('auth:expired', () => {
-    useStore.getState().logout();
+    useStore.getState().logoutWithMessage(
+      'Your session has expired. Please sign in again to continue.'
+    );
   });
 }
 
