@@ -44,12 +44,15 @@ export default function Dashboard() {
 
   const handleCreate = async (data) => {
     await createCollection(data);
-    confetti({
-      particleCount: 80,
-      spread: 70,
-      origin: { y: 0.6 },
-      colors: ['#7c3aed', '#dc2626', '#2563eb', '#9333ea'],
-    });
+    // Only show confetti on desktop (not mobile)
+    if (window.innerWidth >= 768) {
+      confetti({
+        particleCount: 80,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#7c3aed', '#dc2626', '#2563eb', '#9333ea'],
+      });
+    }
   };
 
   return (
