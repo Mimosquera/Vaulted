@@ -1,0 +1,88 @@
+@use '../../styles/variables' as *;
+
+.item-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: $z-modal-backdrop;
+  background: rgba(0, 0, 0, 0.85);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $space-xl;
+
+  &__close {
+    position: absolute;
+    top: $space-lg;
+    right: $space-lg;
+    z-index: 2;
+    width: 40px;
+    height: 40px;
+    border-radius: $radius-full;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: $text-primary;
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+    }
+  }
+
+  &__content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    max-width: 90vw;
+    max-height: 85vh;
+  }
+
+  &__image {
+    max-width: 100%;
+    max-height: 75vh;
+    object-fit: contain;
+    border-radius: $radius-md;
+  }
+
+  &__info {
+    text-align: center;
+    margin-top: $space-md;
+    max-width: 500px;
+  }
+
+  &__name {
+    font-size: $fs-lg;
+    font-weight: 600;
+    color: $text-primary;
+  }
+
+  &__note {
+    font-size: $fs-sm;
+    color: $text-secondary;
+    margin-top: $space-xs;
+  }
+
+  @media (max-width: $bp-md) {
+    padding: $space-md;
+
+    &__close {
+      top: $space-md;
+      right: $space-md;
+      width: 36px;
+      height: 36px;
+    }
+
+    &__image {
+      max-height: 70vh;
+    }
+
+    &__name {
+      font-size: $fs-md;
+    }
+  }
+}

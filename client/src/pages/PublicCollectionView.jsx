@@ -11,13 +11,14 @@ import { ImageIcon } from '@phosphor-icons/react/Image';
 import { SpinnerGapIcon as SpinnerGap } from '@phosphor-icons/react/SpinnerGap';
 import { fetchPublicCollection, getImageUrl } from '../api/client';
 import BlobBackground from '../components/UI/BlobBackground';
+import ItemLightbox from '../components/Collection/ItemLightbox';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import { getCategoryLabel, timeAgo } from '../utils/helpers';
 import './CollectionView.scss';
 
 const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
 
-function PublicItemCard({ item, index = 0 }) {
+function PublicItemCard({ item, index = 0, onExpand }) {
   const imageUrl = item.imageUrl ? getImageUrl(item.imageUrl) : null;
 
   return (
@@ -28,7 +29,7 @@ function PublicItemCard({ item, index = 0 }) {
       layout
     >
       <div className="item-card">
-        <div className="item-card__image">
+        <div className="item-card__image" onClick={() => onExpand && onExpand(item, imageUrl)} style={{ cursor: 'pointer' }}>
           {imageUrl ? (
             <img src={imageUrl} alt={item.name} loading="lazy" />
           ) : (
@@ -53,8 +54,13 @@ export default function PublicCollectionView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const [lightboxItem, setLightboxItem] = useState(null);
+  const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
 
-  useEffect(() => {
+  const handleExpandItem = (item, imageUrl) => {
+    setLightboxItem(item);
+    setLightboxImageUrl(imageUrl);
+  };  useEffect(() => {
     setLoading(true);
     setError(null);
     fetchPublicCollection(id)
@@ -178,7 +184,7 @@ export default function PublicCollectionView() {
                 columnClassName="collection-view__grid-col"
               >
                 {filteredItems.map((item, i) => (
-                  <PublicItemCard key={item.id} item={item} index={i} />
+                  <PublicItemCard key={item.id} item={item} index={i} onExpand={handleExpandItem} />
                 ))}
               </Masonry>
             </AnimatePresence>
@@ -197,6 +203,13 @@ export default function PublicCollectionView() {
           )}
         </motion.div>
       </div>
+
+      <ItemLightbox
+        item={lightboxItem}
+        imageUrl={lightboxImageUrl}
+        isOpen={!!lightboxItem}
+        onClose={() => { setLightboxItem(null); setLightboxImageUrl(null); }}
+      />
     </div>
   );
 }

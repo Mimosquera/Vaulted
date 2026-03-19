@@ -13,6 +13,7 @@ import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/Ma
 import { PencilSimpleIcon as PencilSimple } from '@phosphor-icons/react/PencilSimple';
 import useStore from '../store/useStore';
 import ItemCard from '../components/Collection/ItemCard';
+import ItemLightbox from '../components/Collection/ItemLightbox';
 import AddItemModal from '../components/Modals/AddItemModal';
 import EditItemModal from '../components/Modals/EditItemModal';
 import EditCollectionModal from '../components/Modals/EditCollectionModal';
@@ -40,6 +41,8 @@ export default function CollectionView() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [search, setSearch] = useState('');
+  const [lightboxItem, setLightboxItem] = useState(null);
+  const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
 
   const filteredItems = useMemo(() => {
     if (!collection) return [];
@@ -85,6 +88,11 @@ export default function CollectionView() {
   const handleUpdateCollection = (collectionData) => {
     updateCollection(collection.id, collectionData);
     setEditCollectionModalOpen(false);
+  };
+
+  const handleExpandItem = (item, imageUrl) => {
+    setLightboxItem(item);
+    setLightboxImageUrl(imageUrl);
   };
 
   return (
@@ -204,6 +212,7 @@ export default function CollectionView() {
                     collectionId={collection.id}
                     index={i}
                     onEdit={handleEditItem}
+                    onExpand={handleExpandItem}
                   />
                 ))}
               </Masonry>
@@ -254,6 +263,13 @@ export default function CollectionView() {
         isOpen={shareModalOpen}
         onClose={() => setShareModalOpen(false)}
         collection={collection}
+      />
+
+      <ItemLightbox
+        item={lightboxItem}
+        imageUrl={lightboxImageUrl}
+        isOpen={!!lightboxItem}
+        onClose={() => { setLightboxItem(null); setLightboxImageUrl(null); }}
       />
     </div>
   );

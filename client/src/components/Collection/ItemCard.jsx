@@ -9,7 +9,7 @@ import useStore from '../../store/useStore';
 import { timeAgo } from '../../utils/helpers';
 import './ItemCard.scss';
 
-export default function ItemCard({ item, collectionId, index = 0, onEdit }) {
+export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpand }) {
   const [imageUrl, setImageUrl] = useState(null);
   const [hovering, setHovering] = useState(false);
   const deleteItem = useStore((s) => s.deleteItem);
@@ -28,6 +28,10 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit }) {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.imageUrl]);
+
+  const handleExpand = () => {
+    if (onExpand) onExpand(item, imageUrl);
+  };
 
   return (
     <motion.div
@@ -50,7 +54,7 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit }) {
           onMouseEnter={() => setHovering(true)}
           onMouseLeave={() => setHovering(false)}
         >
-          <div className="item-card__image">
+          <div className="item-card__image" onClick={handleExpand} style={{ cursor: 'pointer' }}>
             {imageUrl ? (
               <img src={imageUrl} alt={item.name} loading="lazy" />
             ) : (
@@ -66,13 +70,13 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit }) {
               transition={{ duration: 0.15 }}
             >
               {onEdit && (
-                <button className="item-card__action" onClick={() => onEdit(item)}>
+                <button className="item-card__action" onClick={(e) => { e.stopPropagation(); onEdit(item); }}>
                   <PencilSimple weight="bold" size={16} />
                 </button>
               )}
               <button
                 className="item-card__action item-card__action--danger"
-                onClick={() => deleteItem(collectionId, item.id)}
+                onClick={(e) => { e.stopPropagation(); deleteItem(collectionId, item.id); }}
               >
                 <Trash weight="bold" size={16} />
               </button>
