@@ -1,6 +1,5 @@
-import { useRef, useState, useEffect } from 'react';
+import { useRef } from 'react';
 import { Link } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion, useScroll, useTransform } from 'framer-motion';
 
 import { RocketIcon as Rocket } from '@phosphor-icons/react/Rocket';
@@ -67,15 +66,8 @@ const CATEGORIES_SHOWCASE = [
 
 export default function Home() {
   const heroRef = useRef(null);
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
-  // Only use scroll animations on desktop
+  // Scroll parallax for hero
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
@@ -87,12 +79,12 @@ export default function Home() {
       <motion.section
         className="home__hero"
         ref={heroRef}
-        style={isMobile ? {} : { opacity: heroOpacity, scale: heroScale }}
+        style={{ opacity: heroOpacity, scale: heroScale }}
       >
         <BlobBackground />
 
-        {/* Floating icons - only on desktop */}
-        {!isMobile && FLOATING_ITEMS.map((item, i) => (
+        {/* Floating icons */}
+        {FLOATING_ITEMS.map((item, i) => (
           <motion.span
             key={i}
             className="home__floating-item"
@@ -116,9 +108,9 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={isMobile ? {} : { opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={isMobile ? {} : { delay: 0.2 }}
+            transition={{ delay: 0.2 }}
           >
             <Sparkle weight="fill" size={14} />
             <span>Organize your collections</span>
@@ -126,9 +118,9 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={isMobile ? {} : { opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={isMobile ? {} : { delay: 0.4, type: 'spring', stiffness: 80 }}
+            transition={{ delay: 0.4, type: 'spring', stiffness: 80 }}
           >
             Curate Your
             <br />
@@ -137,9 +129,9 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={isMobile ? {} : { opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={isMobile ? {} : { delay: 0.6 }}
+            transition={{ delay: 0.6 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
             Upload photos, organize, and share with the world.
@@ -147,9 +139,9 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={isMobile ? {} : { opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={isMobile ? {} : { delay: 0.8 }}
+            transition={{ delay: 0.8 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <Rocket weight="fill" />
@@ -168,8 +160,8 @@ export default function Home() {
         <div className="home__categories-track">
           <motion.div
             className="home__categories-scroll"
-            animate={!isMobile ? { x: [0, -800] } : {}}
-            transition={!isMobile ? { duration: 20, repeat: Infinity, ease: 'linear' } : {}}
+            animate={{ x: [0, -800] }}
+            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
           >
             {[...CATEGORIES_SHOWCASE, ...CATEGORIES_SHOWCASE].map((cat, i) => (
               <span key={i} className="home__category-chip">
@@ -185,9 +177,9 @@ export default function Home() {
         <div className="container">
           <motion.h2
             className="home__section-title"
-            initial={isMobile ? {} : { opacity: 0, y: 20 }}
-            whileInView={isMobile ? {} : { opacity: 1, y: 0 }}
-            viewport={isMobile ? {} : { once: true }}
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
           >
             Why <span className="gradient-text">Vaulted</span>?
           </motion.h2>
@@ -197,11 +189,11 @@ export default function Home() {
               <motion.div
                 key={i}
                 className="home__feature-card"
-                initial={isMobile ? {} : { opacity: 0, y: 30 }}
-                whileInView={isMobile ? {} : { opacity: 1, y: 0 }}
-                viewport={isMobile ? {} : { once: true }}
-                transition={isMobile ? {} : { delay: i * 0.12, type: 'spring', stiffness: 80 }}
-                whileHover={isMobile ? {} : { y: -8, scale: 1.02 }}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.12, type: 'spring', stiffness: 80 }}
+                whileHover={{ y: -8, scale: 1.02 }}
               >
                 <div
                   className="home__feature-icon"
@@ -223,9 +215,9 @@ export default function Home() {
         <div className="container">
           <motion.div
             className="home__bottom-cta-content"
-            initial={isMobile ? {} : { opacity: 0, scale: 0.95 }}
-            whileInView={isMobile ? {} : { opacity: 1, scale: 1 }}
-            viewport={isMobile ? {} : { once: true }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
           >
             <h2>Ready to start collecting?</h2>
             <p>Works offline, syncs across devices, and it's free.</p>

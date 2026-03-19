@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
@@ -40,13 +40,6 @@ export default function CollectionView() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [search, setSearch] = useState('');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const filteredItems = useMemo(() => {
     if (!collection) return [];
@@ -102,7 +95,7 @@ export default function CollectionView() {
         {/* ── Hero Header ── */}
         <motion.div
           className="collection-view__hero"
-          initial={isMobile ? {} : { opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <Link to="/dashboard" className="collection-view__back">
@@ -177,9 +170,9 @@ export default function CollectionView() {
         {collection.items.length > 3 && (
           <motion.div
             className="collection-view__search"
-            initial={isMobile ? {} : { opacity: 0 }}
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={isMobile ? {} : { delay: 0.2 }}
+            transition={{ delay: 0.2 }}
           >
             <MagnifyingGlass weight="bold" size={18} />
             <input
@@ -193,9 +186,9 @@ export default function CollectionView() {
 
         {/* ── Items Grid ── */}
         <motion.div
-          initial={isMobile ? {} : { opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={isMobile ? {} : { delay: 0.15 }}
+          transition={{ delay: 0.15 }}
         >
           {filteredItems.length > 0 ? (
             <AnimatePresence mode="popLayout">

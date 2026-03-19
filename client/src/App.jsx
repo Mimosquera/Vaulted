@@ -22,13 +22,13 @@ function AnimatedRoutes() {
   const location = useLocation();
 
   return (
-    <AnimatePresence mode="wait">
+    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0, y: 12 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -12 }}
-        transition={{ duration: 0.25, ease: 'easeInOut' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.15, ease: 'easeInOut' }}
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
         <Routes location={location}>
@@ -46,12 +46,6 @@ function AnimatedRoutes() {
   );
 }
 
-function ScrollToTop() {
-  const { pathname } = useLocation();
-  useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
-  return null;
-}
-
 export default function App() {
   const init = useStore((s) => s.init);
 
@@ -62,7 +56,6 @@ export default function App() {
   return (
     <ErrorBoundary>
       <BrowserRouter>
-        <ScrollToTop />
         <FloatingParticles />
         <Navbar />
         <AnimatedRoutes />

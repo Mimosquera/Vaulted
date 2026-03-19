@@ -1,4 +1,5 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo } from 'react';
+// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
@@ -22,13 +23,6 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   const filtered = useMemo(() => {
     let result = collections;
@@ -51,7 +45,6 @@ export default function Dashboard() {
 
   const handleCreate = async (data) => {
     await createCollection(data);
-    // Only show confetti on desktop (not mobile)
     if (window.innerWidth >= 768) {
       confetti({
         particleCount: 80,
@@ -70,9 +63,9 @@ export default function Dashboard() {
         {/* ── Header ── */}
         <motion.div
           className="dashboard__header"
-          initial={isMobile ? {} : { opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={isMobile ? {} : { delay: 0.1 }}
+          transition={{ delay: 0.1 }}
         >
           <div className="dashboard__title-row">
             <div>
@@ -109,9 +102,9 @@ export default function Dashboard() {
         {/* ── Search & Filter ── */}
         <motion.div
           className="dashboard__toolbar"
-          initial={isMobile ? {} : { opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={isMobile ? {} : { delay: 0.2 }}
+          transition={{ delay: 0.2 }}
         >
           <div className="dashboard__search">
             <MagnifyingGlass weight="bold" size={18} />
@@ -148,7 +141,7 @@ export default function Dashboard() {
         ) : (
           <motion.div
             className="dashboard__empty"
-            initial={isMobile ? {} : { opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
           >
             <Folder weight="thin" size={64} />

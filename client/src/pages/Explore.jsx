@@ -12,13 +12,6 @@ export default function Explore() {
   const publicCollectionsFromStore = useStore((s) => s.publicCollections);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
-  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
-
-  useEffect(() => {
-    const handleResize = () => setIsMobile(window.innerWidth < 768);
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
 
   // Fetch public collections when component mounts
   useEffect(() => {
@@ -46,7 +39,7 @@ export default function Explore() {
 
         <motion.div
           className="explore__header"
-          initial={isMobile ? {} : { opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <h1>
@@ -58,9 +51,9 @@ export default function Explore() {
 
         <motion.div
           className="explore__toolbar"
-          initial={isMobile ? {} : { opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={isMobile ? {} : { delay: 0.1 }}
+          transition={{ delay: 0.1 }}
         >
           <div className="explore__search">
             <MagnifyingGlass weight="bold" size={18} />
@@ -96,7 +89,7 @@ export default function Explore() {
         ) : (
           <motion.div
             className="explore__empty"
-            initial={isMobile ? {} : { opacity: 0 }}
+            initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
           >
             <Sparkle weight="thin" size={64} />
