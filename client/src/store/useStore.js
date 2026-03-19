@@ -50,7 +50,7 @@ const useStore = create((set, get) => ({
   syncing: false,
   lastSynced: null,
 
-  // ── Initialize from storage ──
+  // ── Initialize from storage ─
   init: async () => {
     try {
       const saved = await dataStore.getItem('collections');
