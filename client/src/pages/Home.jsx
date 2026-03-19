@@ -117,8 +117,8 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 10 } : { opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 10, scale: isMobile ? 0.98 : 1 } : { opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={isInitialLoad ? { delay: 0.2, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             <Sparkle weight="fill" size={14} />
@@ -127,8 +127,8 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 20 } : { opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 20, scale: isMobile ? 0.98 : 1 } : { opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={isInitialLoad ? { delay: 0.35, duration: 0.7, ease: 'easeOut' } : { duration: 0 }}
           >
             Curate Your
@@ -138,8 +138,8 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15 } : { opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15, scale: isMobile ? 0.98 : 1 } : { opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={isInitialLoad ? { delay: 0.5, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
@@ -148,8 +148,8 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15 } : { opacity: 1, y: 0 }}
-            animate={{ opacity: 1, y: 0 }}
+            initial={isInitialLoad ? { opacity: 0, y: isMobile ? 0 : 15, scale: isMobile ? 0.98 : 1 } : { opacity: 1, y: 0, scale: 1 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={isInitialLoad ? { delay: 0.7, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
