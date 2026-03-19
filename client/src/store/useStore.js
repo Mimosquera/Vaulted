@@ -122,8 +122,12 @@ const useStore = create((set, get) => ({
     await dataStore.setItem('username', user.username || user.email.split('@')[0]);
     await dataStore.setItem('collections', []);
 
-    // Sync from cloud after login
-    get().syncFromCloud();
+    // Sync from cloud after login with small delay to ensure token is ready
+    setTimeout(async () => {
+      await get().syncFromCloud();
+      // After sync, migrate any local images to Cloudinary
+      await get().migrateLocalImagesToCloud();
+    }, 150);
   },
 
   register: async (email, password, username) => {
@@ -330,6 +334,82 @@ const useStore = create((set, get) => ({
       set({ syncError: 'Failed to sync collections. Check your connection and try again.' });
     } finally {
       set({ syncing: false });
+    }
+  },
+
+  // ── Migrate local images to Cloudinary ──
+  migrateLocalImagesToCloud: async () => {
+    if (!get().isAuthenticated) return;
+
+    try {
+      const { collections } = get();
+      let migratedCount = 0;
+
+      // Helper to check if URL is a cloud URL
+      const isCloudUrl = (url) => {
+        if (!url) return true;
+        return url.startsWith('http://') || url.startsWith('https://');
+      };
+
+      // Process all collections and items
+      const updatedCollections = await Promise.all(
+        collections.map(async (collection) => {
+          let updatedCollection = { ...collection };
+
+          // Migrate collection cover image
+          if (updatedCollection.coverImageUrl && !isCloudUrl(updatedCollection.coverImageUrl)) {
+            try {
+              const blob = await imageStore.getItem(updatedCollection.coverImageUrl);
+              if (blob) {
+                const file = new File([blob], `cover-${collection.id}`, { type: blob.type });
+                const uploadResult = await api.uploadImageAPI(file);
+                updatedCollection.coverImageUrl = uploadResult.url;
+                migratedCount++;
+              }
+            } catch (err) {
+              console.error('Failed to migrate cover image:', err);
+            }
+          }
+
+          // Migrate item images
+          if (updatedCollection.items && updatedCollection.items.length > 0) {
+            updatedCollection.items = await Promise.all(
+              updatedCollection.items.map(async (item) => {
+                let updatedItem = { ...item };
+
+                if (updatedItem.imageUrl && !isCloudUrl(updatedItem.imageUrl)) {
+                  try {
+                    const blob = await imageStore.getItem(updatedItem.imageUrl);
+                    if (blob) {
+                      const file = new File([blob], `item-${item.id}`, { type: blob.type });
+                      const uploadResult = await api.uploadImageAPI(file);
+                      updatedItem.imageUrl = uploadResult.url;
+                      migratedCount++;
+                    }
+                  } catch (err) {
+                    console.error('Failed to migrate item image:', err);
+                  }
+                }
+
+                return updatedItem;
+              })
+            );
+          }
+
+          return updatedCollection;
+        })
+      );
+
+      // Update store with migrated collections
+      if (migratedCount > 0) {
+        set({ collections: updatedCollections });
+        await get()._persist();
+
+        // Sync migrated images to backend
+        await get().syncToCloud();
+      }
+    } catch (err) {
+      console.error('Local image migration error:', err);
     }
   },
 
