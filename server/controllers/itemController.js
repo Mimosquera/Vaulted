@@ -1,5 +1,15 @@
 import pool from '../config/database.js';
 
+// Helper to convert snake_case DB response to camelCase
+const toCamelCase = (obj) => {
+  const camelCaseObj = {};
+  for (const [key, value] of Object.entries(obj)) {
+    const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
+    camelCaseObj[camelKey] = value;
+  }
+  return camelCaseObj;
+};
+
 export const getItems = async (req, res) => {
   try {
     const { collectionId } = req.params;
@@ -15,7 +25,7 @@ export const getItems = async (req, res) => {
       collectionId,
     ]);
 
-    res.json(result.rows);
+    res.json(result.rows.map(toCamelCase));
   } catch (err) {
     console.error('Get items error:', err);
     res.status(500).json({ error: 'Failed to fetch items' });
@@ -45,7 +55,7 @@ export const addItem = async (req, res) => {
       [id, collectionId, name, note || null, imageUrl || null, createdAt]
     );
 
-    res.status(201).json(result.rows[0]);
+    res.status(201).json(toCamelCase(result.rows[0]));
   } catch (err) {
     console.error('Add item error:', err);
     if (err.code === '23505') {
@@ -88,7 +98,7 @@ export const updateItem = async (req, res) => {
       return res.status(404).json({ error: 'Item not found' });
     }
 
-    res.json(result.rows[0]);
+    res.json(toCamelCase(result.rows[0]));
   } catch (err) {
     console.error('Update item error:', err);
     res.status(500).json({ error: 'Failed to update item' });

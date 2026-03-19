@@ -9,7 +9,7 @@ import BlobBackground from '../components/UI/BlobBackground';
 import './Explore.scss';
 
 export default function Explore() {
-  const collections = useStore((s) => s.collections);
+  const publicCollectionsFromStore = useStore((s) => s.publicCollections);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
@@ -20,8 +20,13 @@ export default function Explore() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
+  // Fetch public collections when component mounts
+  useEffect(() => {
+    useStore.getState().fetchPublicCollections();
+  }, []);
+
   const publicCollections = useMemo(() => {
-    let result = collections.filter((c) => c.isPublic);
+    let result = publicCollectionsFromStore;
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
@@ -32,7 +37,7 @@ export default function Explore() {
       result = result.filter((c) => c.category === filterCategory);
     }
     return result;
-  }, [collections, search, filterCategory]);
+  }, [publicCollectionsFromStore, search, filterCategory]);
 
   return (
     <div className="explore page">

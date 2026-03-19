@@ -39,6 +39,7 @@ const CATEGORIES = [
 
 const useStore = create((set, get) => ({
   collections: [],
+  publicCollections: [],
   loaded: false,
   username: 'Collector',
 
@@ -50,6 +51,7 @@ const useStore = create((set, get) => ({
   // ── Sync State ──
   syncing: false,
   lastSynced: null,
+  syncInterval: null,
 
   // ── Initialize from storage ─
   init: async () => {
@@ -70,11 +72,16 @@ const useStore = create((set, get) => ({
         await dataStore.setItem('collections', []);
       }
 
+      // Fetch public collections (works for everyone)
+      get().fetchPublicCollections();
+
       // If we have a token, try to refresh it and sync
       if (api.getToken()) {
         try {
           const data = await api.refreshToken();
           set({ isAuthenticated: true, user: data.user || get().user });
+          // Start sync polling for authenticated users
+          get().startSyncPolling();
         } catch {
           // Token expired or invalid
           api.setToken(null);
@@ -133,6 +140,7 @@ const useStore = create((set, get) => ({
 
   logout: () => {
     api.logout();
+    get().stopSyncPolling();
     set({
       user: null,
       token: null,
@@ -145,6 +153,43 @@ const useStore = create((set, get) => ({
     dataStore.removeItem('collections');
     imageStore.clear();
     get().init();
+  },
+
+  // ── Public Collections ──
+  fetchPublicCollections: async () => {
+    try {
+      const publicCollections = await api.fetchPublicCollections();
+      set({ publicCollections: publicCollections || [] });
+    } catch (err) {
+      // Fail silently if public collections can't be fetched
+    }
+  },
+
+  // ── Sync Polling ──
+  startSyncPolling: () => {
+    // Stop any existing interval
+    get().stopSyncPolling();
+
+    // Sync immediately
+    get().syncFromCloud();
+
+    // Then poll every 5 seconds when authenticated
+    const interval = setInterval(() => {
+      if (get().isAuthenticated && !get().syncing) {
+        get().syncFromCloud();
+        get().fetchPublicCollections();
+      }
+    }, 5000);
+
+    set({ syncInterval: interval });
+  },
+
+  stopSyncPolling: () => {
+    const { syncInterval } = get();
+    if (syncInterval) {
+      clearInterval(syncInterval);
+      set({ syncInterval: null });
+    }
   },
 
   // ── Sync Actions ──

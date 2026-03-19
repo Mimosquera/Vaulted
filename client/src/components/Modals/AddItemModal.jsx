@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import {  AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon as X } from '@phosphor-icons/react/X';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
 import ImageUploader from '../Upload/ImageUploader';
