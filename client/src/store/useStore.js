@@ -50,6 +50,7 @@ const useStore = create((set, get) => ({
 
   // ── Sync State ──
   syncing: false,
+  syncingVisible: false,
   lastSynced: null,
   syncInterval: null,
 
@@ -195,7 +196,7 @@ const useStore = create((set, get) => ({
   // ── Sync Actions ──
   syncToCloud: async () => {
     if (!get().isAuthenticated || get().syncing) return;
-    set({ syncing: true });
+    set({ syncing: true, syncingVisible: true });
 
     try {
       const { collections } = get();
@@ -233,7 +234,7 @@ const useStore = create((set, get) => ({
 
       set({ lastSynced: Date.now() });
     } catch (err) { /* empty */ } finally {
-      set({ syncing: false });
+      set({ syncing: false, syncingVisible: false });
     }
   },
 

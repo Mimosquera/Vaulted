@@ -24,7 +24,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
     accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'] },
     maxFiles: 1,
     multiple: false,
-    maxSize: 10 * 1024 * 1024,
+    maxSize: 50 * 1024 * 1024,
   });
 
   const removeImage = (e) => {
@@ -73,7 +73,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
               <p className="image-uploader__text">
                 {isDragActive ? 'Drop it here!' : 'Drag & drop or click to upload'}
               </p>
-              <span className="image-uploader__hint">PNG, JPG, WebP up to 10MB</span>
+              <span className="image-uploader__hint">PNG, JPG, WebP up to 50MB</span>
             </motion.div>
           )}
         </AnimatePresence>

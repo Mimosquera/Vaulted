@@ -17,7 +17,7 @@ import CategoryIcon from '../components/UI/CategoryIcon';
 import './Profile.scss';
 
 export default function Profile() {
-  const { username, setUsername, collections, user, syncing, lastSynced, syncToCloud } = useStore();
+  const { username, setUsername, collections, user, syncingVisible: syncing, lastSynced, syncToCloud } = useStore();
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState(username);
 

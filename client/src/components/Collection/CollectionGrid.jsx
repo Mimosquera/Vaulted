@@ -6,7 +6,7 @@ import './CollectionGrid.scss';
 const BREAKPOINT_COLS = {
   default: 3,
   1100: 2,
-  700: 1,
+  700: 2,
 };
 
 export default function CollectionGrid({ collections, isVisitor = false }) {

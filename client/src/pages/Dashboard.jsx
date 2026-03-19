@@ -18,7 +18,7 @@ import './Dashboard.scss';
 export default function Dashboard() {
   const collections = useStore((s) => s.collections);
   const createCollection = useStore((s) => s.createCollection);
-  const syncing = useStore((s) => s.syncing);
+  const syncing = useStore((s) => s.syncingVisible);
   const syncToCloud = useStore((s) => s.syncToCloud);
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState('');

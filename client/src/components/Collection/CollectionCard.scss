@@ -159,4 +159,28 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+  @media (max-width: $bp-md) {
+    &__cover {
+      height: 120px;
+    }
+
+    &__info {
+      padding: $space-sm;
+    }
+
+    &__name {
+      font-size: $fs-sm;
+    }
+
+    &__meta {
+      font-size: 11px;
+    }
+
+    &__desc {
+      font-size: $fs-xs;
+      -webkit-line-clamp: 1;
+      line-clamp: 1;
+    }
+  }
 }

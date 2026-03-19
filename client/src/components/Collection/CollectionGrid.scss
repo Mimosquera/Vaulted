@@ -11,4 +11,12 @@
     gap: $space-lg;
     background-clip: padding-box;
   }
+
+  @media (max-width: $bp-md) {
+    gap: $space-sm;
+
+    &__column {
+      gap: $space-sm;
+    }
+  }
 }

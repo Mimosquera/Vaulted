@@ -22,7 +22,7 @@ import { getCategoryLabel } from '../utils/helpers';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import './CollectionView.scss';
 
-const MASONRY_COLS = { default: 4, 1100: 3, 700: 2, 500: 1 };
+const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
 
 export default function CollectionView() {
   const { id } = useParams();

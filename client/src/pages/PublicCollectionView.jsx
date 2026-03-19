@@ -15,7 +15,7 @@ import CategoryIcon from '../components/UI/CategoryIcon';
 import { getCategoryLabel, timeAgo } from '../utils/helpers';
 import './CollectionView.scss';
 
-const MASONRY_COLS = { default: 4, 1100: 3, 700: 2, 500: 1 };
+const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
 
 function PublicItemCard({ item, index = 0 }) {
   const imageUrl = item.imageUrl ? getImageUrl(item.imageUrl) : null;
