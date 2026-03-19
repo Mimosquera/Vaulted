@@ -34,8 +34,8 @@ export const uploadImage = async (req, res) => {
       url: result.rows[0].url,
     });
   } catch (err) {
-    console.error('Upload image error:', err);
-    res.status(500).json({ error: 'Failed to upload image' });
+    console.error('Upload image error:', err.message, err.stack);
+    res.status(500).json({ error: 'Failed to upload image', details: err.message });
   }
 };
 

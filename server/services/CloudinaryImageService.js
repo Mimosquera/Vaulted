@@ -10,6 +10,13 @@ cloudinary.config({
 class CloudinaryImageService extends ImageService {
   async upload(imageId, fileBuffer, mimeType) {
     return new Promise((resolve, reject) => {
+      console.log('Uploading to Cloudinary:', {
+        imageId,
+        bufferSize: fileBuffer.length,
+        mimeType,
+        cloudName: process.env.CLOUDINARY_CLOUD_NAME ? 'SET' : 'MISSING',
+      });
+
       const uploadStream = cloudinary.v2.uploader.upload_stream(
         {
           public_id: imageId,
@@ -17,8 +24,13 @@ class CloudinaryImageService extends ImageService {
           folder: 'collection-app',
         },
         (error, result) => {
-          if (error) reject(error);
-          else resolve(result);
+          if (error) {
+            console.error('Cloudinary upload error:', error);
+            reject(error);
+          } else {
+            console.log('Cloudinary upload success:', result.secure_url);
+            resolve(result);
+          }
         }
       );
       uploadStream.end(fileBuffer);
