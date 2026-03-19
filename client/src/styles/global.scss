@@ -31,6 +31,11 @@ body {
 }
 
 // ── Scrollbar ──
+* {
+  scrollbar-color: #3b0764 $bg-secondary;
+  scrollbar-width: thin;
+}
+
 ::-webkit-scrollbar {
   width: 8px;
 }
@@ -42,7 +47,7 @@ body {
 ::-webkit-scrollbar-thumb {
   background: #3b0764;
   border-radius: $radius-full;
-  
+
   &:hover {
     background: #4c1d95;
   }
@@ -61,7 +66,7 @@ a {
   transition: color $transition-fast;
 
   &:hover {
-    color: $neon-cyan;
+    color: $accent-primary;
   }
 }
 

@@ -23,6 +23,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null }) {
     onDrop,
     accept: { 'image/*': ['.png', '.jpg', '.jpeg', '.webp', '.gif'] },
     maxFiles: 1,
+    multiple: false,
     maxSize: 10 * 1024 * 1024,
   });
 
