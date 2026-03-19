@@ -247,6 +247,20 @@ const useStore = create((set, get) => ({
       const imageId = `cover-${nanoid()}`;
       await imageStore.setItem(imageId, coverImage);
       coverImageUrl = imageId;
+
+      // Upload cover image to server if authenticated
+      if (get().isAuthenticated) {
+        try {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(coverImage);
+          });
+          await api.uploadImageAPI(imageId, base64, coverImage.type);
+        } catch (err) {
+          console.error('Cover image upload failed:', err);
+        }
+      }
     }
 
     const newCollection = {
@@ -288,6 +302,20 @@ const useStore = create((set, get) => ({
       const imageId = `cover-${nanoid()}`;
       await imageStore.setItem(imageId, updates.coverImage);
       updates.coverImageUrl = imageId;
+
+      // Upload cover image to server if authenticated
+      if (get().isAuthenticated) {
+        try {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(updates.coverImage);
+          });
+          await api.uploadImageAPI(imageId, base64, updates.coverImage.type);
+        } catch (err) {
+          console.error('Cover image upload failed:', err);
+        }
+      }
       delete updates.coverImage;
     }
 
@@ -300,12 +328,17 @@ const useStore = create((set, get) => ({
 
     if (get().isAuthenticated) {
       try {
-        await api.updateCollectionAPI(id, {
+        const updatePayload = {
           name: updates.name,
           category: updates.category,
           description: updates.description,
           coverColor: updates.coverColor,
-        });
+        };
+        // Only include coverImageUrl if it was updated
+        if (updates.coverImageUrl) {
+          updatePayload.coverImageUrl = updates.coverImageUrl;
+        }
+        await api.updateCollectionAPI(id, updatePayload);
       } catch (err) {
         console.error('Cloud sync failed for updateCollection:', err);
       }
@@ -357,6 +390,20 @@ const useStore = create((set, get) => ({
       const imageId = `img-${nanoid()}`;
       await imageStore.setItem(imageId, imageFile);
       imageUrl = imageId;
+
+      // Upload image to server if authenticated
+      if (get().isAuthenticated) {
+        try {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(imageFile);
+          });
+          await api.uploadImageAPI(imageId, base64, imageFile.type);
+        } catch (err) {
+          console.error('Image upload failed:', err);
+        }
+      }
     }
 
     const newItem = {
@@ -396,6 +443,20 @@ const useStore = create((set, get) => ({
       const imageId = `img-${nanoid()}`;
       await imageStore.setItem(imageId, updates.imageFile);
       updates.imageUrl = imageId;
+
+      // Upload image to server if authenticated
+      if (get().isAuthenticated) {
+        try {
+          const base64 = await new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(updates.imageFile);
+          });
+          await api.uploadImageAPI(imageId, base64, updates.imageFile.type);
+        } catch (err) {
+          console.error('Image upload failed:', err);
+        }
+      }
       delete updates.imageFile;
     }
 
@@ -452,6 +513,13 @@ const useStore = create((set, get) => ({
   // ── Image loading ──
   getImageUrl: async (imageId) => {
     if (!imageId) return null;
+
+    // If authenticated, try server first
+    if (get().isAuthenticated) {
+      return api.getImageURL(imageId);
+    }
+
+    // Fall back to local storage
     const blob = await imageStore.getItem(imageId);
     if (!blob) return null;
     return URL.createObjectURL(blob);

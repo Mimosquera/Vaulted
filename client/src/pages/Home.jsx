@@ -116,9 +116,9 @@ export default function Home() {
         <div className="home__hero-content">
           <motion.div
             className="home__badge"
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? {} : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
+            transition={isMobile ? {} : { delay: 0.2 }}
           >
             <Sparkle weight="fill" size={14} />
             <span>Organize your collections</span>
@@ -126,9 +126,9 @@ export default function Home() {
 
           <motion.h1
             className="home__title"
-            initial={{ opacity: 0, y: 30 }}
+            initial={isMobile ? {} : { opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4, type: 'spring', stiffness: 80 }}
+            transition={isMobile ? {} : { delay: 0.4, type: 'spring', stiffness: 80 }}
           >
             Curate Your
             <br />
@@ -137,9 +137,9 @@ export default function Home() {
 
           <motion.p
             className="home__subtitle"
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? {} : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+            transition={isMobile ? {} : { delay: 0.6 }}
           >
             Trading cards, vinyl, figures, sneakers - whatever you collect.
             Upload photos, organize, and share with the world.
@@ -147,9 +147,9 @@ export default function Home() {
 
           <motion.div
             className="home__cta"
-            initial={{ opacity: 0, y: 20 }}
+            initial={isMobile ? {} : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.8 }}
+            transition={isMobile ? {} : { delay: 0.8 }}
           >
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <Rocket weight="fill" />
@@ -185,9 +185,9 @@ export default function Home() {
         <div className="container">
           <motion.h2
             className="home__section-title"
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            initial={isMobile ? {} : { opacity: 0, y: 20 }}
+            whileInView={isMobile ? {} : { opacity: 1, y: 0 }}
+            viewport={isMobile ? {} : { once: true }}
           >
             Why <span className="gradient-text">Vaulted</span>?
           </motion.h2>
@@ -197,11 +197,11 @@ export default function Home() {
               <motion.div
                 key={i}
                 className="home__feature-card"
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12, type: 'spring', stiffness: 80 }}
-                whileHover={{ y: -8, scale: 1.02 }}
+                initial={isMobile ? {} : { opacity: 0, y: 30 }}
+                whileInView={isMobile ? {} : { opacity: 1, y: 0 }}
+                viewport={isMobile ? {} : { once: true }}
+                transition={isMobile ? {} : { delay: i * 0.12, type: 'spring', stiffness: 80 }}
+                whileHover={isMobile ? {} : { y: -8, scale: 1.02 }}
               >
                 <div
                   className="home__feature-icon"
@@ -223,9 +223,9 @@ export default function Home() {
         <div className="container">
           <motion.div
             className="home__bottom-cta-content"
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
+            initial={isMobile ? {} : { opacity: 0, scale: 0.95 }}
+            whileInView={isMobile ? {} : { opacity: 1, scale: 1 }}
+            viewport={isMobile ? {} : { once: true }}
           >
             <h2>Ready to start collecting?</h2>
             <p>Works offline, syncs across devices, and it's free.</p>
