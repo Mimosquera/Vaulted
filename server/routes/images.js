@@ -8,7 +8,7 @@ const router = express.Router();
 // Configure multer for in-memory storage
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 20 * 1024 * 1024 }, // 20MB limit (within Cloudinary free tier)
+  limits: { fileSize: 25 * 1024 * 1024 }, // 25MB limit (within Cloudinary free tier)
   fileFilter: (req, file, cb) => {
     const allowedMimes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
     if (allowedMimes.includes(file.mimetype)) {
