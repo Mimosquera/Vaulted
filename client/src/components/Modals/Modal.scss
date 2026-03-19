@@ -1,5 +1,9 @@
 @use '../../styles/variables' as *;
 
+body.modal-open {
+  overflow: hidden;
+}
+
 .modal-backdrop {
   position: fixed;
   inset: 0;

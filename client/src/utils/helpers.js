@@ -10,6 +10,7 @@ import { CurrencyCircleDollarIcon as CurrencyCircleDollar } from '@phosphor-icon
 import { ScrollIcon as Scroll } from '@phosphor-icons/react/Scroll';
 import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
 import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
+import { COLLECTION_COLORS } from '../constants/colors';
 
 export function timeAgo(timestamp) {
   const seconds = Math.floor((Date.now() - timestamp) / 1000);
@@ -65,6 +66,5 @@ export function getCategoryLabel(categoryId) {
 }
 
 export function getRandomColor() {
-  const colors = ['#7c3aed', '#dc2626', '#2563eb', '#d4a017', '#16a34a', '#4c1d95', '#9333ea', '#00c4cc'];
-  return colors[Math.floor(Math.random() * colors.length)];
+  return COLLECTION_COLORS[Math.floor(Math.random() * COLLECTION_COLORS.length)];
 }

@@ -1,5 +1,4 @@
-import { useState } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon as X } from '@phosphor-icons/react/X';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
@@ -10,6 +9,15 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
   const [name, setName] = useState('');
   const [note, setNote] = useState('');
   const [imageFile, setImageFile] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();

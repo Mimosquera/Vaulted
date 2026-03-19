@@ -1,5 +1,4 @@
 import { useMemo, useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
@@ -26,7 +25,7 @@ export default function Explore() {
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (c) => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q)
+        (c) => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
       );
     }
     if (filterCategory) {

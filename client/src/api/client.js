@@ -132,7 +132,7 @@ export async function uploadImageAPI(id, base64Data, mimeType) {
   });
 }
 
-export function getImageURL(id) {
+export function getImageUrl(id) {
   return `${API_URL}/api/images/${id}`;
 }
 

@@ -1,5 +1,4 @@
 import { useState, useMemo, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
@@ -8,6 +7,7 @@ import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { VaultIcon as Vault } from '@phosphor-icons/react/Vault';
 import { ArrowsClockwiseIcon as ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
 import useStore, { CATEGORIES } from '../store/useStore';
+import { CONFETTI_COLORS } from '../constants/colors';
 import CollectionGrid from '../components/Collection/CollectionGrid';
 import CreateCollectionModal from '../components/Modals/CreateCollectionModal';
 import BlobBackground from '../components/UI/BlobBackground';
@@ -35,7 +35,7 @@ export default function Dashboard() {
     if (search) {
       const q = search.toLowerCase();
       result = result.filter(
-        (c) => c.name.toLowerCase().includes(q) || c.description.toLowerCase().includes(q)
+        (c) => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
       );
     }
     if (filterCategory) {
@@ -57,7 +57,7 @@ export default function Dashboard() {
         particleCount: 80,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#7c3aed', '#dc2626', '#2563eb', '#9333ea'],
+        colors: CONFETTI_COLORS,
       });
     }
   };

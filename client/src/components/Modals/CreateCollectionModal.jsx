@@ -1,18 +1,12 @@
-import { useState } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon as X } from '@phosphor-icons/react/X';
 import { PlusIcon as Plus } from '@phosphor-icons/react/Plus';
 import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
 import { CATEGORIES } from '../../store/useStore';
+import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
 import './Modal.scss';
-
-const COLORS = [
-  '#7c3aed', '#dc2626', '#2563eb', '#4c1d95', '#00c4cc', '#9333ea',
-  '#16a34a', '#d4a017', '#c2410c', '#4f46e5', '#ec4899', '#06b6d4',
-  '#8b5cf6', '#f97316', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'
-];
 
 export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
   const [name, setName] = useState('');
@@ -20,6 +14,15 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
   const [description, setDescription] = useState('');
   const [coverColor, setCoverColor] = useState('#7c3aed');
   const [coverImage, setCoverImage] = useState(null);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [isOpen]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -103,7 +106,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
               <div className="modal__field">
                 <label><Palette weight="duotone" size={16} /> Cover Color</label>
                 <div className="modal__colors">
-                  {COLORS.map((color) => (
+                  {COLLECTION_COLORS.map((color) => (
                     <button
                       type="button"
                       key={color}

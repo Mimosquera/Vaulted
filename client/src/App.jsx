@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import useStore from './store/useStore';
+import ErrorBoundary from './components/ErrorBoundary';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import FloatingParticles from './components/UI/FloatingParticles';
@@ -58,24 +58,26 @@ export default function App() {
   }, [init]);
 
   return (
-    <BrowserRouter>
-      <ScrollToTop />
-      <FloatingParticles />
-      <Navbar />
-      <AnimatedRoutes />
-      <Footer />
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: '#0f0f1e',
-            color: '#e0e0e8',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '12px',
-            fontSize: '14px',
-          },
-        }}
-      />
-    </BrowserRouter>
+    <ErrorBoundary>
+      <BrowserRouter>
+        <ScrollToTop />
+        <FloatingParticles />
+        <Navbar />
+        <AnimatedRoutes />
+        <Footer />
+        <Toaster
+          position="bottom-right"
+          toastOptions={{
+            style: {
+              background: '#0f0f1e',
+              color: '#e0e0e8',
+              border: '1px solid rgba(255,255,255,0.08)',
+              borderRadius: '12px',
+              fontSize: '14px',
+            },
+          }}
+        />
+      </BrowserRouter>
+    </ErrorBoundary>
   );
 }

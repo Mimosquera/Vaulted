@@ -187,7 +187,6 @@ const useStore = create((set, get) => ({
 
       set({ lastSynced: Date.now() });
     } catch (err) {
-      console.error('Sync to cloud failed:', err);
     } finally {
       set({ syncing: false });
     }
@@ -234,7 +233,6 @@ const useStore = create((set, get) => ({
 
       set({ lastSynced: Date.now() });
     } catch (err) {
-      console.error('Sync from cloud failed:', err);
     } finally {
       set({ syncing: false });
     }
@@ -258,7 +256,6 @@ const useStore = create((set, get) => ({
           });
           await api.uploadImageAPI(imageId, base64, coverImage.type);
         } catch (err) {
-          console.error('Cover image upload failed:', err);
         }
       }
     }
@@ -290,7 +287,6 @@ const useStore = create((set, get) => ({
           createdAt: newCollection.createdAt,
         });
       } catch (err) {
-        console.error('Cloud sync failed for createCollection:', err);
       }
     }
 
@@ -313,7 +309,6 @@ const useStore = create((set, get) => ({
           });
           await api.uploadImageAPI(imageId, base64, updates.coverImage.type);
         } catch (err) {
-          console.error('Cover image upload failed:', err);
         }
       }
       delete updates.coverImage;
@@ -340,7 +335,6 @@ const useStore = create((set, get) => ({
         }
         await api.updateCollectionAPI(id, updatePayload);
       } catch (err) {
-        console.error('Cloud sync failed for updateCollection:', err);
       }
     }
   },
@@ -361,7 +355,6 @@ const useStore = create((set, get) => ({
       try {
         await api.deleteCollectionAPI(id);
       } catch (err) {
-        console.error('Cloud sync failed for deleteCollection:', err);
       }
     }
   },
@@ -378,7 +371,6 @@ const useStore = create((set, get) => ({
       try {
         await api.togglePublicAPI(id);
       } catch (err) {
-        console.error('Cloud sync failed for togglePublic:', err);
       }
     }
   },
@@ -401,7 +393,6 @@ const useStore = create((set, get) => ({
           });
           await api.uploadImageAPI(imageId, base64, imageFile.type);
         } catch (err) {
-          console.error('Image upload failed:', err);
         }
       }
     }
@@ -433,7 +424,6 @@ const useStore = create((set, get) => ({
           createdAt: newItem.createdAt,
         });
       } catch (err) {
-        console.error('Cloud sync failed for addItem:', err);
       }
     }
   },
@@ -454,7 +444,6 @@ const useStore = create((set, get) => ({
           });
           await api.uploadImageAPI(imageId, base64, updates.imageFile.type);
         } catch (err) {
-          console.error('Image upload failed:', err);
         }
       }
       delete updates.imageFile;
@@ -482,7 +471,6 @@ const useStore = create((set, get) => ({
           imageUrl: updates.imageUrl,
         });
       } catch (err) {
-        console.error('Cloud sync failed for updateItem:', err);
       }
     }
   },
@@ -505,7 +493,6 @@ const useStore = create((set, get) => ({
       try {
         await api.deleteItemAPI(itemId);
       } catch (err) {
-        console.error('Cloud sync failed for deleteItem:', err);
       }
     }
   },
@@ -516,7 +503,7 @@ const useStore = create((set, get) => ({
 
     // If authenticated, try server first
     if (get().isAuthenticated) {
-      return api.getImageURL(imageId);
+      return api.getImageUrl(imageId);
     }
 
     // Fall back to local storage

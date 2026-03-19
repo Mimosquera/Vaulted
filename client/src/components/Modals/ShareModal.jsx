@@ -1,5 +1,4 @@
-import { useState } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { XIcon as X } from '@phosphor-icons/react/X';
 import { CopyIcon as Copy } from '@phosphor-icons/react/Copy';
@@ -13,6 +12,15 @@ import './Modal.scss';
 export default function ShareModal({ isOpen, onClose, collection }) {
   const [copied, setCopied] = useState(false);
   const togglePublic = useStore((s) => s.togglePublic);
+
+  useEffect(() => {
+    if (isOpen) {
+      document.body.classList.add('modal-open');
+    } else {
+      document.body.classList.remove('modal-open');
+    }
+    return () => document.body.classList.remove('modal-open');
+  }, [isOpen]);
 
   if (!collection) return null;
 
