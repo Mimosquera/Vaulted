@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 // eslint-disable-next-line no-unused-vars
 import { motion, useScroll, useTransform } from 'framer-motion';
@@ -67,6 +67,15 @@ const CATEGORIES_SHOWCASE = [
 
 export default function Home() {
   const heroRef = useRef(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  useEffect(() => {
+    const handleResize = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Only use scroll animations on desktop
   const { scrollYProgress } = useScroll();
   const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
   const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
@@ -78,12 +87,12 @@ export default function Home() {
       <motion.section
         className="home__hero"
         ref={heroRef}
-        style={{ opacity: heroOpacity, scale: heroScale }}
+        style={isMobile ? {} : { opacity: heroOpacity, scale: heroScale }}
       >
         <BlobBackground />
 
-        {/* Floating icons */}
-        {FLOATING_ITEMS.map((item, i) => (
+        {/* Floating icons - only on desktop */}
+        {!isMobile && FLOATING_ITEMS.map((item, i) => (
           <motion.span
             key={i}
             className="home__floating-item"
@@ -159,8 +168,8 @@ export default function Home() {
         <div className="home__categories-track">
           <motion.div
             className="home__categories-scroll"
-            animate={{ x: [0, -800] }}
-            transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            animate={!isMobile ? { x: [0, -800] } : {}}
+            transition={!isMobile ? { duration: 20, repeat: Infinity, ease: 'linear' } : {}}
           >
             {[...CATEGORIES_SHOWCASE, ...CATEGORIES_SHOWCASE].map((cat, i) => (
               <span key={i} className="home__category-chip">
