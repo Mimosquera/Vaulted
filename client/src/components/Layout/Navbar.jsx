@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 // eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { Squash as Hamburger } from 'hamburger-react';
@@ -47,7 +48,17 @@ export default function Navbar() {
 
   const handleLogout = () => {
     logout();
+    toast.success('Signed out successfully', {
+      icon: false,
+      duration: 3000,
+    });
     navigate('/');
+  };
+
+  const handleHomeClick = () => {
+    if (location.pathname === '/') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const navLinks = isAuthenticated
@@ -103,7 +114,7 @@ export default function Navbar() {
         transition={isInitialLoad ? { type: 'spring', stiffness: 100, damping: 20 } : { duration: 0 }}
       >
         <div className="navbar__inner">
-          <Link to="/" className="navbar__logo">
+          <Link to="/" className="navbar__logo" onClick={handleHomeClick}>
             <motion.div
               className="navbar__logo-icon"
               whileHover={{ rotate: 180, scale: 1.15 }}
@@ -127,6 +138,7 @@ export default function Navbar() {
               <Link
                 key={link.to}
                 to={link.to}
+                onClick={link.to === '/' ? handleHomeClick : undefined}
                 className={`navbar__link ${location.pathname === link.to ? 'navbar__link--active' : ''}`}
               >
                 {link.icon}
@@ -163,7 +175,7 @@ export default function Navbar() {
               toggled={isOpen}
               toggle={setIsOpen}
               size={22}
-              color="#c8c8d0"
+              color="#7c3aed"
               rounded
               duration={0.4}
             />

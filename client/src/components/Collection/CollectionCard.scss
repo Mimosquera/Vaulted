@@ -33,6 +33,29 @@
     &::before {
       content: '';
       position: absolute;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(
+          45deg,
+          transparent,
+          transparent 2px,
+          rgba(255, 255, 255, 0.03) 2px,
+          rgba(255, 255, 255, 0.03) 4px
+        ),
+        repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 2px,
+          rgba(0, 0, 0, 0.05) 2px,
+          rgba(0, 0, 0, 0.05) 4px
+        );
+      z-index: 2;
+      pointer-events: none;
+    }
+
+    &::after {
+      content: '';
+      position: absolute;
       bottom: 0;
       left: 0;
       right: 0;

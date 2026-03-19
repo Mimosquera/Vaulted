@@ -8,7 +8,7 @@ import { CameraIcon as Camera } from '@phosphor-icons/react/Camera';
 import { ArrowRightIcon as ArrowRight } from '@phosphor-icons/react/ArrowRight';
 import { ShieldCheckIcon as ShieldCheck } from '@phosphor-icons/react/ShieldCheck';
 import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
-import { CardsIcon as Cards } from '@phosphor-icons/react/Cards';
+import { StackIcon as Stack } from '@phosphor-icons/react/Stack';
 import { VinylRecordIcon as VinylRecord } from '@phosphor-icons/react/VinylRecord';
 import { PersonArmsSpreadIcon as PersonArmsSpread } from '@phosphor-icons/react/PersonArmsSpread';
 import { SneakerIcon as Sneaker } from '@phosphor-icons/react/Sneaker';
@@ -24,7 +24,7 @@ import CategoryIcon from '../components/UI/CategoryIcon';
 import './Home.scss';
 
 const FLOATING_ITEMS = [
-  { Icon: Cards, x: '10%', y: '20%', delay: 0, size: 36, color: '#7c3aed' },
+  { Icon: Stack, x: '10%', y: '20%', delay: 0, size: 36, color: '#7c3aed' },
   { Icon: VinylRecord, x: '80%', y: '15%', delay: 1.2, size: 32, color: '#2563eb' },
   { Icon: PersonArmsSpread, x: '15%', y: '70%', delay: 0.6, size: 28, color: '#dc2626' },
   { Icon: Sneaker, x: '85%', y: '60%', delay: 1.8, size: 34, color: '#9333ea' },

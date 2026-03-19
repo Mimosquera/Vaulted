@@ -100,7 +100,12 @@
   font-size: $fs-md;
 }
 
-// ── Mobile: Disable :active states on touch devices ──
+// ── Mobile: Reduce padding on large buttons ──
+@media (max-width: 768px) {
+  .btn--lg {
+    padding: $space-sm $space-md;
+  }
+}
 @media (hover: none) {
   .btn--primary:active,
   .btn--secondary:active,

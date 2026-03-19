@@ -10,6 +10,7 @@ import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
 import { UserIcon as User } from '@phosphor-icons/react/User';
 import { timeAgo } from '../../utils/helpers';
+import { getCollectionGradient } from '../../constants/colors';
 import CategoryIcon from '../UI/CategoryIcon';
 import EditCollectionModal from '../Modals/EditCollectionModal';
 import useStore from '../../store/useStore';
@@ -97,8 +98,7 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
           <div
             className="collection-card__cover"
             style={{
-              backgroundImage: coverUrl ? `url(${coverUrl})` : 'none',
-              backgroundColor: coverUrl ? 'transparent' : collection.coverColor,
+              backgroundImage: coverUrl ? `url(${coverUrl})` : getCollectionGradient(collection.coverColor),
             }}
           >
             {!coverUrl && (

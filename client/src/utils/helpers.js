@@ -1,4 +1,4 @@
-import { CardsIcon as Cards } from '@phosphor-icons/react/Cards';
+import { StackIcon as Stack } from '@phosphor-icons/react/Stack';
 import { MusicNotesIcon as MusicNotes } from '@phosphor-icons/react/MusicNotes';
 import { PersonArmsSpreadIcon as PersonArmsSpread } from '@phosphor-icons/react/PersonArmsSpread';
 import { TShirtIcon as TShirt } from '@phosphor-icons/react/TShirt';
@@ -29,7 +29,7 @@ export function timeAgo(timestamp) {
 }
 
 const CATEGORY_ICONS = {
-  'trading-cards': Cards,
+  'trading-cards': Stack,
   music: MusicNotes,
   figures: PersonArmsSpread,
   clothes: TShirt,
