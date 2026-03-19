@@ -32,6 +32,10 @@ export default function ShareModal({ isOpen, onClose, collection }) {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleTogglePublic = async () => {
+    await togglePublic(collection.id);
+  };
+
   return (
     <AnimatePresence>
       {isOpen && (
@@ -68,7 +72,7 @@ export default function ShareModal({ isOpen, onClose, collection }) {
                 </span>
                 <button
                   className="btn btn--secondary btn--sm"
-                  onClick={() => togglePublic(collection.id)}
+                  onClick={handleTogglePublic}
                 >
                   {collection.isPublic ? 'Make Private' : 'Make Public'}
                 </button>

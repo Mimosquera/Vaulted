@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import localforage from 'localforage';
@@ -186,8 +187,7 @@ const useStore = create((set, get) => ({
       });
 
       set({ lastSynced: Date.now() });
-    } catch (err) {
-    } finally {
+    } catch (err) { /* empty */ } finally {
       set({ syncing: false });
     }
   },
@@ -232,8 +232,7 @@ const useStore = create((set, get) => ({
       }
 
       set({ lastSynced: Date.now() });
-    } catch (err) {
-    } finally {
+    } catch (err) { /* empty */ } finally {
       set({ syncing: false });
     }
   },
@@ -255,8 +254,7 @@ const useStore = create((set, get) => ({
             reader.readAsDataURL(coverImage);
           });
           await api.uploadImageAPI(imageId, base64, coverImage.type);
-        } catch (err) {
-        }
+        } catch (err) { /* empty */ }
       }
     }
 
@@ -286,7 +284,14 @@ const useStore = create((set, get) => ({
           coverImageUrl,
           createdAt: newCollection.createdAt,
         });
+        // Sync to ensure all changes are reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        set((state) => ({
+          collections: state.collections.filter((c) => c.id !== newCollection.id),
+        }));
+        await get()._persist();
       }
     }
 
@@ -294,6 +299,10 @@ const useStore = create((set, get) => ({
   },
 
   updateCollection: async (id, updates) => {
+    // Save old state for rollback
+    const oldCollection = get().collections.find((c) => c.id === id);
+    if (!oldCollection) return;
+
     if (updates.coverImage) {
       const imageId = `cover-${nanoid()}`;
       await imageStore.setItem(imageId, updates.coverImage);
@@ -308,8 +317,7 @@ const useStore = create((set, get) => ({
             reader.readAsDataURL(updates.coverImage);
           });
           await api.uploadImageAPI(imageId, base64, updates.coverImage.type);
-        } catch (err) {
-        }
+        } catch (err) { /* empty */ }
       }
       delete updates.coverImage;
     }
@@ -334,7 +342,16 @@ const useStore = create((set, get) => ({
           updatePayload.coverImageUrl = updates.coverImageUrl;
         }
         await api.updateCollectionAPI(id, updatePayload);
+        // Sync to ensure all changes are reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        set((state) => ({
+          collections: state.collections.map((c) =>
+            c.id === id ? oldCollection : c
+          ),
+        }));
+        await get()._persist();
       }
     }
   },
@@ -354,7 +371,16 @@ const useStore = create((set, get) => ({
     if (get().isAuthenticated) {
       try {
         await api.deleteCollectionAPI(id);
+        // Sync to ensure deletion is reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        if (col) {
+          set((state) => ({
+            collections: [col, ...state.collections],
+          }));
+          await get()._persist();
+        }
       }
     }
   },
@@ -370,7 +396,16 @@ const useStore = create((set, get) => ({
     if (get().isAuthenticated) {
       try {
         await api.togglePublicAPI(id);
+        // Immediately sync to ensure public/private state is synced
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        set((state) => ({
+          collections: state.collections.map((c) =>
+            c.id === id ? { ...c, isPublic: !c.isPublic } : c
+          ),
+        }));
+        await get()._persist();
       }
     }
   },
@@ -392,8 +427,7 @@ const useStore = create((set, get) => ({
             reader.readAsDataURL(imageFile);
           });
           await api.uploadImageAPI(imageId, base64, imageFile.type);
-        } catch (err) {
-        }
+        } catch (err) { /* empty */ }
       }
     }
 
@@ -423,12 +457,28 @@ const useStore = create((set, get) => ({
           imageUrl,
           createdAt: newItem.createdAt,
         });
+        // Sync to ensure item is reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        set((state) => ({
+          collections: state.collections.map((c) =>
+            c.id === collectionId
+              ? { ...c, items: c.items.filter((i) => i.id !== newItem.id), itemCount: c.items.length - 1 }
+              : c
+          ),
+        }));
+        await get()._persist();
       }
     }
   },
 
   updateItem: async (collectionId, itemId, updates) => {
+    // Save old item for rollback
+    const col = get().collections.find((c) => c.id === collectionId);
+    const oldItem = col?.items.find((i) => i.id === itemId);
+    if (!oldItem) return;
+
     if (updates.imageFile) {
       const imageId = `img-${nanoid()}`;
       await imageStore.setItem(imageId, updates.imageFile);
@@ -443,8 +493,7 @@ const useStore = create((set, get) => ({
             reader.readAsDataURL(updates.imageFile);
           });
           await api.uploadImageAPI(imageId, base64, updates.imageFile.type);
-        } catch (err) {
-        }
+        } catch (err) { /* empty */ }
       }
       delete updates.imageFile;
     }
@@ -470,7 +519,23 @@ const useStore = create((set, get) => ({
           note: updates.note,
           imageUrl: updates.imageUrl,
         });
+        // Sync to ensure item update is reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        set((state) => ({
+          collections: state.collections.map((c) =>
+            c.id === collectionId
+              ? {
+                  ...c,
+                  items: c.items.map((item) =>
+                    item.id === itemId ? oldItem : item
+                  ),
+                }
+              : c
+          ),
+        }));
+        await get()._persist();
       }
     }
   },
@@ -492,7 +557,20 @@ const useStore = create((set, get) => ({
     if (get().isAuthenticated) {
       try {
         await api.deleteItemAPI(itemId);
+        // Sync to ensure deletion is reflected
+        await get().syncToCloud();
       } catch (err) {
+        // Revert on error
+        if (item && col) {
+          set((state) => ({
+            collections: state.collections.map((c) =>
+              c.id === collectionId
+                ? { ...c, items: [...c.items, item], itemCount: c.items.length + 1 }
+                : c
+            ),
+          }));
+          await get()._persist();
+        }
       }
     }
   },
