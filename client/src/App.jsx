@@ -19,6 +19,7 @@ const Explore = lazy(() => import('./pages/Explore'));
 const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
+const DevPerfPanel = import.meta.env.DEV ? lazy(() => import('./components/UI/DevPerfPanel')) : null;
 
 // Renders only after Suspense resolves (lazy component loaded).
 // Reveals #root so navbar/footer snap visible while the route animates in.
@@ -87,6 +88,11 @@ function AppContent() {
             },
           }}
         />
+        {DevPerfPanel && (
+          <Suspense fallback={null}>
+            <DevPerfPanel />
+          </Suspense>
+        )}
       </BrowserRouter>
     </ErrorBoundary>
   );

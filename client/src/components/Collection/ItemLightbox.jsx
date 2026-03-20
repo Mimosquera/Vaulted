@@ -48,6 +48,7 @@ export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
               widthHint={1600}
               wrapperClassName="item-lightbox__safe-image"
               imageClassName="item-lightbox__image"
+              metricContext="lightbox"
             />
             <div className="item-lightbox__info">
               <h3 className="item-lightbox__name">{item.name}</h3>

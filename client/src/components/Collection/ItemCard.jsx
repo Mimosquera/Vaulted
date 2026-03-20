@@ -73,6 +73,7 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
               wrapperClassName="item-card__media"
               imageClassName="item-card__media-img"
               widthHint={360}
+              metricContext="item-card"
             />
 
             {!imageUrl && (

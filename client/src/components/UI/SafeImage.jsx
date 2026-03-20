@@ -1,6 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import { optimizeImageUrl } from '../../utils/helpers';
+import { reportImageTiming } from '../../utils/performanceMetrics';
 import './SafeImage.scss';
 
 const IMAGE_STATE = {
@@ -35,8 +36,10 @@ function SafeImageWithSource({
   loading,
   widthHint,
   fetchPriority,
+  metricContext,
 }) {
   const [state, setState] = useState(IMAGE_STATE.LOADING);
+  const startRef = useRef(0);
   const fit = objectFit === 'contain' ? 'contain' : 'cover';
 
   const optimizedSrc = useMemo(() => {
@@ -50,6 +53,10 @@ function SafeImageWithSource({
     const twoX = optimizeImageUrl(src, { width: widthHint * 2, fit });
     return `${oneX} 1x, ${twoX} 2x`;
   }, [src, widthHint, fit]);
+
+  useEffect(() => {
+    startRef.current = typeof performance !== 'undefined' ? performance.now() : Date.now();
+  }, [optimizedSrc]);
 
   const classes = [
     'safe-image',
@@ -72,7 +79,17 @@ function SafeImageWithSource({
           loading={loading}
           decoding="async"
           fetchPriority={fetchPriority}
-          onLoad={() => setState(IMAGE_STATE.LOADED)}
+          onLoad={() => {
+            const end = typeof performance !== 'undefined' ? performance.now() : Date.now();
+            reportImageTiming({
+              durationMs: end - startRef.current,
+              context: metricContext,
+              src: optimizedSrc,
+              loading,
+              widthHint,
+            });
+            setState(IMAGE_STATE.LOADED);
+          }}
           onError={() => setState(IMAGE_STATE.ERROR)}
         />
       )}
@@ -93,6 +110,7 @@ export default function SafeImage({
   loading = 'lazy',
   widthHint,
   fetchPriority = 'auto',
+  metricContext = 'image',
 }) {
   if (!src) {
     return (
@@ -119,6 +137,7 @@ export default function SafeImage({
       loading={loading}
       widthHint={widthHint}
       fetchPriority={fetchPriority}
+      metricContext={metricContext}
     />
   );
 }

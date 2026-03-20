@@ -43,6 +43,7 @@ function PublicItemCard({ item, index = 0, onExpand }) {
             wrapperClassName="item-card__media"
             imageClassName="item-card__media-img"
             widthHint={360}
+            metricContext="public-item-card"
           />
 
           {!imageUrl && (

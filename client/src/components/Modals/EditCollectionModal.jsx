@@ -103,6 +103,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
                     wrapperClassName="modal__cover-preview"
                     imageClassName="modal__cover-preview-img"
                     widthHint={900}
+                    metricContext="modal-cover-preview"
                   />
                 </div>
               )}
