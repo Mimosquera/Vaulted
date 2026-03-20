@@ -21,18 +21,28 @@ export default function Register() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const emailInvalid = email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const usernameInvalid = username.trim().length > 0 && username.trim().length < 2;
+  const passwordInvalid = password.length > 0 && password.length < 8;
+  const confirmInvalid = confirmPassword.length > 0 && confirmPassword !== password;
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
     // Validation
-    if (!email || !username || !password || !confirmPassword) {
+    if (!email || !password || !confirmPassword) {
       setError('Please fill in all fields.');
       return;
     }
 
-    if (password.length < 6) {
-      setError('Password must be at least 6 characters.');
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters.');
+      return;
+    }
+
+    if (username && username.trim().length < 2) {
+      setError('Username must be at least 2 characters.');
       return;
     }
 
@@ -96,6 +106,9 @@ export default function Register() {
                 maxLength={30}
                 autoComplete="username"
               />
+              <span className={`auth__hint ${usernameInvalid ? 'auth__hint--error' : ''}`}>
+                {usernameInvalid ? 'Use at least 2 characters.' : '2-30 letters or numbers.'}
+              </span>
             </div>
 
             <div className="auth__field">
@@ -112,6 +125,9 @@ export default function Register() {
                 required
                 autoComplete="email"
               />
+              <span className={`auth__hint ${emailInvalid ? 'auth__hint--error' : ''}`}>
+                {emailInvalid ? 'Enter a valid email address.' : 'We will never share your email.'}
+              </span>
             </div>
 
             <div className="auth__field">
@@ -124,11 +140,14 @@ export default function Register() {
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Min 6 characters"
+                placeholder="Min 8 characters"
                 required
                 autoComplete="new-password"
-                minLength={6}
+                minLength={8}
               />
+              <span className={`auth__hint ${passwordInvalid ? 'auth__hint--error' : ''}`}>
+                {passwordInvalid ? 'Password must be at least 8 characters.' : 'Use 8+ characters for stronger security.'}
+              </span>
             </div>
 
             <div className="auth__field">
@@ -144,8 +163,11 @@ export default function Register() {
                 placeholder="Confirm your password"
                 required
                 autoComplete="new-password"
-                minLength={6}
+                minLength={8}
               />
+              <span className={`auth__hint ${confirmInvalid ? 'auth__hint--error' : ''}`}>
+                {confirmInvalid ? 'Passwords do not match.' : 'Re-enter your password to confirm.'}
+              </span>
             </div>
 
             <button

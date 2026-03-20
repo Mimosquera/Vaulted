@@ -20,6 +20,8 @@ export default function Login() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  const emailInvalid = email.length > 0 && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
   useEffect(() => {
     if (authExpiredMessage) {
       setError(authExpiredMessage);
@@ -92,6 +94,9 @@ export default function Login() {
                 required
                 autoComplete="email"
               />
+              <span className={`auth__hint ${emailInvalid ? 'auth__hint--error' : ''}`}>
+                {emailInvalid ? 'Enter a valid email address.' : 'Use the email associated with your account.'}
+              </span>
             </div>
 
             <div className="auth__field">
@@ -107,8 +112,8 @@ export default function Login() {
                 placeholder="Your password"
                 required
                 autoComplete="current-password"
-                minLength={6}
               />
+              <span className="auth__hint">Enter your account password.</span>
             </div>
 
             <button

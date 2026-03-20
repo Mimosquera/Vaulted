@@ -2,10 +2,12 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
+import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
+import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
-import SafeImage from '../UI/SafeImage';
 import useStore from '../../store/useStore';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
@@ -15,6 +17,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
   const [category, setCategory] = useState('');
   const [description, setDescription] = useState('');
   const [coverColor, setCoverColor] = useState('#7c3aed');
+  const [visibility, setVisibility] = useState('private');
   const [coverImage, setCoverImage] = useState(null);
   const [currentCoverUrl, setCurrentCoverUrl] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
@@ -27,6 +30,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
       setCategory(collection.category);
       setDescription(collection.description || '');
       setCoverColor(collection.coverColor);
+      setVisibility(collection.visibility || (collection.isPublic ? 'public' : 'private'));
 
       if (collection.coverImageUrl) {
         getImageUrl(collection.coverImageUrl).then((url) => {
@@ -49,7 +53,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
 
     try {
       await onUpdate(
-        { name: name.trim(), category, description: description.trim(), coverColor, coverImage },
+        { name: name.trim(), category, description: description.trim(), coverColor, coverImage, visibility },
         (progress) => setUploadProgress(progress)
       );
       onClose();
@@ -89,24 +93,10 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
             <form onSubmit={handleSubmit} className="modal__body">
               <ImageUploader
                 onFileSelect={setCoverImage}
+                currentPreview={currentCoverUrl}
                 isUploading={isUploading}
                 uploadProgress={uploadProgress}
               />
-
-              {currentCoverUrl && (
-                <div className="modal__field">
-                  <label>Current Cover</label>
-                  <SafeImage
-                    src={currentCoverUrl}
-                    alt="Current cover"
-                    aspectRatio="16 / 6"
-                    wrapperClassName="modal__cover-preview"
-                    imageClassName="modal__cover-preview-img"
-                    widthHint={900}
-                    metricContext="modal-cover-preview"
-                  />
-                </div>
-              )}
 
               <div className="modal__field">
                 <label>Name</label>
@@ -148,6 +138,21 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
               </div>
 
               <div className="modal__field">
+                <label>Visibility</label>
+                <div className="modal__visibility-options">
+                  <button type="button" className={`modal__visibility-option ${visibility === 'private' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('private')}>
+                    <EyeSlash size={16} /> Private
+                  </button>
+                  <button type="button" className={`modal__visibility-option ${visibility === 'friends_only' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('friends_only')}>
+                    <UsersThree size={16} /> Friends
+                  </button>
+                  <button type="button" className={`modal__visibility-option ${visibility === 'public' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('public')}>
+                    <Eye size={16} /> Public
+                  </button>
+                </div>
+              </div>
+
+              <div className="modal__field">
                 <label><Palette weight="duotone" size={16} /> Cover Color</label>
                 <div className="modal__colors">
                   {COLLECTION_COLORS.map((color) => (
@@ -163,7 +168,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
               </div>
 
               <div className="modal__actions">
-                <button className="btn btn--secondary" onClick={onClose}>
+                <button type="button" className="btn btn--secondary" onClick={onClose}>
                   Cancel
                 </button>
                 <button

@@ -7,6 +7,7 @@ import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import useStore from '../store/useStore';
 import ItemCard from '../components/Collection/ItemCard';
@@ -31,7 +32,6 @@ export default function CollectionView() {
   const updateItem = useStore((s) => s.updateItem);
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
-  const togglePublic = useStore((s) => s.togglePublic);
   const getImageUrl = useStore((s) => s.getImageUrl);
   const prefetchImages = useStore((s) => s.prefetchImages);
 
@@ -136,6 +136,7 @@ export default function CollectionView() {
   };
 
   const coverColor = collection.coverColor || '#7c3aed';
+  const visibility = collection.visibility || (collection.isPublic ? 'public' : 'private');
   const coverWidthHint = Math.min(2200, Math.max(900, Math.round(window.innerWidth * (window.devicePixelRatio || 1))));
   const optimizedCoverUrl = coverUrl ? optimizeImageUrl(coverUrl, { width: coverWidthHint, fit: 'cover' }) : null;
 
@@ -179,9 +180,14 @@ export default function CollectionView() {
           <div className="collection-view__category">
             <CategoryIcon category={collection.category} size={16} />
             {getCategoryLabel(collection.category)}
-            {collection.isPublic && (
+            {visibility === 'public' && (
               <span className="collection-view__public-badge">
                 <Eye weight="bold" size={11} /> Public
+              </span>
+            )}
+            {visibility === 'friends_only' && (
+              <span className="collection-view__public-badge">
+                <UsersThree weight="bold" size={11} /> Friends
               </span>
             )}
           </div>
@@ -219,9 +225,11 @@ export default function CollectionView() {
               <ShareNetwork weight="bold" size={16} />
               Share
             </button>
-            <button className="btn btn--ghost" onClick={() => togglePublic(collection.id)}>
-              {collection.isPublic ? <EyeSlash weight="bold" size={16} /> : <Eye weight="bold" size={16} />}
-              {collection.isPublic ? 'Private' : 'Public'}
+            <button className="btn btn--ghost" onClick={() => setShareModalOpen(true)}>
+              {visibility === 'public' && <Eye weight="bold" size={16} />}
+              {visibility === 'friends_only' && <UsersThree weight="bold" size={16} />}
+              {visibility === 'private' && <EyeSlash weight="bold" size={16} />}
+              {visibility === 'public' ? 'Public' : visibility === 'friends_only' ? 'Friends' : 'Private'}
             </button>
             <button className="btn btn--danger btn--sm" onClick={handleDelete}>
               <Trash2 strokeWidth={2} size={14} />

@@ -7,6 +7,7 @@
   justify-content: center;
   min-height: 100vh;
   padding-top: 80px;
+  padding-bottom: 120px;
 
   &__container {
     width: 100%;
@@ -98,6 +99,16 @@
     font-weight: 400;
     color: $text-muted;
     font-size: $fs-xs;
+  }
+
+  &__hint {
+    font-size: $fs-xs;
+    color: $text-muted;
+    min-height: 14px;
+
+    &--error {
+      color: #fca5a5;
+    }
   }
 
   &__submit {

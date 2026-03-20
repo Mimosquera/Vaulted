@@ -11,6 +11,8 @@ import collectionRoutes from './routes/collections.js';
 import itemRoutes from './routes/items.js';
 import syncRoutes from './routes/sync.js';
 import imageRoutes from './routes/images.js';
+import friendsRoutes from './routes/friends.js';
+import userRoutes from './routes/users.js';
 
 // Middleware
 import { errorHandler, notFoundHandler } from './middleware/errorHandler.js';
@@ -142,6 +144,8 @@ app.use('/api/collections/:collectionId/items', itemRoutes);
 app.use('/api/items', itemRoutes);
 app.use('/api/sync', syncRoutes);
 app.use('/api/images', imageRoutes);
+app.use('/api/friends', friendsRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

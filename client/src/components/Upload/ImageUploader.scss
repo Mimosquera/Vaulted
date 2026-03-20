@@ -75,9 +75,33 @@
   }
 
   &__remove {
+    width: 44px;
+    height: 44px;
+    border-radius: $radius-full;
+    background: rgba(0, 0, 0, 0.6);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    transition: background $transition-fast;
+
+    &:hover {
+      background: rgba($accent-secondary, 0.8);
+    }
+  }
+
+  &__preview-actions {
     position: absolute;
     top: $space-sm;
     right: $space-sm;
+    display: flex;
+    gap: $space-xs;
+    z-index: 2;
+  }
+
+  &__action-btn {
     width: 44px;
     height: 44px;
     border-radius: $radius-full;

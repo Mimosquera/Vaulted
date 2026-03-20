@@ -1,12 +1,14 @@
 import { useState, useEffect, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import Tilt from 'react-parallax-tilt';
 import { Trash2, Edit2 } from 'lucide-react';
 import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { DotsThreeIcon as DotsThree } from '@phosphor-icons/react/DotsThree';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { UserIcon as User } from '@phosphor-icons/react/User';
 import { timeAgo, isCloudUrl } from '../../utils/helpers';
 import { getCollectionGradient } from '../../constants/colors';
@@ -22,11 +24,27 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
   const hasHover = useHasHover();
-  const togglePublic = useStore((s) => s.togglePublic);
+  const menuRef = useRef(null);
+  const setCollectionVisibility = useStore((s) => s.setCollectionVisibility);
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
   const getImageUrl = useStore((s) => s.getImageUrl);
   const mountedRef = useRef(true);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -63,11 +81,22 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
     setMenuOpen(false);
   };
 
-  const handleTogglePublic = (e) => {
+  const visibility = collection.visibility || (collection.isPublic ? 'public' : 'private');
+
+  const handleSetVisibility = async (nextVisibility, e) => {
     e.preventDefault();
     e.stopPropagation();
-    togglePublic(collection.id);
-    setMenuOpen(false);
+    try {
+      await setCollectionVisibility(collection.id, nextVisibility);
+      const label = nextVisibility === 'friends_only'
+        ? 'Friends only'
+        : `${nextVisibility.charAt(0).toUpperCase()}${nextVisibility.slice(1)}`;
+      toast.success(`Visibility set to ${label}`);
+    } catch {
+      toast.error('Unable to update visibility. Please try again.');
+    } finally {
+      setMenuOpen(false);
+    }
   };
 
   const handleEditClick = (e) => {
@@ -117,44 +146,56 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
             <div className="collection-card__cover-overlay" />
 
             <div className="collection-card__badges">
-              {collection.isPublic && (
+              {visibility === 'public' && (
                 <span className="collection-card__badge collection-card__badge--public">
                   <Eye weight="bold" size={12} /> Public
+                </span>
+              )}
+              {visibility === 'friends_only' && (
+                <span className="collection-card__badge collection-card__badge--public">
+                  <UsersThree weight="bold" size={12} /> Friends
                 </span>
               )}
             </div>
 
             {!isVisitor && (
-              <button
-                className="collection-card__menu-btn"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setMenuOpen(!menuOpen);
-                }}
-              >
-                <DotsThree weight="bold" size={20} />
-              </button>
-            )}
+              <div ref={menuRef}>
+                <button
+                  className="collection-card__menu-btn"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setMenuOpen(!menuOpen);
+                  }}
+                >
+                  <DotsThree weight="bold" size={20} />
+                </button>
 
-            {!isVisitor && menuOpen && (
-              <motion.div
-                className="collection-card__menu"
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                onClick={(e) => e.preventDefault()}
-              >
-                <button onClick={handleEditClick}>
-                  <Edit2 strokeWidth={2} size={14} /> Edit
-                </button>
-                <button onClick={handleTogglePublic}>
-                  {collection.isPublic ? <EyeSlash size={16} /> : <Eye size={16} />}
-                  {collection.isPublic ? 'Make Private' : 'Make Public'}
-                </button>
-                <button className="collection-card__menu-danger" onClick={handleDelete}>
-                  <Trash2 strokeWidth={2} size={14} /> Delete
-                </button>
-              </motion.div>
+                {menuOpen && (
+                  <motion.div
+                    className="collection-card__menu"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    onClick={(e) => e.preventDefault()}
+                  >
+                    <button onClick={handleEditClick}>
+                      <Edit2 strokeWidth={2} size={14} /> Edit
+                    </button>
+                    <button onClick={(e) => handleSetVisibility('public', e)}>
+                      <Eye size={16} /> Make Public
+                    </button>
+                    <button onClick={(e) => handleSetVisibility('friends_only', e)}>
+                      <UsersThree size={16} /> Friends Only
+                    </button>
+                    <button onClick={(e) => handleSetVisibility('private', e)}>
+                      <EyeSlash size={16} /> Make Private
+                    </button>
+                    <button className="collection-card__menu-danger" onClick={handleDelete}>
+                      <Trash2 strokeWidth={2} size={14} /> Delete
+                    </button>
+                  </motion.div>
+                )}
+              </div>
             )}
           </div>
 

@@ -202,9 +202,9 @@ export default function PublicCollectionView() {
             <p className="collection-view__desc">{collection.description}</p>
           )}
           <div className="collection-view__visitor-meta">
-            <span className="collection-view__owner">
+            <Link className="collection-view__owner" to={`/u/${collection.userId}`}>
               <User weight="bold" size={14} /> {collection.username}
-            </span>
+            </Link>
             <span className="collection-view__count">
               {collection.items.length} {collection.items.length === 1 ? 'item' : 'items'}
             </span>

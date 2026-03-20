@@ -32,31 +32,47 @@ export const ERROR_MESSAGES = {
 export function getUserFriendlyError(error) {
   if (!error) return ERROR_MESSAGES.SOMETHING_WRONG;
 
-  const message = error.message || error.toString();
+  const message = String(error.message || error.toString() || '').trim();
+  const normalized = message.toLowerCase();
 
-  // Check for specific error patterns
-  if (message.includes('401') || message.includes('Unauthorized')) {
-    return ERROR_MESSAGES.AUTH_REQUIRED;
+  if (!message) return ERROR_MESSAGES.SOMETHING_WRONG;
+
+  if (normalized.includes('password') && (normalized.includes('at least 8') || normalized.includes('length must'))) {
+    return ERROR_MESSAGES.PASSWORD_TOO_SHORT;
   }
-  if (message.includes('403') || message.includes('Forbidden')) {
-    return ERROR_MESSAGES.FORBIDDEN;
-  }
-  if (message.includes('404') || message.includes('not found')) {
-    return ERROR_MESSAGES.COLLECTION_NOT_FOUND;
-  }
-  if (message.includes('already exists') || message.includes('duplicate')) {
+
+  if (normalized.includes('unable to create account with this email') || normalized.includes('already exists') || normalized.includes('duplicate')) {
     return ERROR_MESSAGES.EMAIL_EXISTS;
   }
-  if (message.includes('Invalid') || message.includes('invalid')) {
-    if (message.includes('email')) return ERROR_MESSAGES.INVALID_EMAIL;
-    if (message.includes('password')) return ERROR_MESSAGES.INVALID_CREDENTIALS;
+
+  if (normalized.includes('invalid email or password')) {
     return ERROR_MESSAGES.INVALID_CREDENTIALS;
   }
-  if (message.includes('Network') || message.includes('ECONNREFUSED')) {
+
+  // Check for specific error patterns
+  if (normalized.includes('401') || normalized.includes('unauthorized')) {
+    return ERROR_MESSAGES.AUTH_REQUIRED;
+  }
+  if (normalized.includes('403') || normalized.includes('forbidden')) {
+    return ERROR_MESSAGES.FORBIDDEN;
+  }
+  if (normalized.includes('404') || normalized.includes('not found')) {
+    return ERROR_MESSAGES.COLLECTION_NOT_FOUND;
+  }
+  if (normalized.includes('invalid')) {
+    if (normalized.includes('email')) return ERROR_MESSAGES.INVALID_EMAIL;
+    if (normalized.includes('password')) return ERROR_MESSAGES.INVALID_CREDENTIALS;
+    return ERROR_MESSAGES.INVALID_CREDENTIALS;
+  }
+  if (normalized.includes('network') || normalized.includes('econnrefused')) {
     return ERROR_MESSAGES.NETWORK_ERROR;
   }
-  if (message.includes('timeout')) {
+  if (normalized.includes('timeout')) {
     return ERROR_MESSAGES.PLEASE_WAIT;
+  }
+
+  if (message.length <= 140 && !normalized.includes('internal server error')) {
+    return message.replace(/"([a-z_]+)"/gi, (_, field) => `${field.charAt(0).toUpperCase()}${field.slice(1)}`);
   }
 
   // Fallback - never pass raw backend messages through

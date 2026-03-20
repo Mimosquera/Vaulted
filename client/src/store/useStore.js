@@ -10,6 +10,13 @@ const imageStore = localforage.createInstance({ name: 'vaulted-images' });
 const dataStore = localforage.createInstance({ name: 'vaulted-data' });
 const imageUrlCache = new Map();
 const imagePromiseCache = new Map();
+const VISIBILITY_OPTIONS = ['private', 'public', 'friends_only'];
+
+function normalizeVisibility(value, fallback = 'private') {
+  if (typeof value === 'string' && VISIBILITY_OPTIONS.includes(value)) return value;
+  if (typeof value === 'boolean') return value ? 'public' : 'private';
+  return fallback;
+}
 
 function isOffline() {
   return typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -83,6 +90,9 @@ const useStore = create((set, get) => ({
   syncInterval: null,
   syncError: null,
   authExpiredMessage: null,
+  friends: [],
+  incomingFriendRequests: [],
+  outgoingFriendRequests: [],
 
   // ── Initialize from storage ─
   init: async () => {
@@ -106,11 +116,16 @@ const useStore = create((set, get) => ({
       // Fetch public collections (works for everyone)
       get().fetchPublicCollections();
 
+      if (api.getToken()) {
+        get().fetchFriends();
+      }
+
       // If we have a token, try to refresh it and sync
       if (api.getToken()) {
         try {
           const data = await api.refreshToken();
           set({ isAuthenticated: true, user: data.user || get().user });
+          get().fetchFriends();
           // Start sync polling for authenticated users
           get().startSyncPolling();
         } catch {
@@ -149,6 +164,7 @@ const useStore = create((set, get) => ({
     await dataStore.setItem('user', user);
     await dataStore.setItem('username', user.username || user.email.split('@')[0]);
     await dataStore.setItem('collections', []);
+    get().fetchFriends();
 
     // Sync from cloud after login with small delay to ensure token is ready
     setTimeout(async () => {
@@ -171,6 +187,7 @@ const useStore = create((set, get) => ({
     await dataStore.setItem('user', user);
     await dataStore.setItem('username', username || user.email.split('@')[0]);
     await dataStore.setItem('collections', []);
+    get().fetchFriends();
   },
 
   logout: () => {
@@ -184,6 +201,9 @@ const useStore = create((set, get) => ({
       collections: [],
       loaded: false,
       authExpiredMessage: null,
+      friends: [],
+      incomingFriendRequests: [],
+      outgoingFriendRequests: [],
     });
     dataStore.removeItem('user');
     dataStore.removeItem('username');
@@ -203,6 +223,9 @@ const useStore = create((set, get) => ({
       collections: [],
       loaded: false,
       authExpiredMessage: message,
+      friends: [],
+      incomingFriendRequests: [],
+      outgoingFriendRequests: [],
     });
     dataStore.removeItem('user');
     dataStore.removeItem('username');
@@ -221,10 +244,59 @@ const useStore = create((set, get) => ({
 
     try {
       const publicCollections = await api.fetchPublicCollections();
-      set({ publicCollections: publicCollections || [] });
+      set({
+        publicCollections: (publicCollections || []).map((c) => ({
+          ...c,
+          visibility: normalizeVisibility(c.visibility, c.isPublic ? 'public' : 'private'),
+          isPublic: normalizeVisibility(c.visibility, c.isPublic ? 'public' : 'private') === 'public',
+        })),
+      });
     } catch {
       // Fail silently if public collections can't be fetched
     }
+  },
+
+  fetchFriends: async () => {
+    if (!get().isAuthenticated || isOffline()) return;
+    try {
+      const data = await api.fetchFriendsAPI();
+      set({
+        friends: data.friends || [],
+        incomingFriendRequests: data.incomingRequests || [],
+        outgoingFriendRequests: data.outgoingRequests || [],
+      });
+    } catch {
+      // silent fail to avoid noisy UI interruptions
+    }
+  },
+
+  searchUsers: async (query) => {
+    if (!get().isAuthenticated || !query?.trim()) return [];
+    try {
+      return await api.searchUsersAPI(query.trim());
+    } catch {
+      return [];
+    }
+  },
+
+  sendFriendRequest: async (userId) => {
+    await api.sendFriendRequestAPI(userId);
+    await get().fetchFriends();
+  },
+
+  acceptFriendRequest: async (id) => {
+    await api.acceptFriendRequestAPI(id);
+    await get().fetchFriends();
+  },
+
+  rejectFriendRequest: async (id) => {
+    await api.rejectFriendRequestAPI(id);
+    await get().fetchFriends();
+  },
+
+  removeFriend: async (userId) => {
+    await api.removeFriendAPI(userId);
+    await get().fetchFriends();
   },
 
   // ── Sync Polling ──
@@ -273,6 +345,7 @@ const useStore = create((set, get) => ({
         // Only sync cover image if it's a cloud URL, not a local-only ID
         coverImageUrl: isCloudUrl(c.coverImageUrl) ? c.coverImageUrl : null,
         isPublic: c.isPublic,
+        visibility: normalizeVisibility(c.visibility, c.isPublic ? 'public' : 'private'),
         createdAt: c.createdAt,
         updatedAt: Date.now(),
       }));
@@ -326,7 +399,8 @@ const useStore = create((set, get) => ({
           imageUrl: isCloudUrl(item.imageUrl) ? item.imageUrl : null,
           createdAt: Number(item.createdAt) || Date.now(),
         })),
-        isPublic: c.isPublic || false,
+        visibility: normalizeVisibility(c.visibility, c.isPublic ? 'public' : 'private'),
+        isPublic: normalizeVisibility(c.visibility, c.isPublic ? 'public' : 'private') === 'public',
         createdAt: Number(c.createdAt) || Date.now(),
         itemCount: c.items?.length || 0,
       }));
@@ -411,7 +485,7 @@ const useStore = create((set, get) => ({
   },
 
   // ── Collection CRUD ──
-  createCollection: async ({ name, category, description, coverColor, coverImage }, onProgress) => {
+  createCollection: async ({ name, category, description, coverColor, coverImage, visibility = 'private' }, onProgress) => {
     let coverImageUrl = null;
     if (coverImage) {
       const imageId = `cover-${nanoid()}`;
@@ -437,7 +511,8 @@ const useStore = create((set, get) => ({
       coverColor: coverColor || '#7c3aed',
       coverImageUrl,
       items: [],
-      isPublic: false,
+      visibility: normalizeVisibility(visibility, 'private'),
+      isPublic: normalizeVisibility(visibility, 'private') === 'public',
       createdAt: Date.now(),
       itemCount: 0,
     };
@@ -453,6 +528,8 @@ const useStore = create((set, get) => ({
           description: description || '',
           coverColor: coverColor || '#7c3aed',
           coverImageUrl,
+          visibility: newCollection.visibility,
+          isPublic: newCollection.visibility === 'public',
           createdAt: newCollection.createdAt,
         });
       } catch {
@@ -491,7 +568,20 @@ const useStore = create((set, get) => ({
 
     set((state) => ({
       collections: state.collections.map((c) =>
-        c.id === id ? { ...c, ...updates } : c
+        c.id === id
+          ? {
+              ...c,
+              ...updates,
+              visibility: normalizeVisibility(
+                updates.visibility,
+                updates.isPublic !== undefined ? (updates.isPublic ? 'public' : 'private') : c.visibility
+              ),
+              isPublic: normalizeVisibility(
+                updates.visibility,
+                updates.isPublic !== undefined ? (updates.isPublic ? 'public' : 'private') : c.visibility
+              ) === 'public',
+            }
+          : c
       ),
     }));
     await get()._persist();
@@ -503,6 +593,7 @@ const useStore = create((set, get) => ({
           category: updates.category,
           description: updates.description,
           coverColor: updates.coverColor,
+          visibility: updates.visibility,
         };
         // Only include coverImageUrl if it was updated
         if (updates.coverImageUrl) {
@@ -551,25 +642,33 @@ const useStore = create((set, get) => ({
   },
 
   togglePublic: async (id) => {
+    const target = get().collections.find((c) => c.id === id);
+    if (!target) return;
+    const nextVisibility = normalizeVisibility(target.visibility, target.isPublic ? 'public' : 'private') === 'public'
+      ? 'private'
+      : 'public';
+    await get().setCollectionVisibility(id, nextVisibility);
+  },
+
+  setCollectionVisibility: async (id, visibility) => {
+    const normalized = normalizeVisibility(visibility, null);
+    if (!normalized) return;
+
+    const previous = get().collections;
     set((state) => ({
       collections: state.collections.map((c) =>
-        c.id === id ? { ...c, isPublic: !c.isPublic } : c
+        c.id === id ? { ...c, visibility: normalized, isPublic: normalized === 'public' } : c
       ),
     }));
     await get()._persist();
 
     if (get().isAuthenticated) {
       try {
-        await api.togglePublicAPI(id);
-        // Immediately sync to ensure public/private state is synced
-      } catch {
-        // Revert on error
-        set((state) => ({
-          collections: state.collections.map((c) =>
-            c.id === id ? { ...c, isPublic: !c.isPublic } : c
-          ),
-        }));
+        await api.setCollectionVisibilityAPI(id, normalized);
+      } catch (err) {
+        set({ collections: previous });
         await get()._persist();
+        throw err;
       }
     }
   },

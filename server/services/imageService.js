@@ -1,13 +1,13 @@
 class ImageService {
-  async upload(imageId, fileBuffer, mimeType) {
+  async upload(_imageId, _fileBuffer, _mimeType) {
     throw new Error('upload() must be implemented by subclass');
   }
 
-  async delete(imageId) {
+  async delete(_imageId) {
     throw new Error('delete() must be implemented by subclass');
   }
 
-  getUrl(imageId) {
+  getUrl(_imageId) {
     throw new Error('getUrl() must be implemented by subclass');
   }
 }

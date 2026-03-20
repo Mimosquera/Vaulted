@@ -1,0 +1,114 @@
+@use '../../styles/variables' as *;
+
+.image-cropper {
+  display: flex;
+  flex-direction: column;
+  gap: $space-sm;
+  width: 100%;
+
+  // ── Topbar ─────────────────────────────────────────────────────────────
+  &__topbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: $space-sm;
+  }
+
+  &__title {
+    font-size: $fs-sm;
+    font-weight: 600;
+    color: $text-secondary;
+    letter-spacing: 0.02em;
+  }
+
+  &__aspect-pills {
+    display: inline-flex;
+    gap: 4px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: $radius-full;
+    padding: 3px;
+  }
+
+  &__aspect-pill {
+    padding: 3px 10px;
+    border-radius: $radius-full;
+    font-size: $fs-xs;
+    color: $text-muted;
+    transition: all $transition-fast;
+
+    &--active {
+      background: rgba($accent-primary, 0.22);
+      color: #e9d5ff;
+      box-shadow: 0 0 12px rgba($accent-primary, 0.18);
+    }
+
+    &:not(&--active):hover {
+      color: $text-secondary;
+      background: rgba(255, 255, 255, 0.05);
+    }
+  }
+
+  // ── Crop area ──────────────────────────────────────────────────────────
+  &__canvas {
+    border-radius: $radius-md;
+    overflow: hidden;
+    background: #010108;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    // react-image-crop wrapper
+    .ReactCrop {
+      max-width: 100%;
+    }
+
+    // Constrain the image height
+    &__img,
+    .ReactCrop img {
+      max-width: 100%;
+      max-height: 340px;
+      display: block;
+      object-fit: contain;
+
+      @media (max-height: 700px) {
+        max-height: 240px;
+      }
+    }
+
+    // Purple crop selection border (override library default white)
+    .ReactCrop__crop-selection {
+      border-color: rgba($accent-primary, 0.9);
+      box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.55);
+    }
+
+    // Purple corner/edge handles
+    .ReactCrop__drag-handle::after {
+      background-color: $accent-primary;
+      border: none;
+      width: 10px;
+      height: 10px;
+    }
+  }
+
+  &__img {
+    max-width: 100%;
+    max-height: 340px;
+    display: block;
+    object-fit: contain;
+
+    @media (max-height: 700px) {
+      max-height: 240px;
+    }
+  }
+
+  // ── Actions ────────────────────────────────────────────────────────────
+  &__actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: $space-sm;
+    padding-top: $space-xs;
+  }
+}

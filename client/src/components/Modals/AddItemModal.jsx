@@ -92,7 +92,7 @@ export default function AddItemModal({ isOpen, onClose, onAdd }) {
               </div>
 
               <div className="modal__actions">
-                <button className="btn btn--secondary" onClick={onClose}>
+                <button type="button" className="btn btn--secondary" onClick={onClose}>
                   Cancel
                 </button>
                 <button

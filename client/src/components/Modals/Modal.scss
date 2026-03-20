@@ -1,5 +1,7 @@
 @use '../../styles/variables' as *;
 
+/* body.modal-open is kept for non-iOS fallback and legacy behaviour;
+   primary iOS scroll lock is handled via JS position:fixed in useModalScrollLock */
 body.modal-open {
   overflow: hidden;
 }
@@ -20,8 +22,12 @@ body.modal-open {
 .modal {
   width: 100%;
   max-width: 520px;
+  /* 90svh = smallest viewport height, shrinks when the iOS soft keyboard opens.
+     Falls back to 90vh on older browsers that don't support svh. */
   max-height: 90vh;
+  max-height: 90svh;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   background: $bg-secondary;
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -139,6 +145,38 @@ body.modal-open {
     display: flex;
     gap: $space-sm;
     flex-wrap: wrap;
+  }
+
+  &__visibility-options {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: $space-sm;
+  }
+
+  &__visibility-option {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: $space-xs;
+    padding: $space-sm;
+    border-radius: $radius-sm;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    color: $text-secondary;
+    font-size: $fs-sm;
+    transition: all $transition-fast;
+
+    &:hover {
+      border-color: rgba($accent-primary, 0.35);
+      background: rgba($accent-primary, 0.07);
+    }
+
+    &--active {
+      border-color: rgba($accent-primary, 0.6);
+      background: rgba($accent-primary, 0.16);
+      color: $text-primary;
+      box-shadow: inset 0 0 0 1px rgba($accent-primary, 0.25);
+    }
   }
 
   &__color {
@@ -271,6 +309,10 @@ body.modal-open {
       button {
         width: 100%;
       }
+    }
+
+    &__visibility-options {
+      grid-template-columns: 1fr;
     }
   }
 }

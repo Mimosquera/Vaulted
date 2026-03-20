@@ -17,6 +17,7 @@ const CollectionView = lazy(() => import('./pages/CollectionView'));
 const PublicCollectionView = lazy(() => import('./pages/PublicCollectionView'));
 const Explore = lazy(() => import('./pages/Explore'));
 const Profile = lazy(() => import('./pages/Profile'));
+const PublicProfile = lazy(() => import('./pages/PublicProfile'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const DevPerfPanel = import.meta.env.DEV ? lazy(() => import('./components/UI/DevPerfPanel')) : null;
@@ -53,6 +54,7 @@ function AnimatedRoutes() {
               <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/explore/:id" element={<PublicCollectionView />} />
+              <Route path="/u/:userId" element={<PublicProfile />} />
               <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
             </Routes>
           </ReadyGate>

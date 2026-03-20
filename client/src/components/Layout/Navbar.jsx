@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ import './Navbar.scss';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
   const { isInitialLoad, markLoadComplete } = useInitialLoad();
@@ -41,11 +42,27 @@ export default function Navbar() {
   }, [location.pathname]);
 
   useEffect(() => {
+    if (!isOpen) return;
+    const handleOutside = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [isOpen]);
+
+  useEffect(() => {
     // Mark initial load as complete after first render
     markLoadComplete();
   }, [markLoadComplete]);
 
   const handleLogout = () => {
+    setIsOpen(false);
     logout();
     toast.success('Signed out successfully', {
       icon: false,
@@ -107,6 +124,7 @@ export default function Navbar() {
         )}
       </AnimatePresence>
       <motion.nav
+        ref={navRef}
         className={`navbar ${scrolled ? 'navbar--scrolled' : ''}`}
         initial={isInitialLoad ? { y: -100 } : { y: 0 }}
         animate={{ y: 0 }}

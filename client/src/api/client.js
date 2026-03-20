@@ -16,6 +16,27 @@ function setToken(token) {
 
 let refreshPromise = null;
 
+function extractErrorMessage(payload, fallback = 'Request failed') {
+  if (!payload) return fallback;
+
+  if (typeof payload.error === 'string' && payload.error.trim()) {
+    return payload.error.trim();
+  }
+
+  if (payload.error && typeof payload.error === 'object') {
+    const message = typeof payload.error.message === 'string' ? payload.error.message.trim() : '';
+    const details = typeof payload.error.details === 'string' ? payload.error.details.trim() : '';
+    if (details) return details;
+    if (message) return message;
+  }
+
+  if (typeof payload.message === 'string' && payload.message.trim()) {
+    return payload.message.trim();
+  }
+
+  return fallback;
+}
+
 function shouldRetryGet(method, status, attempt) {
   return method === 'GET' && attempt < MAX_GET_RETRIES && status >= 500;
 }
@@ -84,8 +105,11 @@ async function request(path, options = {}, isRetry = false, attempt = 0) {
   }
 
   if (!res.ok) {
-    const error = await res.json().catch(() => null);
-    throw new Error(error?.error || res.statusText || 'Request failed');
+    const payload = await res.json().catch(() => null);
+    const message = extractErrorMessage(payload, res.statusText || 'Request failed');
+    const error = new Error(message);
+    error.status = res.status;
+    throw error;
   }
 
   if (res.status === 204) return null;
@@ -94,9 +118,14 @@ async function request(path, options = {}, isRetry = false, attempt = 0) {
 
 // ── Auth ──
 export async function register(email, password, username) {
+  const cleanedUsername = typeof username === 'string' ? username.trim() : '';
   const data = await request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password, username }),
+    body: JSON.stringify({
+      email,
+      password,
+      username: cleanedUsername || undefined,
+    }),
   });
   setToken(data.token);
   return data;
@@ -158,6 +187,45 @@ export async function deleteCollectionAPI(id) {
 
 export async function togglePublicAPI(id) {
   return request(`/api/collections/${id}/toggle-public`, { method: 'POST' });
+}
+
+export async function setCollectionVisibilityAPI(id, visibility) {
+  return request(`/api/collections/${id}/visibility`, {
+    method: 'PUT',
+    body: JSON.stringify({ visibility }),
+  });
+}
+
+// ── Users / Friends ──
+export async function searchUsersAPI(query) {
+  return request(`/api/friends/search?q=${encodeURIComponent(query)}`);
+}
+
+export async function fetchFriendsAPI() {
+  return request('/api/friends');
+}
+
+export async function sendFriendRequestAPI(userId) {
+  return request('/api/friends/requests', {
+    method: 'POST',
+    body: JSON.stringify({ userId }),
+  });
+}
+
+export async function acceptFriendRequestAPI(id) {
+  return request(`/api/friends/requests/${id}/accept`, { method: 'POST' });
+}
+
+export async function rejectFriendRequestAPI(id) {
+  return request(`/api/friends/requests/${id}`, { method: 'DELETE' });
+}
+
+export async function removeFriendAPI(userId) {
+  return request(`/api/friends/${userId}`, { method: 'DELETE' });
+}
+
+export async function fetchPublicProfileAPI(userId) {
+  return request(`/api/users/${userId}/profile`);
 }
 
 // ── Items ──

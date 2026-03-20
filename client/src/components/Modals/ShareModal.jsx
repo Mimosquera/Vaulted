@@ -4,6 +4,7 @@ import { X, Copy, Check } from 'lucide-react';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import toast from 'react-hot-toast';
 import useStore from '../../store/useStore';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
@@ -11,7 +12,7 @@ import './Modal.scss';
 
 export default function ShareModal({ isOpen, onClose, collection }) {
   const [copied, setCopied] = useState(false);
-  const togglePublic = useStore((s) => s.togglePublic);
+  const setCollectionVisibility = useStore((s) => s.setCollectionVisibility);
 
   useModalScrollLock(isOpen);
 
@@ -29,8 +30,10 @@ export default function ShareModal({ isOpen, onClose, collection }) {
     }
   };
 
-  const handleTogglePublic = async () => {
-    await togglePublic(collection.id);
+  const visibility = collection.visibility || (collection.isPublic ? 'public' : 'private');
+
+  const handleSetVisibility = async (nextVisibility) => {
+    await setCollectionVisibility(collection.id, nextVisibility);
   };
 
   return (
@@ -60,18 +63,22 @@ export default function ShareModal({ isOpen, onClose, collection }) {
 
             <div className="modal__body">
               <div className="modal__share-status">
-                <span className={`modal__visibility ${collection.isPublic ? 'modal__visibility--public' : ''}`}>
-                  {collection.isPublic ? (
-                    <><Eye weight="bold" size={16} /> Public (visible on Explore)</>
-                  ) : (
-                    <><EyeSlash weight="bold" size={16} /> Private (only you)</>
-                  )}
+                <span className={`modal__visibility ${visibility === 'public' ? 'modal__visibility--public' : ''}`}>
+                  {visibility === 'public' && <><Eye weight="bold" size={16} /> Public (visible to everyone)</>}
+                  {visibility === 'friends_only' && <><UsersThree weight="bold" size={16} /> Friends only (visible to approved friends)</>}
+                  {visibility === 'private' && <><EyeSlash weight="bold" size={16} /> Private (only you)</>}
                 </span>
-                <button
-                  className="btn btn--secondary btn--sm"
-                  onClick={handleTogglePublic}
-                >
-                  {collection.isPublic ? 'Make Private' : 'Make Public'}
+              </div>
+
+              <div className="modal__visibility-options">
+                <button type="button" className={`modal__visibility-option ${visibility === 'private' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('private')}>
+                  <EyeSlash size={16} /> Private
+                </button>
+                <button type="button" className={`modal__visibility-option ${visibility === 'friends_only' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('friends_only')}>
+                  <UsersThree size={16} /> Friends
+                </button>
+                <button type="button" className={`modal__visibility-option ${visibility === 'public' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('public')}>
+                  <Eye size={16} /> Public
                 </button>
               </div>
 

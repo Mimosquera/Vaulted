@@ -12,7 +12,13 @@ export const sync = async (req, res) => {
 
       // Sync collections
       for (const collection of collections) {
-        const { id, name, category, description, coverColor, coverImageUrl, isPublic, createdAt } = collection;
+        const { id, name, category, description, coverColor, coverImageUrl, isPublic, visibility, createdAt } = collection;
+        const rawVisibility = typeof visibility === 'string'
+          ? visibility
+          : (isPublic ? 'public' : 'private');
+        const normalizedVisibility = ['private', 'public', 'friends_only'].includes(rawVisibility)
+          ? rawVisibility
+          : 'private';
 
         const existing = await client.query('SELECT id FROM collections WHERE id = $1', [id]);
 
@@ -20,16 +26,16 @@ export const sync = async (req, res) => {
           // Update existing
           await client.query(
             `UPDATE collections
-             SET name = $1, category = $2, description = $3, cover_color = $4, cover_image_url = $5, is_public = $6, updated_at = CURRENT_TIMESTAMP
-             WHERE id = $7 AND user_id = $8`,
-            [name, category, description, coverColor, coverImageUrl, isPublic, id, userId]
+             SET name = $1, category = $2, description = $3, cover_color = $4, cover_image_url = $5, is_public = $6, visibility = $7, updated_at = CURRENT_TIMESTAMP
+             WHERE id = $8 AND user_id = $9`,
+            [name, category, description, coverColor, coverImageUrl, normalizedVisibility === 'public', normalizedVisibility, id, userId]
           );
         } else {
           // Insert new
           await client.query(
-            `INSERT INTO collections (id, user_id, name, category, description, cover_color, cover_image_url, is_public, created_at)
-             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)`,
-            [id, userId, name, category, description, coverColor, coverImageUrl, isPublic, createdAt]
+            `INSERT INTO collections (id, user_id, name, category, description, cover_color, cover_image_url, is_public, visibility, created_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)`,
+            [id, userId, name, category, description, coverColor, coverImageUrl, normalizedVisibility === 'public', normalizedVisibility, createdAt]
           );
         }
       }

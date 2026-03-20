@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import ImageUploader from '../Upload/ImageUploader';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
+import useStore from '../../store/useStore';
 import './Modal.scss';
 
 export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
@@ -11,14 +12,20 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
   const [imageFile, setImageFile] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
+  const [currentImageUrl, setCurrentImageUrl] = useState(null);
+  const getImageUrl = useStore((s) => s.getImageUrl);
 
   useEffect(() => {
     if (item) {
       setName(item.name);
       setNote(item.note || '');
       setImageFile(null);
+      setCurrentImageUrl(null);
+      if (item.imageUrl) {
+        getImageUrl(item.imageUrl).then((url) => setCurrentImageUrl(url || null));
+      }
     }
-  }, [item, isOpen]);
+  }, [item, isOpen, getImageUrl]);
 
   useModalScrollLock(isOpen);
 
@@ -71,6 +78,7 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
             <form onSubmit={handleSubmit} className="modal__body">
               <ImageUploader
                 onFileSelect={setImageFile}
+                currentPreview={currentImageUrl}
                 isUploading={isUploading}
                 uploadProgress={uploadProgress}
               />
@@ -99,7 +107,7 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
               </div>
 
               <div className="modal__actions">
-                <button className="btn btn--secondary" onClick={onClose}>
+                <button type="button" className="btn btn--secondary" onClick={onClose}>
                   Cancel
                 </button>
                 <button

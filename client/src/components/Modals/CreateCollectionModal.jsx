@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus } from 'lucide-react';
 import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
+import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
+import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
@@ -14,6 +17,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
   const [description, setDescription] = useState('');
   const [coverColor, setCoverColor] = useState('#7c3aed');
   const [coverImage, setCoverImage] = useState(null);
+  const [visibility, setVisibility] = useState('private');
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
@@ -28,7 +32,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
 
     try {
       await onCreate(
-        { name: name.trim(), category, description: description.trim(), coverColor, coverImage },
+        { name: name.trim(), category, description: description.trim(), coverColor, coverImage, visibility },
         (progress) => setUploadProgress(progress)
       );
       setName('');
@@ -36,6 +40,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
       setDescription('');
       setCoverColor('#7c3aed');
       setCoverImage(null);
+      setVisibility('private');
       onClose();
     } finally {
       setIsUploading(false);
@@ -115,6 +120,21 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
               </div>
 
               <div className="modal__field">
+                <label>Visibility</label>
+                <div className="modal__visibility-options">
+                  <button type="button" className={`modal__visibility-option ${visibility === 'private' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('private')}>
+                    <EyeSlash size={16} /> Private
+                  </button>
+                  <button type="button" className={`modal__visibility-option ${visibility === 'friends_only' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('friends_only')}>
+                    <UsersThree size={16} /> Friends
+                  </button>
+                  <button type="button" className={`modal__visibility-option ${visibility === 'public' ? 'modal__visibility-option--active' : ''}`} onClick={() => setVisibility('public')}>
+                    <Eye size={16} /> Public
+                  </button>
+                </div>
+              </div>
+
+              <div className="modal__field">
                 <label><Palette weight="duotone" size={16} /> Cover Color</label>
                 <div className="modal__colors">
                   {COLLECTION_COLORS.map((color) => (
@@ -130,7 +150,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
               </div>
 
               <div className="modal__actions">
-                <button className="btn btn--secondary" onClick={onClose}>
+                <button type="button" className="btn btn--secondary" onClick={onClose}>
                   Cancel
                 </button>
                 <button
