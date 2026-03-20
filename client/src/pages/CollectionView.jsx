@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
@@ -15,10 +15,9 @@ import AddItemModal from '../components/Modals/AddItemModal';
 import EditItemModal from '../components/Modals/EditItemModal';
 import EditCollectionModal from '../components/Modals/EditCollectionModal';
 import ShareModal from '../components/Modals/ShareModal';
-import BlobBackground from '../components/UI/BlobBackground';
-import { getCategoryLabel } from '../utils/helpers';
-import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import CategoryIcon from '../components/UI/CategoryIcon';
+import { getCategoryLabel, isCloudUrl } from '../utils/helpers';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './CollectionView.scss';
 
 const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
@@ -32,6 +31,7 @@ export default function CollectionView() {
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
   const togglePublic = useStore((s) => s.togglePublic);
+  const getImageUrl = useStore((s) => s.getImageUrl);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editItemModalOpen, setEditItemModalOpen] = useState(false);
@@ -42,6 +42,36 @@ export default function CollectionView() {
   const debouncedSearch = useDebouncedValue(search);
   const [lightboxItem, setLightboxItem] = useState(null);
   const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
+  const [coverUrl, setCoverUrl] = useState(null);
+  const mountedRef = useRef(true);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    let blobUrl = null;
+
+    if (collection?.coverImageUrl) {
+      if (isCloudUrl(collection.coverImageUrl)) {
+        setCoverUrl(collection.coverImageUrl);
+      } else {
+        getImageUrl(collection.coverImageUrl).then((u) => {
+          if (!mountedRef.current) {
+            if (u && !isCloudUrl(u)) URL.revokeObjectURL(u);
+            return;
+          }
+          if (u && !isCloudUrl(u)) blobUrl = u;
+          setCoverUrl(u);
+        });
+      }
+    } else {
+      setCoverUrl(null);
+    }
+
+    return () => {
+      mountedRef.current = false;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [collection?.coverImageUrl]);
 
   const filteredItems = useMemo(() => {
     if (!collection) return [];
@@ -94,81 +124,84 @@ export default function CollectionView() {
     setLightboxImageUrl(imageUrl);
   };
 
+  const coverColor = collection.coverColor || '#7c3aed';
+
   return (
     <div className="collection-view page">
-      <BlobBackground color1={collection.coverColor} />
-      <div className="container">
+      {/* ── Cover Banner ── */}
+      <motion.div
+        className="collection-view__cover"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        {coverUrl ? (
+          <img src={coverUrl} alt="" className="collection-view__cover-img" />
+        ) : (
+          <div
+            className="collection-view__cover-solid"
+            style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+          />
+        )}
+        <div className="collection-view__cover-fade" />
 
-        {/* ── Hero Header ── */}
-        <motion.div
-          className="collection-view__hero"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <div className="collection-view__cover-nav container">
           <Link to="/dashboard" className="collection-view__back">
             <ArrowLeft weight="bold" size={18} />
-            Back to Vault
+            Back
           </Link>
+        </div>
 
-          <div className="collection-view__hero-info">
-            <motion.div
-              className="collection-view__icon"
-              style={{ backgroundColor: `${collection.coverColor}20` }}
-              animate={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <CategoryIcon category={collection.category} size={40} />
-            </motion.div>
-
-            <div className="collection-view__hero-text">
-              <div className="collection-view__category">
-                {getCategoryLabel(collection.category)}
-                {collection.isPublic && (
-                  <span className="collection-view__public-badge">
-                    <Eye weight="bold" size={12} /> Public
-                  </span>
-                )}
-              </div>
-              <h1>{collection.name}</h1>
-              {collection.description && <p>{collection.description}</p>}
-              <span className="collection-view__count">
-                {collection.items.length} {collection.items.length === 1 ? 'item' : 'items'}
+        <div className="collection-view__cover-content container">
+          <div className="collection-view__category">
+            <CategoryIcon category={collection.category} size={16} />
+            {getCategoryLabel(collection.category)}
+            {collection.isPublic && (
+              <span className="collection-view__public-badge">
+                <Eye weight="bold" size={11} /> Public
               </span>
-            </div>
+            )}
           </div>
+          <h1 className="collection-view__title">{collection.name}</h1>
+          {collection.description && (
+            <p className="collection-view__desc">{collection.description}</p>
+          )}
+          <span className="collection-view__count">
+            {collection.items.length} {collection.items.length === 1 ? 'item' : 'items'}
+          </span>
+        </div>
+      </motion.div>
 
-          <div className="collection-view__actions">
-            <button
-              className="btn btn--secondary"
-              onClick={() => setEditCollectionModalOpen(true)}
-            >
-              <Edit2 strokeWidth={2} />
-              Edit
-            </button>
-            <button
-              className="btn btn--primary"
-              onClick={() => setAddModalOpen(true)}
-            >
+      {/* ── Content ── */}
+      <div className="container">
+        {/* ── Toolbar ── */}
+        <motion.div
+          className="collection-view__toolbar"
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+        >
+          <div className="collection-view__toolbar-left">
+            <button className="btn btn--primary" onClick={() => setAddModalOpen(true)}>
               <Plus strokeWidth={2} size={16} />
               Add Item
             </button>
-            <button
-              className="btn btn--secondary"
-              onClick={() => setShareModalOpen(true)}
-            >
-              <ShareNetwork weight="bold" />
+            <button className="btn btn--secondary" onClick={() => setEditCollectionModalOpen(true)}>
+              <Edit2 strokeWidth={2} size={14} />
+              Edit
+            </button>
+          </div>
+          <div className="collection-view__toolbar-right">
+            <button className="btn btn--secondary" onClick={() => setShareModalOpen(true)}>
+              <ShareNetwork weight="bold" size={16} />
               Share
             </button>
-            <button
-              className="btn btn--ghost"
-              onClick={() => togglePublic(collection.id)}
-            >
-              {collection.isPublic ? <EyeSlash weight="bold" /> : <Eye weight="bold" />}
+            <button className="btn btn--ghost" onClick={() => togglePublic(collection.id)}>
+              {collection.isPublic ? <EyeSlash weight="bold" size={16} /> : <Eye weight="bold" size={16} />}
               {collection.isPublic ? 'Private' : 'Public'}
             </button>
             <button className="btn btn--danger btn--sm" onClick={handleDelete}>
-              <Trash2 strokeWidth={2} />
-              Delete
+              <Trash2 strokeWidth={2} size={14} />
             </button>
           </div>
         </motion.div>

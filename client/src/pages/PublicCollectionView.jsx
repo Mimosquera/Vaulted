@@ -9,10 +9,9 @@ import { UserIcon as User } from '@phosphor-icons/react/User';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import { SpinnerGapIcon as SpinnerGap } from '@phosphor-icons/react/SpinnerGap';
 import { fetchPublicCollection, getImageUrl } from '../api/client';
-import BlobBackground from '../components/UI/BlobBackground';
 import ItemLightbox from '../components/Collection/ItemLightbox';
 import CategoryIcon from '../components/UI/CategoryIcon';
-import { getCategoryLabel, timeAgo } from '../utils/helpers';
+import { getCategoryLabel, isCloudUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './CollectionView.scss';
 
@@ -61,7 +60,9 @@ export default function PublicCollectionView() {
   const handleExpandItem = (item, imageUrl) => {
     setLightboxItem(item);
     setLightboxImageUrl(imageUrl);
-  };  useEffect(() => {
+  };
+
+  useEffect(() => {
     setLoading(true);
     setError(null);
     fetchPublicCollection(id)
@@ -109,52 +110,60 @@ export default function PublicCollectionView() {
     );
   }
 
+  const coverColor = collection.coverColor || '#7c3aed';
+  const coverUrl = isCloudUrl(collection.coverImageUrl) ? collection.coverImageUrl : null;
+
   return (
     <div className="collection-view page">
-      <BlobBackground color1={collection.coverColor || '#7c3aed'} />
-      <div className="container">
+      {/* ── Cover Banner ── */}
+      <motion.div
+        className="collection-view__cover"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.4 }}
+      >
+        {coverUrl ? (
+          <img src={coverUrl} alt="" className="collection-view__cover-img" />
+        ) : (
+          <div
+            className="collection-view__cover-solid"
+            style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+          />
+        )}
+        <div className="collection-view__cover-fade" />
 
-        <motion.div
-          className="collection-view__hero"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-        >
+        <div className="collection-view__cover-nav container">
           <Link to="/explore" className="collection-view__back">
             <ArrowLeft weight="bold" size={18} />
-            Back to Explore
+            Back
           </Link>
+        </div>
 
-          <div className="collection-view__hero-info">
-            <motion.div
-              className="collection-view__icon"
-              style={{ backgroundColor: `${collection.coverColor || '#7c3aed'}20` }}
-              animate={{ rotate: [0, -5, 5, 0] }}
-              transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
-            >
-              <CategoryIcon category={collection.category} size={40} />
-            </motion.div>
-
-            <div className="collection-view__hero-text">
-              <div className="collection-view__category">
-                {getCategoryLabel(collection.category)}
-                <span className="collection-view__public-badge">
-                  <Eye weight="bold" size={12} /> Public
-                </span>
-              </div>
-              <h1>{collection.name}</h1>
-              {collection.description && <p>{collection.description}</p>}
-              <div className="collection-view__visitor-meta">
-                <span className="collection-view__owner">
-                  <User weight="bold" size={14} /> {collection.username}
-                </span>
-                <span className="collection-view__count">
-                  {collection.items.length} {collection.items.length === 1 ? 'item' : 'items'}
-                </span>
-              </div>
-            </div>
+        <div className="collection-view__cover-content container">
+          <div className="collection-view__category">
+            <CategoryIcon category={collection.category} size={16} />
+            {getCategoryLabel(collection.category)}
+            <span className="collection-view__public-badge">
+              <Eye weight="bold" size={11} /> Public
+            </span>
           </div>
-        </motion.div>
+          <h1 className="collection-view__title">{collection.name}</h1>
+          {collection.description && (
+            <p className="collection-view__desc">{collection.description}</p>
+          )}
+          <div className="collection-view__visitor-meta">
+            <span className="collection-view__owner">
+              <User weight="bold" size={14} /> {collection.username}
+            </span>
+            <span className="collection-view__count">
+              {collection.items.length} {collection.items.length === 1 ? 'item' : 'items'}
+            </span>
+          </div>
+        </div>
+      </motion.div>
 
+      {/* ── Content ── */}
+      <div className="container">
         {collection.items.length > 3 && (
           <motion.div
             className="collection-view__search"
