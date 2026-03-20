@@ -7,22 +7,34 @@ export const COLLECTION_COLORS = [
 
 // Avatar icon color options: includes app theme colors plus balanced supporting tones.
 export const AVATAR_THEME_COLORS = [
-  '#dc2626', // accent-secondary
+  '#dc2626', // red
   '#ef4444',
-  '#c2410c', // gradient-fire support
-  '#f59e0b',
-  '#d4a017', // accent-gold
-  '#16a34a', // accent-green
-  '#10b981',
-  '#00c4cc', // neon-cyan
+  '#f43f5e', // rose
+  '#be185d', // deep rose
+  '#c2410c', // orange-red
+  '#b45309', // burnt amber
+  '#f59e0b', // amber
+  '#d4a017', // gold
+  '#16a34a', // green
+  '#10b981', // emerald
+  '#0f766e', // dark teal
+  '#0891b2', // ocean
+  '#00c4cc', // neon cyan
   '#06b6d4',
-  '#2563eb', // accent-tertiary
-  '#4f46e5',
-  '#9333ea', // neon-violet
-  '#7c3aed', // accent-primary
+  '#2563eb', // blue
+  '#1d4ed8', // royal blue
+  '#0369a1', // deep ocean
+  '#4f46e5', // indigo
+  '#6366f1', // periwinkle
+  '#7c3aed', // purple
+  '#6d28d9',
+  '#7e22ce',
+  '#9333ea', // violet
   '#8b5cf6',
+  '#a855f7', // bright violet
   '#4c1d95', // deep purple
-  '#ec4899',
+  '#ec4899', // pink
+  '#db2777', // deep pink
 ];
 
 // Create gradients for each color (base color to lighter/rotated variation)

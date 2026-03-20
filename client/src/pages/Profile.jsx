@@ -240,10 +240,10 @@ export default function Profile() {
               {avatarEditorOpen && (
                 <motion.div
                   className="profile__avatar-editor"
-                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
-                  animate={{ height: 'auto', opacity: 1, marginTop: '0.25rem' }}
-                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
-                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
+                  initial={{ opacity: 0, y: -6 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -6 }}
+                  transition={{ duration: 0.18, ease: [0.4, 0, 0.2, 1] }}
                 >
                   <div className="profile__avatar-editor-inner">
                     <div className="profile__avatar-mode-switch" role="tablist" aria-label="Avatar mode">
