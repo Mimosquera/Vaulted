@@ -17,10 +17,15 @@
   &__floating-item {
     position: absolute;
     pointer-events: none;
-    opacity: 0.35;
+    opacity: 0.3;
     z-index: 0;
-    filter: drop-shadow(0 0 8px currentColor);
     will-change: transform;
+    animation: home-float var(--float-duration, 8s) ease-in-out var(--float-delay, 0s) infinite;
+  }
+
+  @keyframes home-float {
+    0%, 100% { transform: translateY(0); }
+    50%       { transform: translateY(-15px); }
   }
 
   &__hero-content {
@@ -340,9 +345,6 @@
       font-size: $fs-md;
     }
 
-    &__floating-item {
-      opacity: 0.25;
-    }
 
     &__features-grid {
       grid-template-columns: repeat(2, 1fr);

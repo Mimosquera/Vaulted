@@ -1,4 +1,4 @@
-import { useRef, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
@@ -63,8 +63,8 @@ const FEATURES = [
     icon: <ShieldCheck weight="duotone" size={32} />,
     title: 'Offline First',
     desc: 'No internet needed to add or browse. Sign in and it syncs across all your devices automatically.',
-    color: '#16a34a',
-    colorRgb: '22, 163, 74',
+    color: '#00c4cc',
+    colorRgb: '0, 196, 204',
     num: '04',
   },
 ];
@@ -74,11 +74,16 @@ const CATEGORIES_SHOWCASE = [
 ];
 
 export default function Home() {
-  const heroRef = useRef(null);
   const { isInitialLoad } = useInitialLoad();
-  const [isMobile, setIsMobile] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth < 768);
 
-  // Scroll parallax for hero
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    window.addEventListener('resize', checkMobile, { passive: true });
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
+
+  // Scroll parallax — desktop only
   const { scrollYProgress } = useScroll();
   const heroOpacityProgress = useTransform(
     scrollYProgress,
@@ -92,43 +97,31 @@ export default function Home() {
   });
   const heroScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.95]);
 
-  // Check if mobile on mount and window resize
-  useEffect(() => {
-    const checkMobile = () => setIsMobile(window.innerWidth < 768);
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
-  }, []);
-
   return (
     <div className="home">
 
       {/* ── Hero ── */}
       <motion.section
         className="home__hero"
-        ref={heroRef}
-        style={{ opacity: heroOpacity, scale: heroScale }}
+        style={isMobile ? undefined : { opacity: heroOpacity, scale: heroScale }}
       >
         <BlobBackground />
 
-        {/* Floating icons */}
+        {/* Floating icons — CSS-driven */}
         {FLOATING_ITEMS.map((item, i) => (
-          <motion.span
+          <span
             key={i}
             className="home__floating-item"
-            style={{ left: item.x, top: item.y, color: item.color }}
-            animate={{
-              y: [0, -15, 0],
-            }}
-            transition={{
-              duration: 6 + item.delay,
-              delay: item.delay,
-              repeat: Infinity,
-              ease: 'easeInOut',
+            style={{
+              left: item.x,
+              top: item.y,
+              color: item.color,
+              '--float-duration': `${6 + item.delay}s`,
+              '--float-delay': `${item.delay}s`,
             }}
           >
             <item.Icon weight="duotone" size={item.size} />
-          </motion.span>
+          </span>
         ))}
 
         <div className="home__hero-content">
