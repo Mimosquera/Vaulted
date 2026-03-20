@@ -1,23 +1,6 @@
 import pool from '../config/database.js';
 import imageService from '../services/imageServiceFactory.js';
-
-// Helper to extract Cloudinary public_id from secure_url
-const extractCloudinaryPublicId = (url) => {
-  if (!url) return null;
-  // URL format: https://res.cloudinary.com/{cloud_name}/image/upload/v{version}/{public_id}.{ext}
-  const match = url.match(/\/upload\/(?:v\d+\/)?(.+)\.\w+$/);
-  return match ? match[1] : null;
-};
-
-// Helper to convert snake_case DB response to camelCase
-const toCamelCase = (obj) => {
-  const camelCaseObj = {};
-  for (const [key, value] of Object.entries(obj)) {
-    const camelKey = key.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
-    camelCaseObj[camelKey] = value;
-  }
-  return camelCaseObj;
-};
+import { toCamelCase, extractCloudinaryPublicId } from '../utils/helpers.js';
 
 export const getItems = async (req, res) => {
   try {
@@ -64,7 +47,7 @@ export const addItem = async (req, res) => {
     );
 
     res.status(201).json(toCamelCase(result.rows[0]));
-  } catch {
+  } catch (err) {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Item with this ID already exists' });
     }

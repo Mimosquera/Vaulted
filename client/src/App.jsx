@@ -9,9 +9,9 @@ import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import FloatingParticles from './components/UI/FloatingParticles';
 import ProtectedRoute from './components/ProtectedRoute';
-import Home from './pages/Home';
 import './styles/global.scss';
 
+const Home = lazy(() => import('./pages/Home'));
 const Dashboard = lazy(() => import('./pages/Dashboard'));
 const CollectionView = lazy(() => import('./pages/CollectionView'));
 const PublicCollectionView = lazy(() => import('./pages/PublicCollectionView'));

@@ -251,42 +251,29 @@ const useStore = create((set, get) => ({
     set({ syncing: true, syncError: null });
 
     try {
-      const cloudCollections = await api.fetchCollections();
+      const cloudCollections = await api.fetchCollectionsWithItems();
 
-      if (cloudCollections && cloudCollections.length > 0) {
-        const localCollections = await Promise.all(
-          cloudCollections.map(async (c) => {
-            const cloudItems = await api.fetchItems(c.id);
-            return {
-              id: c.id,
-              name: c.name,
-              category: c.category,
-              description: c.description || '',
-              coverColor: c.coverColor || c.cover_color || '#7c3aed',
-              // Filter out local-only cover images
-              coverImageUrl: isCloudUrl(c.coverImageUrl || c.cover_image_url) ? (c.coverImageUrl || c.cover_image_url) : null,
-              items: (cloudItems || []).map((item) => ({
-                id: item.id,
-                name: item.name,
-                note: item.note || '',
-                // Filter out local-only item images
-                imageUrl: isCloudUrl(item.imageUrl || item.image_url) ? (item.imageUrl || item.image_url) : null,
-                createdAt: Number(item.createdAt || item.created_at) || Date.now(),
-              })),
-              isPublic: c.isPublic || c.is_public || false,
-              createdAt: Number(c.createdAt || c.created_at) || Date.now(),
-              itemCount: cloudItems?.length || 0,
-            };
-          })
-        );
+      const localCollections = (cloudCollections || []).map((c) => ({
+        id: c.id,
+        name: c.name,
+        category: c.category,
+        description: c.description || '',
+        coverColor: c.coverColor || '#7c3aed',
+        coverImageUrl: isCloudUrl(c.coverImageUrl) ? c.coverImageUrl : null,
+        items: (c.items || []).map((item) => ({
+          id: item.id,
+          name: item.name,
+          note: item.note || '',
+          imageUrl: isCloudUrl(item.imageUrl) ? item.imageUrl : null,
+          createdAt: Number(item.createdAt) || Date.now(),
+        })),
+        isPublic: c.isPublic || false,
+        createdAt: Number(c.createdAt) || Date.now(),
+        itemCount: c.items?.length || 0,
+      }));
 
-        set({ collections: localCollections });
-        await get()._persist();
-      } else {
-        set({ collections: [] });
-        await get()._persist();
-      }
-
+      set({ collections: localCollections });
+      await get()._persist();
       set({ lastSynced: Date.now() });
     } catch {
       set({ syncError: 'Failed to sync collections. Check your connection and try again.' });

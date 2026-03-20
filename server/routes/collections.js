@@ -1,6 +1,7 @@
 import express from 'express';
 import {
   getCollections,
+  getCollectionsWithItems,
   getPublicCollections,
   getPublicCollection,
   createCollection,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 router.get('/public', getPublicCollections);
 router.get('/public/:id', getPublicCollection);
+router.get('/full', authMiddleware, getCollectionsWithItems);
 router.get('/', authMiddleware, getCollections);
 router.post('/', authMiddleware, createCollection);
 router.put('/:id', authMiddleware, updateCollection);

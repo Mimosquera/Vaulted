@@ -1,23 +1,25 @@
-import { useSpring, animated } from '@react-spring/web';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { animate } from 'framer-motion';
 
-export default function AnimatedCounter({ value, duration = 1500 }) {
+export default function AnimatedCounter({ value, duration = 1.5 }) {
+  const ref = useRef(null);
   const [inView, setInView] = useState(false);
-
-  const { number } = useSpring({
-    from: { number: 0 },
-    number: inView ? value : 0,
-    config: { duration },
-  });
 
   useEffect(() => {
     const timer = setTimeout(() => setInView(true), 200);
     return () => clearTimeout(timer);
   }, []);
 
-  return (
-    <animated.span>
-      {number.to((n) => Math.floor(n).toLocaleString())}
-    </animated.span>
-  );
+  useEffect(() => {
+    if (!inView || !ref.current) return;
+    const controls = animate(0, value, {
+      duration,
+      onUpdate: (v) => {
+        if (ref.current) ref.current.textContent = Math.floor(v).toLocaleString();
+      },
+    });
+    return () => controls.stop();
+  }, [inView, value, duration]);
+
+  return <span ref={ref}>0</span>;
 }

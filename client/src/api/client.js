@@ -93,6 +93,10 @@ export async function fetchCollections() {
   return request('/api/collections');
 }
 
+export async function fetchCollectionsWithItems() {
+  return request('/api/collections/full');
+}
+
 export async function fetchPublicCollections() {
   return request('/api/collections/public');
 }
