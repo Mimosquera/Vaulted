@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
@@ -10,14 +10,15 @@ import Footer from './components/Layout/Footer';
 import FloatingParticles from './components/UI/FloatingParticles';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
-import Dashboard from './pages/Dashboard';
-import CollectionView from './pages/CollectionView';
-import PublicCollectionView from './pages/PublicCollectionView';
-import Explore from './pages/Explore';
-import Profile from './pages/Profile';
-import Login from './pages/Login';
-import Register from './pages/Register';
 import './styles/global.scss';
+
+const Dashboard = lazy(() => import('./pages/Dashboard'));
+const CollectionView = lazy(() => import('./pages/CollectionView'));
+const PublicCollectionView = lazy(() => import('./pages/PublicCollectionView'));
+const Explore = lazy(() => import('./pages/Explore'));
+const Profile = lazy(() => import('./pages/Profile'));
+const Login = lazy(() => import('./pages/Login'));
+const Register = lazy(() => import('./pages/Register'));
 
 function AnimatedRoutes() {
   const location = useLocation();
@@ -32,16 +33,18 @@ function AnimatedRoutes() {
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
-        <Routes location={location}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-          <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
-          <Route path="/explore" element={<Explore />} />
-          <Route path="/explore/:id" element={<PublicCollectionView />} />
-          <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-        </Routes>
+        <Suspense fallback={null}>
+          <Routes location={location}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
+            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+            <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
+            <Route path="/explore" element={<Explore />} />
+            <Route path="/explore/:id" element={<PublicCollectionView />} />
+            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+          </Routes>
+        </Suspense>
       </motion.div>
     </AnimatePresence>
   );

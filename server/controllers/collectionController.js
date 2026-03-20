@@ -34,8 +34,7 @@ export const getCollections = async (req, res) => {
     );
 
     res.json(result.rows.map(toCamelCase));
-  } catch (err) {
-    console.error('Get collections error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to fetch collections' });
   }
 };
@@ -55,8 +54,7 @@ export const getPublicCollections = async (req, res) => {
     );
 
     res.json(result.rows.map(toCamelCase));
-  } catch (err) {
-    console.error('Get public collections error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to fetch public collections' });
   }
 };
@@ -87,8 +85,7 @@ export const getPublicCollection = async (req, res) => {
     collection.items = items.rows.map(toCamelCase);
 
     res.json(collection);
-  } catch (err) {
-    console.error('Get public collection error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to fetch collection' });
   }
 };
@@ -110,8 +107,7 @@ export const createCollection = async (req, res) => {
     );
 
     res.status(201).json(toCamelCase(result.rows[0]));
-  } catch (err) {
-    console.error('Create collection error:', err);
+  } catch {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Collection with this ID already exists' });
     }
@@ -149,8 +145,7 @@ export const updateCollection = async (req, res) => {
     }
 
     res.json(toCamelCase(result.rows[0]));
-  } catch (err) {
-    console.error('Update collection error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to update collection' });
   }
 };
@@ -197,8 +192,7 @@ export const deleteCollection = async (req, res) => {
     await pool.query('DELETE FROM collections WHERE id = $1 AND user_id = $2', [id, userId]);
 
     res.json({ message: 'Collection deleted successfully' });
-  } catch (err) {
-    console.error('Delete collection error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to delete collection' });
   }
 };
@@ -222,8 +216,7 @@ export const togglePublic = async (req, res) => {
     );
 
     res.json(toCamelCase(result.rows[0]));
-  } catch (err) {
-    console.error('Toggle public error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to toggle collection visibility' });
   }
 };

@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'; // eslint-disable-line no-unused-vars
+import { motion } from 'framer-motion';
 import { useEffect, useState } from 'react';
 
 export default function BlobBackground({ color1 = '#7c3aed', color2 = '#dc2626', color3 = '#2563eb' }) {

@@ -1,40 +1,13 @@
-/* eslint-disable no-unused-vars */
 import { create } from 'zustand';
 import { nanoid } from 'nanoid';
 import localforage from 'localforage';
 
-import { StackIcon as Stack } from '@phosphor-icons/react/Stack';
-import { MusicNotesIcon as MusicNotes } from '@phosphor-icons/react/MusicNotes';
-import { PersonArmsSpreadIcon as PersonArmsSpread } from '@phosphor-icons/react/PersonArmsSpread';
-import { TShirtIcon as TShirt } from '@phosphor-icons/react/TShirt';
-import { PushPinIcon as PushPin } from '@phosphor-icons/react/PushPin';
-import { SneakerIcon as Sneaker } from '@phosphor-icons/react/Sneaker';
-import { BookOpenIcon as BookOpen } from '@phosphor-icons/react/BookOpen';
-import { GameControllerIcon as GameController } from '@phosphor-icons/react/GameController';
-import { CurrencyCircleDollarIcon as CurrencyCircleDollar } from '@phosphor-icons/react/CurrencyCircleDollar';
-import { ScrollIcon as Scroll } from '@phosphor-icons/react/Scroll';
-import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
-import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
-
+import { CATEGORIES } from '../constants/categories';
 import * as api from '../api/client';
+import { isCloudUrl } from '../utils/helpers';
 
 const imageStore = localforage.createInstance({ name: 'vaulted-images' });
 const dataStore = localforage.createInstance({ name: 'vaulted-data' });
-
-const CATEGORIES = [
-  { id: 'trading-cards', label: 'Trading Cards', Icon: Stack },
-  { id: 'music', label: 'Music', Icon: MusicNotes },
-  { id: 'figures', label: 'Figures', Icon: PersonArmsSpread },
-  { id: 'clothes', label: 'Clothes', Icon: TShirt },
-  { id: 'pins', label: 'Pins', Icon: PushPin },
-  { id: 'sneakers', label: 'Sneakers', Icon: Sneaker },
-  { id: 'manga', label: 'Manga', Icon: BookOpen },
-  { id: 'video-games', label: 'Video Games', Icon: GameController },
-  { id: 'coins', label: 'Coins', Icon: CurrencyCircleDollar },
-  { id: 'art', label: 'Art', Icon: PaintBrush },
-  { id: 'anime', label: 'Anime', Icon: Scroll },
-  { id: 'custom', label: 'Custom', Icon: Sparkle },
-];
 
 
 const useStore = create((set, get) => ({
@@ -190,26 +163,24 @@ const useStore = create((set, get) => ({
     try {
       const publicCollections = await api.fetchPublicCollections();
       set({ publicCollections: publicCollections || [] });
-    } catch (err) {
+    } catch {
       // Fail silently if public collections can't be fetched
     }
   },
 
   // ── Sync Polling ──
   startSyncPolling: () => {
-    // Stop any existing interval
     get().stopSyncPolling();
 
-    // Sync immediately
     get().syncFromCloud();
 
-    // Then poll every 5 seconds when authenticated
     const interval = setInterval(() => {
+      if (document.hidden) return;
       if (get().isAuthenticated && !get().syncing) {
         get().syncFromCloud();
         get().fetchPublicCollections();
       }
-    }, 5000);
+    }, 30000);
 
     set({ syncInterval: interval });
   },
@@ -233,13 +204,6 @@ const useStore = create((set, get) => ({
 
     try {
       const { collections } = get();
-
-      // Helper to check if URL is a cloud URL (not a local-only ID)
-      const isCloudUrl = (url) => {
-        if (!url) return true; // null/undefined is ok
-        // Check if it's a full HTTP(S) URL or Cloudinary CDN
-        return url.startsWith('http://') || url.startsWith('https://');
-      };
 
       const syncCollections = collections.map((c) => ({
         id: c.id,
@@ -275,7 +239,7 @@ const useStore = create((set, get) => ({
       });
 
       set({ lastSynced: Date.now() });
-    } catch (err) {
+    } catch {
       set({ syncError: 'Sync failed. Check your connection and try again.' });
     } finally {
       set({ syncing: false, syncingVisible: false });
@@ -288,12 +252,6 @@ const useStore = create((set, get) => ({
 
     try {
       const cloudCollections = await api.fetchCollections();
-
-      // Helper to check if URL is a cloud URL (not a local-only ID)
-      const isCloudUrl = (url) => {
-        if (!url) return true; // null/undefined is ok
-        return url.startsWith('http://') || url.startsWith('https://');
-      };
 
       if (cloudCollections && cloudCollections.length > 0) {
         const localCollections = await Promise.all(
@@ -330,7 +288,7 @@ const useStore = create((set, get) => ({
       }
 
       set({ lastSynced: Date.now() });
-    } catch (err) {
+    } catch {
       set({ syncError: 'Failed to sync collections. Check your connection and try again.' });
     } finally {
       set({ syncing: false });
@@ -344,12 +302,6 @@ const useStore = create((set, get) => ({
     try {
       const { collections } = get();
       let migratedCount = 0;
-
-      // Helper to check if URL is a cloud URL
-      const isCloudUrl = (url) => {
-        if (!url) return true;
-        return url.startsWith('http://') || url.startsWith('https://');
-      };
 
       // Process all collections and items
       const updatedCollections = await Promise.all(
@@ -366,8 +318,8 @@ const useStore = create((set, get) => ({
                 updatedCollection.coverImageUrl = uploadResult.url;
                 migratedCount++;
               }
-            } catch (err) {
-              console.error('Failed to migrate cover image:', err);
+            } catch {
+              // Image migration failed - continue with other items
             }
           }
 
@@ -386,8 +338,8 @@ const useStore = create((set, get) => ({
                       updatedItem.imageUrl = uploadResult.url;
                       migratedCount++;
                     }
-                  } catch (err) {
-                    console.error('Failed to migrate item image:', err);
+                  } catch {
+                    // Item image migration failed - continue with other items
                   }
                 }
 
@@ -405,11 +357,10 @@ const useStore = create((set, get) => ({
         set({ collections: updatedCollections });
         await get()._persist();
 
-        // Sync migrated images to backend
         await get().syncToCloud();
       }
-    } catch (err) {
-      console.error('Local image migration error:', err);
+    } catch {
+      // Migration failed - continue running with unsynced local images
     }
   },
 
@@ -426,7 +377,9 @@ const useStore = create((set, get) => ({
         try {
           const uploadResult = await api.uploadImageAPI(coverImage, onProgress);
           coverImageUrl = uploadResult.url;
-        } catch (err) { /* empty */ }
+        } catch {
+          // Cover image upload failed - continue with local fallback
+        }
       }
     }
 
@@ -456,9 +409,7 @@ const useStore = create((set, get) => ({
           coverImageUrl,
           createdAt: newCollection.createdAt,
         });
-        // Sync to ensure all changes are reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         set((state) => ({
           collections: state.collections.filter((c) => c.id !== newCollection.id),
@@ -485,7 +436,9 @@ const useStore = create((set, get) => ({
         try {
           const uploadResult = await api.uploadImageAPI(updates.coverImage, onProgress);
           updates.coverImageUrl = uploadResult.url;
-        } catch (err) { /* empty */ }
+        } catch {
+          // Cover image upload failed - continue with previous image
+        }
       }
       delete updates.coverImage;
     }
@@ -510,9 +463,7 @@ const useStore = create((set, get) => ({
           updatePayload.coverImageUrl = updates.coverImageUrl;
         }
         await api.updateCollectionAPI(id, updatePayload);
-        // Sync to ensure all changes are reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         set((state) => ({
           collections: state.collections.map((c) =>
@@ -539,9 +490,7 @@ const useStore = create((set, get) => ({
     if (get().isAuthenticated) {
       try {
         await api.deleteCollectionAPI(id);
-        // Sync to ensure deletion is reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         if (col) {
           set((state) => ({
@@ -565,8 +514,7 @@ const useStore = create((set, get) => ({
       try {
         await api.togglePublicAPI(id);
         // Immediately sync to ensure public/private state is synced
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         set((state) => ({
           collections: state.collections.map((c) =>
@@ -591,7 +539,9 @@ const useStore = create((set, get) => ({
         try {
           const uploadResult = await api.uploadImageAPI(imageFile, onProgress);
           imageUrl = uploadResult.url;
-        } catch (err) { /* empty */ }
+        } catch {
+          // Image upload failed - continue with local fallback
+        }
       }
     }
 
@@ -621,9 +571,7 @@ const useStore = create((set, get) => ({
           imageUrl,
           createdAt: newItem.createdAt,
         });
-        // Sync to ensure item is reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         set((state) => ({
           collections: state.collections.map((c) =>
@@ -653,7 +601,9 @@ const useStore = create((set, get) => ({
         try {
           const uploadResult = await api.uploadImageAPI(updates.imageFile, onProgress);
           updates.imageUrl = uploadResult.url;
-        } catch (err) { /* empty */ }
+        } catch {
+          // Image upload failed - continue with local fallback
+        }
       }
       delete updates.imageFile;
     }
@@ -679,9 +629,7 @@ const useStore = create((set, get) => ({
           note: updates.note,
           imageUrl: updates.imageUrl,
         });
-        // Sync to ensure item update is reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         set((state) => ({
           collections: state.collections.map((c) =>
@@ -717,9 +665,7 @@ const useStore = create((set, get) => ({
     if (get().isAuthenticated) {
       try {
         await api.deleteItemAPI(itemId);
-        // Sync to ensure deletion is reflected
-        await get().syncToCloud();
-      } catch (err) {
+      } catch {
         // Revert on error
         if (item && col) {
           set((state) => ({
@@ -755,11 +701,6 @@ const useStore = create((set, get) => ({
     const col = get().collections.find((c) => c.id === collectionId);
     if (!col) return;
 
-    const isCloudUrl = (url) => {
-      if (!url) return true;
-      return url.startsWith('http://') || url.startsWith('https://');
-    };
-
     // Filter out items with local-only image IDs
     const validItems = col.items.filter((item) => !item.imageUrl || isCloudUrl(item.imageUrl));
     const brokenItems = col.items.filter((item) => item.imageUrl && !isCloudUrl(item.imageUrl));
@@ -780,8 +721,7 @@ const useStore = create((set, get) => ({
           for (const item of brokenItems) {
             await api.deleteItemAPI(item.id);
           }
-          await get().syncToCloud();
-        } catch (err) {
+        } catch {
           // Silent fail - items are already removed locally
         }
       }

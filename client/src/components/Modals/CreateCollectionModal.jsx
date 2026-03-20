@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Plus } from 'lucide-react';
 import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
 import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
 
 export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
@@ -16,14 +17,7 @@ export default function CreateCollectionModal({ isOpen, onClose, onCreate }) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => document.body.classList.remove('modal-open');
-  }, [isOpen]);
+  useModalScrollLock(isOpen);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

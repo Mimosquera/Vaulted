@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import { Edit2, Check } from 'lucide-react';
 import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
@@ -16,7 +15,13 @@ import CategoryIcon from '../components/UI/CategoryIcon';
 import './Profile.scss';
 
 export default function Profile() {
-  const { username, setUsername, collections, user, syncingVisible: syncing, lastSynced, syncToCloud } = useStore();
+  const username = useStore((s) => s.username);
+  const setUsername = useStore((s) => s.setUsername);
+  const collections = useStore((s) => s.collections);
+  const user = useStore((s) => s.user);
+  const syncing = useStore((s) => s.syncingVisible);
+  const lastSynced = useStore((s) => s.lastSynced);
+  const syncToCloud = useStore((s) => s.syncToCloud);
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState(username);
 

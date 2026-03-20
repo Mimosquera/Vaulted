@@ -1,6 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
 import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
@@ -14,6 +13,7 @@ import BlobBackground from '../components/UI/BlobBackground';
 import ItemLightbox from '../components/Collection/ItemLightbox';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import { getCategoryLabel, timeAgo } from '../utils/helpers';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './CollectionView.scss';
 
 const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
@@ -54,6 +54,7 @@ export default function PublicCollectionView() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const [lightboxItem, setLightboxItem] = useState(null);
   const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
 
@@ -71,12 +72,12 @@ export default function PublicCollectionView() {
 
   const filteredItems = useMemo(() => {
     if (!collection?.items) return [];
-    if (!search) return collection.items;
-    const q = search.toLowerCase();
+    if (!debouncedSearch) return collection.items;
+    const q = debouncedSearch.toLowerCase();
     return collection.items.filter(
       (item) => item.name.toLowerCase().includes(q) || item.note?.toLowerCase().includes(q)
     );
-  }, [collection, search]);
+  }, [collection, debouncedSearch]);
 
   if (loading) {
     return (

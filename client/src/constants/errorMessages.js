@@ -5,7 +5,7 @@ export const ERROR_MESSAGES = {
   INVALID_CREDENTIALS: 'Invalid email or password. Please try again.',
   EMAIL_EXISTS: 'An account with this email already exists.',
   INVALID_EMAIL: 'Please enter a valid email address.',
-  PASSWORD_TOO_SHORT: 'Password must be at least 6 characters.',
+  PASSWORD_TOO_SHORT: 'Password must be at least 8 characters.',
   NETWORK_ERROR: 'Connection error. Check your internet and try again.',
 
   // Authorization errors
@@ -59,10 +59,6 @@ export function getUserFriendlyError(error) {
     return ERROR_MESSAGES.PLEASE_WAIT;
   }
 
-  // If message is short and looks like a system message, use it
-  if (message.length < 100 && !message.includes('Error:')) {
-    return message;
-  }
-
+  // Fallback - never pass raw backend messages through
   return ERROR_MESSAGES.SOMETHING_WRONG;
 }

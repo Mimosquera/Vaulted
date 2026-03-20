@@ -6,11 +6,13 @@ import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
 import useStore, { CATEGORIES } from '../store/useStore';
 import CollectionGrid from '../components/Collection/CollectionGrid';
 import BlobBackground from '../components/UI/BlobBackground';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './Explore.scss';
 
 export default function Explore() {
   const publicCollectionsFromStore = useStore((s) => s.publicCollections);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const [filterCategory, setFilterCategory] = useState('');
 
   // Fetch public collections when component mounts
@@ -20,8 +22,8 @@ export default function Explore() {
 
   const publicCollections = useMemo(() => {
     let result = publicCollectionsFromStore;
-    if (search) {
-      const q = search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter(
         (c) => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
       );
@@ -30,7 +32,7 @@ export default function Explore() {
       result = result.filter((c) => c.category === filterCategory);
     }
     return result;
-  }, [publicCollectionsFromStore, search, filterCategory]);
+  }, [publicCollectionsFromStore, debouncedSearch, filterCategory]);
 
   return (
     <div className="explore page">

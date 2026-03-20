@@ -1,5 +1,4 @@
 import { useState, useMemo } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { Plus } from 'lucide-react';
@@ -9,6 +8,7 @@ import { VaultIcon as Vault } from '@phosphor-icons/react/Vault';
 import { ArrowsClockwiseIcon as ArrowsClockwise } from '@phosphor-icons/react/ArrowsClockwise';
 import useStore, { CATEGORIES } from '../store/useStore';
 import { CONFETTI_COLORS } from '../constants/colors';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import CollectionGrid from '../components/Collection/CollectionGrid';
 import CreateCollectionModal from '../components/Modals/CreateCollectionModal';
 import BlobBackground from '../components/UI/BlobBackground';
@@ -23,11 +23,12 @@ export default function Dashboard() {
   const [modalOpen, setModalOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [filterCategory, setFilterCategory] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
 
   const filtered = useMemo(() => {
     let result = collections;
-    if (search) {
-      const q = search.toLowerCase();
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase();
       result = result.filter(
         (c) => c.name.toLowerCase().includes(q) || (c.description || '').toLowerCase().includes(q)
       );
@@ -36,7 +37,7 @@ export default function Dashboard() {
       result = result.filter((c) => c.category === filterCategory);
     }
     return result;
-  }, [collections, search, filterCategory]);
+  }, [collections, debouncedSearch, filterCategory]);
 
   const totalItems = useMemo(
     () => collections.reduce((sum, c) => sum + (c.items?.length || 0), 0),

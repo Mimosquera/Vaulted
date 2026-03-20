@@ -35,8 +35,7 @@ export const getItems = async (req, res) => {
     ]);
 
     res.json(result.rows.map(toCamelCase));
-  } catch (err) {
-    console.error('Get items error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to fetch items' });
   }
 };
@@ -65,8 +64,7 @@ export const addItem = async (req, res) => {
     );
 
     res.status(201).json(toCamelCase(result.rows[0]));
-  } catch (err) {
-    console.error('Add item error:', err);
+  } catch {
     if (err.code === '23505') {
       return res.status(409).json({ error: 'Item with this ID already exists' });
     }
@@ -108,8 +106,7 @@ export const updateItem = async (req, res) => {
     }
 
     res.json(toCamelCase(result.rows[0]));
-  } catch (err) {
-    console.error('Update item error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to update item' });
   }
 };
@@ -145,8 +142,7 @@ export const deleteItem = async (req, res) => {
     await pool.query('DELETE FROM items WHERE id = $1', [id]);
 
     res.json({ message: 'Item deleted successfully' });
-  } catch (err) {
-    console.error('Delete item error:', err);
+  } catch {
     res.status(500).json({ error: 'Failed to delete item' });
   }
 };

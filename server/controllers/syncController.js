@@ -34,22 +34,27 @@ export const sync = async (req, res) => {
         }
       }
 
-      // Sync items
+      // Sync items - verify collection ownership before modifying items
       for (const item of items) {
         const { id, collectionId, name, note, imageUrl, createdAt } = item;
+
+        // Verify the collection belongs to this user
+        const ownerCheck = await client.query(
+          'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
+          [collectionId, userId]
+        );
+        if (ownerCheck.rows.length === 0) continue;
 
         const existing = await client.query('SELECT id FROM items WHERE id = $1', [id]);
 
         if (existing.rows.length > 0) {
-          // Update existing
           await client.query(
             `UPDATE items
              SET name = $1, note = $2, image_url = $3, updated_at = CURRENT_TIMESTAMP
-             WHERE id = $4`,
-            [name, note, imageUrl, id]
+             WHERE id = $4 AND collection_id IN (SELECT id FROM collections WHERE user_id = $5)`,
+            [name, note, imageUrl, id, userId]
           );
         } else {
-          // Insert new
           await client.query(
             `INSERT INTO items (id, collection_id, name, note, image_url, created_at)
              VALUES ($1, $2, $3, $4, $5, $6)`,
@@ -107,8 +112,7 @@ export const sync = async (req, res) => {
     } finally {
       client.release();
     }
-  } catch (err) {
-    console.error('Sync error:', err);
+  } catch {
     res.status(500).json({ error: 'Sync failed' });
   }
 };

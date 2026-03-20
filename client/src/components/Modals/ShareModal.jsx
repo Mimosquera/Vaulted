@@ -1,33 +1,32 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
+import toast from 'react-hot-toast';
 import useStore from '../../store/useStore';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
 
 export default function ShareModal({ isOpen, onClose, collection }) {
   const [copied, setCopied] = useState(false);
   const togglePublic = useStore((s) => s.togglePublic);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => document.body.classList.remove('modal-open');
-  }, [isOpen]);
+  useModalScrollLock(isOpen);
 
   if (!collection) return null;
 
   const shareUrl = `${window.location.origin}/explore/${collection.id}`;
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(shareUrl);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      toast.error('Unable to copy to clipboard');
+    }
   };
 
   const handleTogglePublic = async () => {

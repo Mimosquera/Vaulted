@@ -1,6 +1,5 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import { Trash2, Edit2 } from 'lucide-react';
@@ -9,7 +8,7 @@ import { DotsThreeIcon as DotsThree } from '@phosphor-icons/react/DotsThree';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
 import { UserIcon as User } from '@phosphor-icons/react/User';
-import { timeAgo } from '../../utils/helpers';
+import { timeAgo, isCloudUrl } from '../../utils/helpers';
 import { getCollectionGradient } from '../../constants/colors';
 import CategoryIcon from '../UI/CategoryIcon';
 import EditCollectionModal from '../Modals/EditCollectionModal';
@@ -18,7 +17,7 @@ import useHasHover from '../../hooks/useHasHover';
 import { getImageUrl as getImageUrlDirect } from '../../api/client';
 import './CollectionCard.scss';
 
-export default function CollectionCard({ collection, index = 0, isVisitor = false }) {
+export default memo(function CollectionCard({ collection, index = 0, isVisitor = false }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
@@ -27,9 +26,11 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
   const getImageUrl = useStore((s) => s.getImageUrl);
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    let url = null;
+    mountedRef.current = true;
+    let blobUrl = null;
     const imageRef = collection.coverImageUrl || collection.items?.find((i) => i.imageUrl);
     const imageId = typeof imageRef === 'string' ? imageRef : imageRef?.imageUrl;
     if (imageId) {
@@ -37,13 +38,20 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
         setCoverUrl(getImageUrlDirect(imageId));
       } else {
         getImageUrl(imageId).then((u) => {
-          url = u;
+          if (!mountedRef.current) {
+            if (u && !isCloudUrl(u)) URL.revokeObjectURL(u);
+            return;
+          }
+          if (u && !isCloudUrl(u)) blobUrl = u;
           setCoverUrl(u);
         });
       }
+    } else {
+      setCoverUrl(null);
     }
     return () => {
-      if (url) URL.revokeObjectURL(url);
+      mountedRef.current = false;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [collection.items, collection.coverImageUrl, isVisitor]);
@@ -180,4 +188,4 @@ export default function CollectionCard({ collection, index = 0, isVisitor = fals
     )}
     </>
   );
-}
+})

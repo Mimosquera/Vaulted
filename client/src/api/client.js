@@ -12,21 +12,47 @@ function setToken(token) {
   }
 }
 
-async function request(path, options = {}) {
+let refreshPromise = null;
+
+async function request(path, options = {}, isRetry = false) {
   const token = getToken();
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
   const res = await fetch(`${API_URL}${path}`, { ...options, headers });
 
-  if (res.status === 401) {
-    setToken(null);
-    window.dispatchEvent(new CustomEvent('auth:expired'));
+  if (res.status === 401 && !isRetry && !path.startsWith('/auth/')) {
+    // Deduplicate concurrent refresh attempts
+    if (!refreshPromise) {
+      refreshPromise = fetch(`${API_URL}/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${getToken()}`,
+        },
+      }).then(async (refreshRes) => {
+        if (!refreshRes.ok) throw new Error('Refresh failed');
+        const data = await refreshRes.json();
+        setToken(data.token);
+        return data.token;
+      }).finally(() => {
+        refreshPromise = null;
+      });
+    }
+
+    try {
+      await refreshPromise;
+      return request(path, options, true);
+    } catch {
+      setToken(null);
+      window.dispatchEvent(new CustomEvent('auth:expired'));
+      throw new Error('Session expired');
+    }
   }
 
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ message: res.statusText }));
-    throw new Error(error.message || 'Request failed');
+    const error = await res.json().catch(() => ({ error: res.statusText }));
+    throw new Error(error.error || 'Request failed');
   }
 
   if (res.status === 204) return null;
@@ -165,7 +191,7 @@ export async function uploadImageAPI(file, onProgress) {
       } else {
         try {
           const error = JSON.parse(xhr.responseText);
-          reject(new Error(error.message || xhr.statusText));
+          reject(new Error(error.error || xhr.statusText));
         } catch (e) {
           reject(new Error(xhr.statusText || 'Upload failed'));
         }

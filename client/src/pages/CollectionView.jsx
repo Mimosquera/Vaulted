@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
@@ -18,6 +17,7 @@ import EditCollectionModal from '../components/Modals/EditCollectionModal';
 import ShareModal from '../components/Modals/ShareModal';
 import BlobBackground from '../components/UI/BlobBackground';
 import { getCategoryLabel } from '../utils/helpers';
+import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import './CollectionView.scss';
 
@@ -39,17 +39,18 @@ export default function CollectionView() {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [editingItem, setEditingItem] = useState(null);
   const [search, setSearch] = useState('');
+  const debouncedSearch = useDebouncedValue(search);
   const [lightboxItem, setLightboxItem] = useState(null);
   const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
 
   const filteredItems = useMemo(() => {
     if (!collection) return [];
-    if (!search) return collection.items;
-    const q = search.toLowerCase();
+    if (!debouncedSearch) return collection.items;
+    const q = debouncedSearch.toLowerCase();
     return collection.items.filter(
       (item) => item.name.toLowerCase().includes(q) || item.note?.toLowerCase().includes(q)
     );
-  }, [collection, search]);
+  }, [collection, debouncedSearch]);
 
   if (!collection) {
     return (

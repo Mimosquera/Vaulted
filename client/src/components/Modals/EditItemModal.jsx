@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Check } from 'lucide-react';
 import ImageUploader from '../Upload/ImageUploader';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
 
 export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
@@ -20,14 +20,7 @@ export default function EditItemModal({ isOpen, onClose, onUpdate, item }) {
     }
   }, [item, isOpen]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => document.body.classList.remove('modal-open');
-  }, [isOpen]);
+  useModalScrollLock(isOpen);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

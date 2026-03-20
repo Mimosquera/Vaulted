@@ -1,31 +1,39 @@
-import { useState, useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
+import { useState, useEffect, useRef, memo } from 'react';
 import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import { Trash2, Edit2 } from 'lucide-react';
 import { ImageIcon } from '@phosphor-icons/react/Image';
 import useStore from '../../store/useStore';
 import useHasHover from '../../hooks/useHasHover';
-import { timeAgo } from '../../utils/helpers';
+import { timeAgo, isCloudUrl } from '../../utils/helpers';
 import './ItemCard.scss';
 
-export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpand }) {
+export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, onExpand }) {
   const [imageUrl, setImageUrl] = useState(null);
   const [hovering, setHovering] = useState(false);
   const deleteItem = useStore((s) => s.deleteItem);
   const getImageUrl = useStore((s) => s.getImageUrl);
   const hasHover = useHasHover();
+  const mountedRef = useRef(true);
 
   useEffect(() => {
-    let url = null;
+    mountedRef.current = true;
+    let blobUrl = null;
     if (item.imageUrl) {
       getImageUrl(item.imageUrl).then((u) => {
-        url = u;
+        if (!mountedRef.current) {
+          if (u && !isCloudUrl(u)) URL.revokeObjectURL(u);
+          return;
+        }
+        if (u && !isCloudUrl(u)) blobUrl = u;
         setImageUrl(u);
       });
+    } else {
+      setImageUrl(null);
     }
     return () => {
-      if (url) URL.revokeObjectURL(url);
+      mountedRef.current = false;
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [item.imageUrl]);
@@ -94,4 +102,4 @@ export default function ItemCard({ item, collectionId, index = 0, onEdit, onExpa
       </Tilt>
     </motion.div>
   );
-}
+})

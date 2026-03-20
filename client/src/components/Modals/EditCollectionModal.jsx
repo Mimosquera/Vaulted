@@ -6,6 +6,7 @@ import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
 import useStore from '../../store/useStore';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
 
 export default function EditCollectionModal({ isOpen, onClose, onUpdate, collection }) {
@@ -36,14 +37,7 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
     }
   }, [collection, isOpen, getImageUrl]);
 
-  useEffect(() => {
-    if (isOpen) {
-      document.body.classList.add('modal-open');
-    } else {
-      document.body.classList.remove('modal-open');
-    }
-    return () => document.body.classList.remove('modal-open');
-  }, [isOpen]);
+  useModalScrollLock(isOpen);
 
   const handleSubmit = async (e) => {
     e.preventDefault();

@@ -1,21 +1,18 @@
 import { useEffect } from 'react';
-// eslint-disable-next-line no-unused-vars
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
+import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './ItemLightbox.scss';
 
 export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
+  useModalScrollLock(isOpen);
+
   useEffect(() => {
     if (isOpen) {
-      document.body.classList.add('modal-open');
       const onKey = (e) => { if (e.key === 'Escape') onClose(); };
       window.addEventListener('keydown', onKey);
-      return () => {
-        document.body.classList.remove('modal-open');
-        window.removeEventListener('keydown', onKey);
-      };
+      return () => window.removeEventListener('keydown', onKey);
     }
-    return () => document.body.classList.remove('modal-open');
   }, [isOpen, onClose]);
 
   return (
