@@ -165,16 +165,6 @@ export default function Explore() {
           )}
         </motion.div>
 
-        {viewMode === 'collections' && isAuthenticated && friendsFeedCollections.length > 0 && (
-          <section className="explore__friends-feed">
-            <div className="explore__friends-feed-header">
-              <h2><UsersThree weight="duotone" size={18} /> Friends Feed</h2>
-              <p>Private discoveries shared only with friends</p>
-            </div>
-            <CollectionGrid collections={friendsFeedCollections} isVisitor />
-          </section>
-        )}
-
         {viewMode === 'collections' && nonFriendCollections.length > 0 ? (
           <CollectionGrid collections={nonFriendCollections} isVisitor />
         ) : null}
@@ -198,6 +188,16 @@ export default function Explore() {
             <p>User discovery and friend requests are available for authenticated accounts.</p>
             <Link to="/login" className="btn btn--primary">Sign In</Link>
           </motion.div>
+        )}
+
+        {viewMode === 'users' && isAuthenticated && friendsFeedCollections.length > 0 && (
+          <section className="explore__friends-feed">
+            <div className="explore__friends-feed-header">
+              <h2><UsersThree weight="duotone" size={18} /> Friends Feed</h2>
+              <p>Private discoveries shared only with friends</p>
+            </div>
+            <CollectionGrid collections={friendsFeedCollections} isVisitor />
+          </section>
         )}
 
         {viewMode === 'users' && isAuthenticated && (

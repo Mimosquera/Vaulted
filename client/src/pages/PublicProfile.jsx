@@ -177,7 +177,7 @@ export default function PublicProfile() {
         ) : (
           <div className="public-profile__empty">
             <h3>No visible collections</h3>
-            <p>This profile currently has no collections available to your access level.</p>
+            <p>This profile currently has no public collections available.</p>
           </div>
         )}
       </div>

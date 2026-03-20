@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dir \"C:\\\\Users\\\\micha\\\\MiMo Projects\\\\collection-app\\\\src\")",
+      "Bash(find '/c/Users/micha/MiMo Projects/collection-app' -maxdepth 3 -name *.html -o -name manifest*)"
+    ]
+  }
+}

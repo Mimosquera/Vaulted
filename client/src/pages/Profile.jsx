@@ -1,6 +1,6 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Edit2, Check } from 'lucide-react';
 import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
@@ -213,7 +213,7 @@ export default function Profile() {
         >
           <div
             ref={avatarEditorRef}
-            className="profile__avatar-editor-shell"
+            className={`profile__avatar-editor-shell${avatarMode === 'icon' ? ' profile__avatar-editor-shell--icon' : ''}`}
             style={{
               '--avatar-icon-bg': shellTone.bg,
               '--avatar-icon-ring': shellTone.ring,
@@ -236,66 +236,75 @@ export default function Profile() {
               </button>
             </motion.div>
 
-            <div
-              className={`profile__avatar-editor ${avatarEditorOpen ? 'profile__avatar-editor--open' : ''}`}
-              style={avatarEditorOpen ? { '--editor-max-h': avatarMode === 'image' ? '520px' : '240px' } : {}}
-            >
-              <div className="profile__avatar-mode-switch" role="tablist" aria-label="Avatar mode">
-                <button
-                  type="button"
-                  className={`profile__avatar-mode-btn ${avatarMode === 'image' ? 'profile__avatar-mode-btn--active' : ''}`}
-                  onClick={() => setAvatarMode('image')}
+            <AnimatePresence initial={false}>
+              {avatarEditorOpen && (
+                <motion.div
+                  className="profile__avatar-editor"
+                  initial={{ height: 0, opacity: 0, marginTop: 0 }}
+                  animate={{ height: 'auto', opacity: 1, marginTop: '0.25rem' }}
+                  exit={{ height: 0, opacity: 0, marginTop: 0 }}
+                  transition={{ duration: 0.2, ease: [0.4, 0, 0.2, 1] }}
                 >
-                  Photo
-                </button>
-                <button
-                  type="button"
-                  className={`profile__avatar-mode-btn ${avatarMode === 'icon' ? 'profile__avatar-mode-btn--active' : ''}`}
-                    onClick={handleIconTabClick}
-                  disabled={savingProfile || uploadingAvatar}
-                >
-                  Icon
-                </button>
-              </div>
-              {avatarMode === 'image' ? (
-                <div className="profile__avatar-uploader-wrap">
-                  <ImageUploader
-                    key={uploaderKey}
-                    currentPreview={user?.avatarImageUrl || null}
-                    onFileSelect={handleAvatarFileSelect}
-                    isUploading={uploadingAvatar}
-                    uploadProgress={avatarUploadProgress}
-                    cropShape="circle"
-                  />
-                  {pendingAvatarFile && !uploadingAvatar && (
-                    <button
-                      type="button"
-                      className="btn btn--primary btn--sm profile__avatar-confirm-btn"
-                      onClick={handleAvatarUpload}
-                    >
-                      Set as avatar
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <div className="profile__avatar-color-row">
-                  <span className="profile__avatar-color-label"><PaintBrush weight="duotone" size={14} /> Icon color</span>
-                  <div className="profile__avatar-swatch-list" role="radiogroup" aria-label="Avatar icon color">
-                    {avatarColorOptions.map((color) => (
+                  <div className="profile__avatar-editor-inner">
+                    <div className="profile__avatar-mode-switch" role="tablist" aria-label="Avatar mode">
                       <button
-                        key={color}
                         type="button"
-                        className={`profile__avatar-swatch ${avatarColor === color ? 'profile__avatar-swatch--active' : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => handleAvatarColorSelect(color)}
-                        aria-label={`Use ${color} avatar color`}
-                        aria-pressed={avatarColor === color}
-                      />
-                    ))}
+                        className={`profile__avatar-mode-btn ${avatarMode === 'image' ? 'profile__avatar-mode-btn--active' : ''}`}
+                        onClick={() => setAvatarMode('image')}
+                      >
+                        Photo
+                      </button>
+                      <button
+                        type="button"
+                        className={`profile__avatar-mode-btn ${avatarMode === 'icon' ? 'profile__avatar-mode-btn--active' : ''}`}
+                        onClick={handleIconTabClick}
+                        disabled={savingProfile || uploadingAvatar}
+                      >
+                        Icon
+                      </button>
+                    </div>
+                    {avatarMode === 'image' ? (
+                      <div className="profile__avatar-uploader-wrap">
+                        <ImageUploader
+                          key={uploaderKey}
+                          currentPreview={user?.avatarImageUrl || null}
+                          onFileSelect={handleAvatarFileSelect}
+                          isUploading={uploadingAvatar}
+                          uploadProgress={avatarUploadProgress}
+                          cropShape="circle"
+                        />
+                        {pendingAvatarFile && !uploadingAvatar && (
+                          <button
+                            type="button"
+                            className="btn btn--primary btn--sm profile__avatar-confirm-btn"
+                            onClick={handleAvatarUpload}
+                          >
+                            Set as avatar
+                          </button>
+                        )}
+                      </div>
+                    ) : (
+                      <div className="profile__avatar-color-row">
+                        <span className="profile__avatar-color-label"><PaintBrush weight="duotone" size={14} /> Icon color</span>
+                        <div className="profile__avatar-swatch-list" role="radiogroup" aria-label="Avatar icon color">
+                          {avatarColorOptions.map((color) => (
+                            <button
+                              key={color}
+                              type="button"
+                              className={`profile__avatar-swatch ${avatarColor === color ? 'profile__avatar-swatch--active' : ''}`}
+                              style={{ backgroundColor: color }}
+                              onClick={() => handleAvatarColorSelect(color)}
+                              aria-label={`Use ${color} avatar color`}
+                              aria-pressed={avatarColor === color}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
                   </div>
-                </div>
+                </motion.div>
               )}
-            </div>
+            </AnimatePresence>
           </div>
 
           <div className="profile__name-row">
