@@ -46,12 +46,13 @@ export const getImage = async (req, res) => {
     const { url, data, mime_type } = result.rows[0];
 
     if (url) {
-      return res.json({ url });
+      res.setHeader('Cache-Control', 'public, max-age=3600');
+      return res.redirect(302, url);
     }
 
     if (data) {
       res.setHeader('Content-Type', mime_type || 'image/jpeg');
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
       return res.send(data);
     }
 

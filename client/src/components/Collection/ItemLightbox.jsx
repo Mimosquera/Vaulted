@@ -44,6 +44,8 @@ export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
               objectFit="contain"
               aspectRatio="4 / 3"
               loading="eager"
+              fetchPriority="high"
+              widthHint={1600}
               wrapperClassName="item-lightbox__safe-image"
               imageClassName="item-lightbox__image"
             />

@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { ImageIcon } from '@phosphor-icons/react/Image';
+import { optimizeImageUrl } from '../../utils/helpers';
 import './SafeImage.scss';
 
 const IMAGE_STATE = {
@@ -32,8 +33,23 @@ function SafeImageWithSource({
   aspectRatio,
   objectFit,
   loading,
+  widthHint,
+  fetchPriority,
 }) {
   const [state, setState] = useState(IMAGE_STATE.LOADING);
+  const fit = objectFit === 'contain' ? 'contain' : 'cover';
+
+  const optimizedSrc = useMemo(() => {
+    if (!src) return src;
+    return optimizeImageUrl(src, { width: widthHint, fit });
+  }, [src, widthHint, fit]);
+
+  const srcSet = useMemo(() => {
+    if (!src || !widthHint) return undefined;
+    const oneX = optimizeImageUrl(src, { width: widthHint, fit });
+    const twoX = optimizeImageUrl(src, { width: widthHint * 2, fit });
+    return `${oneX} 1x, ${twoX} 2x`;
+  }, [src, widthHint, fit]);
 
   const classes = [
     'safe-image',
@@ -50,10 +66,12 @@ function SafeImageWithSource({
       {state !== IMAGE_STATE.ERROR && (
         <img
           className={['safe-image__img', imageClassName].filter(Boolean).join(' ')}
-          src={src}
+          src={optimizedSrc}
+          srcSet={srcSet}
           alt={alt}
           loading={loading}
           decoding="async"
+          fetchPriority={fetchPriority}
           onLoad={() => setState(IMAGE_STATE.LOADED)}
           onError={() => setState(IMAGE_STATE.ERROR)}
         />
@@ -73,6 +91,8 @@ export default function SafeImage({
   aspectRatio = '1 / 1',
   objectFit = 'cover',
   loading = 'lazy',
+  widthHint,
+  fetchPriority = 'auto',
 }) {
   if (!src) {
     return (
@@ -97,6 +117,8 @@ export default function SafeImage({
       aspectRatio={aspectRatio}
       objectFit={objectFit}
       loading={loading}
+      widthHint={widthHint}
+      fetchPriority={fetchPriority}
     />
   );
 }

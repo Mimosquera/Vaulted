@@ -57,6 +57,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
                 wrapperClassName="image-uploader__preview-media"
                 imageClassName="image-uploader__preview-img"
                 loading="eager"
+                widthHint={1000}
               />
               {isUploading && (
                 <div className="image-uploader__overlay">

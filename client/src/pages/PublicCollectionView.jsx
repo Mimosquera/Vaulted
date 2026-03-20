@@ -14,7 +14,7 @@ import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import SafeImage from '../components/UI/SafeImage';
 import '../components/Collection/ItemCard.scss';
-import { getCategoryLabel, isCloudUrl, timeAgo } from '../utils/helpers';
+import { getCategoryLabel, isCloudUrl, optimizeImageUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './CollectionView.scss';
 
@@ -41,6 +41,7 @@ function PublicItemCard({ item, index = 0, onExpand }) {
             aspectRatio="1 / 1"
             wrapperClassName="item-card__media"
             imageClassName="item-card__media-img"
+            widthHint={360}
           />
 
           {!imageUrl && (
@@ -137,6 +138,8 @@ export default function PublicCollectionView() {
 
   const coverColor = collection.coverColor || '#7c3aed';
   const coverUrl = isCloudUrl(collection.coverImageUrl) ? collection.coverImageUrl : null;
+  const coverWidthHint = Math.min(2200, Math.max(900, Math.round(window.innerWidth * (window.devicePixelRatio || 1))));
+  const optimizedCoverUrl = coverUrl ? optimizeImageUrl(coverUrl, { width: coverWidthHint, fit: 'cover' }) : null;
 
   return (
     <div className="collection-view page">
@@ -153,14 +156,15 @@ export default function PublicCollectionView() {
           className="collection-view__cover-solid"
           style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
         />
-        {coverUrl && (
+        {optimizedCoverUrl && (
           <img
-            src={coverUrl}
+            src={optimizedCoverUrl}
             alt=""
             className="collection-view__cover-img"
             onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
             onError={(e) => e.currentTarget.remove()}
             loading="eager"
+            fetchPriority="high"
             decoding="async"
           />
         )}

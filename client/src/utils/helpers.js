@@ -26,3 +26,34 @@ export function isCloudUrl(url) {
   if (!url) return true;
   return url.startsWith('http://') || url.startsWith('https://');
 }
+
+function isCloudinaryUrl(url) {
+  return typeof url === 'string' && /res\.cloudinary\.com/i.test(url) && /\/upload\//i.test(url);
+}
+
+export function optimizeImageUrl(url, options = {}) {
+  if (!url || !isCloudinaryUrl(url)) return url;
+
+  const {
+    width = null,
+    fit = 'cover',
+    quality = 'auto',
+    format = 'auto',
+  } = options;
+
+  const roundedWidth = Number.isFinite(width) ? Math.max(80, Math.round(width)) : null;
+  const crop = fit === 'contain' ? 'c_limit' : 'c_fill,g_auto';
+  const transforms = [
+    `f_${format}`,
+    `q_${quality}`,
+    'dpr_auto',
+    crop,
+  ];
+
+  if (roundedWidth) {
+    transforms.push(`w_${roundedWidth}`);
+  }
+
+  const transformString = transforms.join(',');
+  return url.replace('/upload/', `/upload/${transformString}/`);
+}
