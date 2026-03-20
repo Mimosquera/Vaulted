@@ -69,28 +69,30 @@ export default function Dashboard() {
           transition={{ delay: 0.1 }}
         >
           <div className="dashboard__title-row">
-            <div>
+            <div className="dashboard__heading">
               <h1 className="dashboard__title">
                 <Vault weight="duotone" className="dashboard__title-icon" />
                 My Vault
               </h1>
-              <p className="dashboard__subtitle">
-                <AnimatedCounter value={collections.length} duration={800} /> collections &middot;{' '}
-                <AnimatedCounter value={totalItems} duration={1000} /> items
-              </p>
+              <div className="dashboard__meta-row">
+                <p className="dashboard__subtitle">
+                  <AnimatedCounter value={collections.length} duration={800} /> collections &middot;{' '}
+                  <AnimatedCounter value={totalItems} duration={1000} /> items
+                </p>
+                <button
+                  className={`dashboard__sync-btn ${syncing ? 'dashboard__sync-btn--syncing' : ''}`}
+                  onClick={syncToCloud}
+                  disabled={syncing}
+                  title="Sync to cloud"
+                >
+                  <ArrowsClockwise weight="bold" size={16} />
+                  <span>{syncing ? 'Syncing' : 'Sync now'}</span>
+                </button>
+              </div>
             </div>
             <div className="dashboard__actions">
               <button
-                className={`dashboard__sync-btn ${syncing ? 'dashboard__sync-btn--syncing' : ''}`}
-                onClick={syncToCloud}
-                disabled={syncing}
-                title="Sync to cloud"
-              >
-                <ArrowsClockwise weight="bold" size={18} />
-                <span>{syncing ? 'Syncing...' : 'Sync'}</span>
-              </button>
-              <button
-                className="btn btn--primary"
+                className="btn btn--primary dashboard__new-btn"
                 onClick={() => setModalOpen(true)}
               >
                 <Plus strokeWidth={2} size={16} />
@@ -117,22 +119,30 @@ export default function Dashboard() {
             />
           </div>
 
-          <div className="dashboard__filters">
-            <button
-              className={`dashboard__filter-chip ${!filterCategory ? 'dashboard__filter-chip--active' : ''}`}
-              onClick={() => setFilterCategory('')}
-            >
-              All
-            </button>
-            {CATEGORIES.slice(0, 8).map((cat) => (
-              <button
-                key={cat.id}
-                className={`dashboard__filter-chip ${filterCategory === cat.id ? 'dashboard__filter-chip--active' : ''}`}
-                onClick={() => setFilterCategory(filterCategory === cat.id ? '' : cat.id)}
-              >
-                {cat.Icon && <cat.Icon weight="duotone" size={14} />} {cat.label}
-              </button>
-            ))}
+          <div className="dashboard__toolbar-summary">
+            Showing <strong>{filtered.length}</strong> of <strong>{collections.length}</strong> collections
+          </div>
+
+          <div className="dashboard__filters-scroll">
+            <div className="dashboard__filters-track">
+              <div className="dashboard__filters">
+                <button
+                  className={`dashboard__filter-chip ${!filterCategory ? 'dashboard__filter-chip--active' : ''}`}
+                  onClick={() => setFilterCategory('')}
+                >
+                  All
+                </button>
+                {CATEGORIES.slice(0, 8).map((cat) => (
+                  <button
+                    key={cat.id}
+                    className={`dashboard__filter-chip ${filterCategory === cat.id ? 'dashboard__filter-chip--active' : ''}`}
+                    onClick={() => setFilterCategory(filterCategory === cat.id ? '' : cat.id)}
+                  >
+                    {cat.Icon && <cat.Icon weight="duotone" size={14} />} {cat.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
         </motion.div>
 
