@@ -185,7 +185,7 @@ export async function uploadImageAPI(file, onProgress) {
         try {
           const response = JSON.parse(xhr.responseText);
           resolve(response);
-        } catch (e) {
+        } catch {
           reject(new Error('Invalid response format'));
         }
       } else if (xhr.status === 401) {
@@ -196,7 +196,7 @@ export async function uploadImageAPI(file, onProgress) {
         try {
           const error = JSON.parse(xhr.responseText);
           reject(new Error(error.error || xhr.statusText));
-        } catch (e) {
+        } catch {
           reject(new Error(xhr.statusText || 'Upload failed'));
         }
       }

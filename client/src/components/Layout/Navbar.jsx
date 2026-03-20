@@ -10,7 +10,7 @@ import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
 import { SignInIcon as SignIn } from '@phosphor-icons/react/SignIn';
 import { SignOutIcon as SignOut } from '@phosphor-icons/react/SignOut';
 import { WarningIcon as Warning } from '@phosphor-icons/react/Warning';
-import { useInitialLoad } from '../../contexts/InitialLoadContext';
+import { useInitialLoad } from '../../contexts/useInitialLoad';
 import useStore from '../../store/useStore';
 import VaultLogo from '../VaultLogo';
 import './Navbar.scss';

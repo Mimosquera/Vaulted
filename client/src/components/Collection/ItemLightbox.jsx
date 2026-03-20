@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
+import SafeImage from '../UI/SafeImage';
 import './ItemLightbox.scss';
 
 export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
@@ -37,13 +38,15 @@ export default function ItemLightbox({ item, imageUrl, isOpen, onClose }) {
             transition={{ type: 'spring', stiffness: 200, damping: 22 }}
             onClick={(e) => e.stopPropagation()}
           >
-            {imageUrl && (
-              <img
-                className="item-lightbox__image"
-                src={imageUrl}
-                alt={item.name}
-              />
-            )}
+            <SafeImage
+              src={imageUrl}
+              alt={item.name}
+              objectFit="contain"
+              aspectRatio="4 / 3"
+              loading="eager"
+              wrapperClassName="item-lightbox__safe-image"
+              imageClassName="item-lightbox__image"
+            />
             <div className="item-lightbox__info">
               <h3 className="item-lightbox__name">{item.name}</h3>
               {item.note && <p className="item-lightbox__note">{item.note}</p>}

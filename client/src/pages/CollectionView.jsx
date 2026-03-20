@@ -138,12 +138,19 @@ export default function CollectionView() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        {coverUrl ? (
-          <img src={coverUrl} alt="" className="collection-view__cover-img" />
-        ) : (
-          <div
-            className="collection-view__cover-solid"
-            style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+        <div
+          className="collection-view__cover-solid"
+          style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+        />
+        {coverUrl && (
+          <img
+            src={coverUrl}
+            alt=""
+            className="collection-view__cover-img"
+            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+            onError={(e) => e.currentTarget.remove()}
+            loading="eager"
+            decoding="async"
           />
         )}
         <div className="collection-view__cover-fade" />

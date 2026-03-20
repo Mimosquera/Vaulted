@@ -5,6 +5,7 @@ import { PaletteIcon as Palette } from '@phosphor-icons/react/Palette';
 import { CATEGORIES } from '../../store/useStore';
 import { COLLECTION_COLORS } from '../../constants/colors';
 import ImageUploader from '../Upload/ImageUploader';
+import SafeImage from '../UI/SafeImage';
 import useStore from '../../store/useStore';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
@@ -95,7 +96,13 @@ export default function EditCollectionModal({ isOpen, onClose, onUpdate, collect
               {currentCoverUrl && (
                 <div className="modal__field">
                   <label>Current Cover</label>
-                  <img src={currentCoverUrl} alt="Current cover" style={{ maxWidth: '100%', borderRadius: '8px', maxHeight: '150px', objectFit: 'cover' }} />
+                  <SafeImage
+                    src={currentCoverUrl}
+                    alt="Current cover"
+                    aspectRatio="16 / 6"
+                    wrapperClassName="modal__cover-preview"
+                    imageClassName="modal__cover-preview-img"
+                  />
                 </div>
               )}
 

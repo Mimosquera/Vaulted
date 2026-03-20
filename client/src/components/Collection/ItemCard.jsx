@@ -6,6 +6,7 @@ import { ImageIcon } from '@phosphor-icons/react/Image';
 import useStore from '../../store/useStore';
 import useHasHover from '../../hooks/useHasHover';
 import { timeAgo, isCloudUrl } from '../../utils/helpers';
+import SafeImage from '../UI/SafeImage';
 import './ItemCard.scss';
 
 export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, onExpand }) {
@@ -39,7 +40,8 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
   }, [item.imageUrl]);
 
   const handleExpand = () => {
-    if (onExpand) onExpand(item, imageUrl);
+    if (!onExpand || !imageUrl) return;
+    onExpand(item, imageUrl);
   };
 
   return (
@@ -64,9 +66,15 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
           onMouseLeave={() => setHovering(false)}
         >
           <div className="item-card__image" onClick={handleExpand} style={{ cursor: 'pointer' }}>
-            {imageUrl ? (
-              <img src={imageUrl} alt={item.name} loading="lazy" />
-            ) : (
+            <SafeImage
+              src={imageUrl}
+              alt={item.name}
+              aspectRatio="1 / 1"
+              wrapperClassName="item-card__media"
+              imageClassName="item-card__media-img"
+            />
+
+            {!imageUrl && (
               <div className="item-card__placeholder">
                 <ImageIcon weight="thin" size={40} />
               </div>

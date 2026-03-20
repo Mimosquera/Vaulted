@@ -144,6 +144,12 @@ button {
   }
 }
 
+// ── Media Safety ──
+img {
+  display: block;
+  max-width: 100%;
+}
+
 // ── Inputs ──
 input, textarea, select {
   font-family: $font-body;

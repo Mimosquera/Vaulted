@@ -12,6 +12,8 @@ import { fetchPublicCollection, getImageUrl } from '../api/client';
 import ItemLightbox from '../components/Collection/ItemLightbox';
 import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
+import SafeImage from '../components/UI/SafeImage';
+import '../components/Collection/ItemCard.scss';
 import { getCategoryLabel, isCloudUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './CollectionView.scss';
@@ -20,6 +22,10 @@ const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
 
 function PublicItemCard({ item, index = 0, onExpand }) {
   const imageUrl = item.imageUrl ? getImageUrl(item.imageUrl) : null;
+  const handleExpand = () => {
+    if (!onExpand || !imageUrl) return;
+    onExpand(item, imageUrl);
+  };
 
   return (
     <motion.div
@@ -28,10 +34,16 @@ function PublicItemCard({ item, index = 0, onExpand }) {
       transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
     >
       <div className="item-card">
-        <div className="item-card__image" onClick={() => onExpand && onExpand(item, imageUrl)} style={{ cursor: 'pointer' }}>
-          {imageUrl ? (
-            <img src={imageUrl} alt={item.name} loading="lazy" />
-          ) : (
+        <div className="item-card__image" onClick={handleExpand} style={{ cursor: 'pointer' }}>
+          <SafeImage
+            src={imageUrl}
+            alt={item.name}
+            aspectRatio="1 / 1"
+            wrapperClassName="item-card__media"
+            imageClassName="item-card__media-img"
+          />
+
+          {!imageUrl && (
             <div className="item-card__placeholder">
               <ImageIcon weight="thin" size={40} />
             </div>
@@ -50,8 +62,7 @@ function PublicItemCard({ item, index = 0, onExpand }) {
 export default function PublicCollectionView() {
   const { id } = useParams();
   const [collection, setCollection] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [errorById, setErrorById] = useState({ id: null, message: null });
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
   const [lightboxItem, setLightboxItem] = useState(null);
@@ -63,13 +74,27 @@ export default function PublicCollectionView() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    setError(null);
+    let cancelled = false;
+
     fetchPublicCollection(id)
-      .then((data) => setCollection(data))
-      .catch(() => setError('Collection not found or is private'))
-      .finally(() => setLoading(false));
+      .then((data) => {
+        if (cancelled) return;
+        setCollection(data);
+        setErrorById({ id: null, message: null });
+      })
+      .catch(() => {
+        if (cancelled) return;
+        setCollection(null);
+        setErrorById({ id, message: 'Collection not found or is private' });
+      });
+
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
+
+  const currentError = errorById.id === id ? errorById.message : null;
+  const loading = !currentError && (!collection || String(collection.id) !== String(id));
 
   const filteredItems = useMemo(() => {
     if (!collection?.items) return [];
@@ -94,12 +119,12 @@ export default function PublicCollectionView() {
     );
   }
 
-  if (error || !collection) {
+  if (currentError) {
     return (
       <div className="collection-view page">
         <div className="container">
           <div className="collection-view__not-found">
-            <h2>{error || 'Collection not found'}</h2>
+            <h2>{currentError}</h2>
             <Link to="/explore" className="btn btn--secondary">
               <ArrowLeft weight="bold" />
               Back to Explore
@@ -124,12 +149,19 @@ export default function PublicCollectionView() {
         animate={{ opacity: 1 }}
         transition={{ duration: 0.4 }}
       >
-        {coverUrl ? (
-          <img src={coverUrl} alt="" className="collection-view__cover-img" />
-        ) : (
-          <div
-            className="collection-view__cover-solid"
-            style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+        <div
+          className="collection-view__cover-solid"
+          style={{ background: `linear-gradient(135deg, ${coverColor}, ${coverColor}88)` }}
+        />
+        {coverUrl && (
+          <img
+            src={coverUrl}
+            alt=""
+            className="collection-view__cover-img"
+            onLoad={(e) => e.currentTarget.classList.add('is-loaded')}
+            onError={(e) => e.currentTarget.remove()}
+            loading="eager"
+            decoding="async"
           />
         )}
         <div className="collection-view__cover-fade" />

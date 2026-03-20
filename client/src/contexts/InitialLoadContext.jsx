@@ -1,6 +1,5 @@
-import { createContext, useState, useContext } from 'react';
-
-const InitialLoadContext = createContext();
+import { useState } from 'react';
+import { InitialLoadContext } from './InitialLoadContextValue';
 
 export function InitialLoadProvider({ children }) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
@@ -16,12 +15,4 @@ export function InitialLoadProvider({ children }) {
       {children}
     </InitialLoadContext.Provider>
   );
-}
-
-export function useInitialLoad() {
-  const context = useContext(InitialLoadContext);
-  if (!context) {
-    throw new Error('useInitialLoad must be used within InitialLoadProvider');
-  }
-  return context;
 }

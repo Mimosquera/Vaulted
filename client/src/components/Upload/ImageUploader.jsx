@@ -3,7 +3,7 @@ import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X } from 'lucide-react';
 import { CloudArrowUpIcon as CloudArrowUp } from '@phosphor-icons/react/CloudArrowUp';
-import { ImageIcon } from '@phosphor-icons/react/Image';
+import SafeImage from '../UI/SafeImage';
 import './ImageUploader.scss';
 
 export default function ImageUploader({ onFileSelect, currentPreview = null, isUploading = false, uploadProgress = 0 }) {
@@ -50,7 +50,14 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
             >
-              <img src={preview} alt="Preview" />
+              <SafeImage
+                src={preview}
+                alt="Preview"
+                aspectRatio="4 / 3"
+                wrapperClassName="image-uploader__preview-media"
+                imageClassName="image-uploader__preview-img"
+                loading="eager"
+              />
               {isUploading && (
                 <div className="image-uploader__overlay">
                   <div className="image-uploader__progress">

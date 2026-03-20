@@ -10,7 +10,7 @@ export default class ErrorBoundary extends Component {
     return { hasError: true, error };
   }
 
-  componentDidCatch(error) {
+  componentDidCatch() {
     // Log error for monitoring services
     // Sentry.captureException(error);
   }
@@ -43,7 +43,7 @@ export default class ErrorBoundary extends Component {
             <p style={{ fontSize: '16px', color: '#8c8c94', marginBottom: '32px' }}>
               We encountered an unexpected error. Please try refreshing the page.
             </p>
-            {process.env.NODE_ENV === 'development' && (
+            {import.meta.env.DEV && (
               <details style={{
                 textAlign: 'left',
                 backgroundColor: 'rgba(255, 0, 0, 0.1)',

@@ -17,7 +17,7 @@ import { GameControllerIcon as GameController } from '@phosphor-icons/react/Game
 import { CurrencyCircleDollarIcon as CurrencyCircleDollar } from '@phosphor-icons/react/CurrencyCircleDollar';
 import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
 
-import { useInitialLoad } from '../contexts/InitialLoadContext';
+import { useInitialLoad } from '../contexts/useInitialLoad';
 import VaultLogo from '../components/VaultLogo';
 import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';

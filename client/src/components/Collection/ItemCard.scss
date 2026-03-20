@@ -20,28 +20,34 @@
 
   &__image {
     position: relative;
+    aspect-ratio: 1;
     overflow: hidden;
     background: $bg-secondary;
+  }
 
-    img {
-      width: 100%;
-      display: block;
-      transition: transform $transition-slow;
-    }
+  &__media {
+    width: 100%;
+    height: 100%;
+  }
 
-    &:hover img {
-      transform: scale(1.05);
-    }
+  &__media-img {
+    transition: transform $transition-slow, opacity 260ms ease;
+  }
+
+  &__image:hover &__media-img {
+    transform: scale(1.05);
   }
 
   &__placeholder {
+    position: absolute;
+    inset: 0;
     width: 100%;
-    aspect-ratio: 1;
     display: flex;
     align-items: center;
     justify-content: center;
     color: $text-muted;
-    background: linear-gradient(135deg, $bg-secondary, $bg-card);
+    background: linear-gradient(135deg, rgba($bg-secondary, 0.85), rgba($bg-card, 0.9));
+    pointer-events: none;
   }
 
   &__actions {
