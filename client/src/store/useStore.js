@@ -9,6 +9,14 @@ import { isCloudUrl } from '../utils/helpers';
 const imageStore = localforage.createInstance({ name: 'vaulted-images' });
 const dataStore = localforage.createInstance({ name: 'vaulted-data' });
 
+function isOffline() {
+  return typeof navigator !== 'undefined' && navigator.onLine === false;
+}
+
+function isLocalImageId(imageId) {
+  return typeof imageId === 'string' && /^(img|cover)-/.test(imageId);
+}
+
 
 const useStore = create((set, get) => ({
   collections: [],
@@ -160,6 +168,8 @@ const useStore = create((set, get) => ({
 
   // ── Public Collections ──
   fetchPublicCollections: async () => {
+    if (isOffline()) return;
+
     try {
       const publicCollections = await api.fetchPublicCollections();
       set({ publicCollections: publicCollections || [] });
@@ -199,7 +209,7 @@ const useStore = create((set, get) => ({
 
   // ── Sync Actions ──
   syncToCloud: async () => {
-    if (!get().isAuthenticated || get().syncing) return;
+    if (!get().isAuthenticated || get().syncing || isOffline()) return;
     set({ syncing: true, syncingVisible: true, syncError: null });
 
     try {
@@ -247,7 +257,7 @@ const useStore = create((set, get) => ({
   },
 
   syncFromCloud: async () => {
-    if (!get().isAuthenticated || get().syncing) return;
+    if (!get().isAuthenticated || get().syncing || isOffline()) return;
     set({ syncing: true, syncError: null });
 
     try {
@@ -672,6 +682,16 @@ const useStore = create((set, get) => ({
   getImageUrl: async (imageId) => {
     if (!imageId) return null;
 
+    if (isCloudUrl(imageId)) {
+      return imageId;
+    }
+
+    // Local image IDs should resolve from IndexedDB first to avoid broken network fetches.
+    if (isLocalImageId(imageId)) {
+      const localBlob = await imageStore.getItem(imageId);
+      return localBlob ? URL.createObjectURL(localBlob) : null;
+    }
+
     // If authenticated, try server first
     if (get().isAuthenticated) {
       return api.getImageUrl(imageId);
@@ -722,6 +742,14 @@ if (typeof window !== 'undefined') {
     useStore.getState().logoutWithMessage(
       'Your session has expired. Please sign in again to continue.'
     );
+  });
+
+  window.addEventListener('online', () => {
+    const state = useStore.getState();
+    state.fetchPublicCollections();
+    if (state.isAuthenticated) {
+      state.syncFromCloud();
+    }
   });
 }
 

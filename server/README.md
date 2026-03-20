@@ -173,6 +173,9 @@ DB_PASSWORD=postgres
 # Server
 PORT=5000
 NODE_ENV=development
+BODY_LIMIT=2mb
+REQUEST_TIMEOUT_MS=20000
+TRUST_PROXY=false
 
 # JWT
 JWT_SECRET=your_secret_key

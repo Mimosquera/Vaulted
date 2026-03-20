@@ -1,4 +1,6 @@
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+const REQUEST_TIMEOUT_MS = 15000;
+const MAX_GET_RETRIES = 2;
 
 function getToken() {
   return localStorage.getItem('vaulted-token');
@@ -14,23 +16,50 @@ function setToken(token) {
 
 let refreshPromise = null;
 
-async function request(path, options = {}, isRetry = false) {
+function shouldRetryGet(method, status, attempt) {
+  return method === 'GET' && attempt < MAX_GET_RETRIES && status >= 500;
+}
+
+function withTimeout(fetchFn, timeoutMs = REQUEST_TIMEOUT_MS) {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  return fetchFn(controller.signal)
+    .finally(() => clearTimeout(timeoutId));
+}
+
+async function request(path, options = {}, isRetry = false, attempt = 0) {
   const token = getToken();
+  const method = (options.method || 'GET').toUpperCase();
   const headers = { 'Content-Type': 'application/json', ...options.headers };
   if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  const res = await fetch(`${API_URL}${path}`, { ...options, headers });
+  let res;
+  try {
+    res = await withTimeout((signal) => fetch(`${API_URL}${path}`, { ...options, headers, signal }));
+  } catch (error) {
+    if (method === 'GET' && attempt < MAX_GET_RETRIES) {
+      return request(path, options, isRetry, attempt + 1);
+    }
+
+    if (error?.name === 'AbortError') {
+      throw new Error('Request timed out. Please try again.');
+    }
+
+    throw new Error('Network error. Please check your connection and try again.');
+  }
 
   if (res.status === 401 && !isRetry && !path.startsWith('/auth/')) {
     // Deduplicate concurrent refresh attempts
     if (!refreshPromise) {
-      refreshPromise = fetch(`${API_URL}/auth/refresh`, {
+      refreshPromise = withTimeout((signal) => fetch(`${API_URL}/auth/refresh`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${getToken()}`,
         },
-      }).then(async (refreshRes) => {
+        signal,
+      })).then(async (refreshRes) => {
         if (!refreshRes.ok) throw new Error('Refresh failed');
         const data = await refreshRes.json();
         setToken(data.token);
@@ -42,7 +71,7 @@ async function request(path, options = {}, isRetry = false) {
 
     try {
       await refreshPromise;
-      return request(path, options, true);
+      return request(path, options, true, attempt);
     } catch {
       setToken(null);
       window.dispatchEvent(new CustomEvent('auth:expired'));
@@ -50,9 +79,13 @@ async function request(path, options = {}, isRetry = false) {
     }
   }
 
+  if (shouldRetryGet(method, res.status, attempt)) {
+    return request(path, options, isRetry, attempt + 1);
+  }
+
   if (!res.ok) {
-    const error = await res.json().catch(() => ({ error: res.statusText }));
-    throw new Error(error.error || 'Request failed');
+    const error = await res.json().catch(() => null);
+    throw new Error(error?.error || res.statusText || 'Request failed');
   }
 
   if (res.status === 204) return null;
