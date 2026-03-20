@@ -77,11 +77,6 @@ export default function PublicProfile() {
   const profileBio = (profile.user?.bio || '').trim();
 
   const handleBack = () => {
-    if (window.history.length > 1) {
-      navigate(-1);
-      return;
-    }
-
     navigate(location.state?.from || '/explore');
   };
 

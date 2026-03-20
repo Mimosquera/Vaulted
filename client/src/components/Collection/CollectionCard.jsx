@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, memo } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import Tilt from 'react-parallax-tilt';
@@ -10,7 +10,7 @@ import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
 import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { UserIcon as User } from '@phosphor-icons/react/User';
-import { timeAgo, isCloudUrl } from '../../utils/helpers';
+import { timeAgo, isCloudUrl, getReturnPath } from '../../utils/helpers';
 import { getCollectionGradient } from '../../constants/colors';
 import CategoryIcon from '../UI/CategoryIcon';
 import EditCollectionModal from '../Modals/EditCollectionModal';
@@ -20,6 +20,7 @@ import { getImageUrl as getImageUrlDirect } from '../../api/client';
 import './CollectionCard.scss';
 
 export default memo(function CollectionCard({ collection, index = 0, isVisitor = false }) {
+  const location = useLocation();
   const [menuOpen, setMenuOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [coverUrl, setCoverUrl] = useState(null);
@@ -112,6 +113,7 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
   };
 
   const linkTo = isVisitor ? `/explore/${collection.id}` : `/collection/${collection.id}`;
+  const linkState = isVisitor ? { from: getReturnPath(location, '/explore') } : undefined;
 
   return (
     <>
@@ -131,7 +133,7 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
           transitionSpeed={400}
           tiltEnable={hasHover}
         >
-          <Link to={linkTo} className="collection-card">
+          <Link to={linkTo} state={linkState} className="collection-card">
           <div
             className="collection-card__cover"
             style={{

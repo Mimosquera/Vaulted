@@ -1,5 +1,5 @@
 import { useRef, useState, useMemo, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { Edit2, Check } from 'lucide-react';
@@ -20,9 +20,11 @@ import UserAvatar, { getToneShade } from '../components/UI/UserAvatar';
 import ImageUploader from '../components/Upload/ImageUploader';
 import { uploadImageAPI } from '../api/client';
 import { AVATAR_THEME_COLORS } from '../constants/colors';
+import { getPublicProfileLinkState } from '../utils/helpers';
 import './Profile.scss';
 
 export default function Profile() {
+  const location = useLocation();
   const avatarColorOptions = AVATAR_THEME_COLORS;
   const username = useStore((s) => s.username);
   const setUsername = useStore((s) => s.setUsername);
@@ -52,6 +54,7 @@ export default function Profile() {
     const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
     const [uploaderKey, setUploaderKey] = useState(0);
     const shellTone = useMemo(() => getToneShade(avatarColor), [avatarColor]);
+  const publicProfileLinkState = getPublicProfileLinkState(location, '/profile');
   const avatarEditorRef = useRef(null);
 
   useEffect(() => {
@@ -466,7 +469,7 @@ export default function Profile() {
                       <UserAvatar user={friend.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
-                      <Link to={`/u/${friend.user.id}`} className="profile__friend-name">{friend.user.username}</Link>
+                      <Link to={`/u/${friend.user.id}`} state={publicProfileLinkState} className="profile__friend-name">{friend.user.username}</Link>
                       <span className="profile__friend-subtext">{friend.user.bio?.trim() || 'Connected'}</span>
                     </div>
                   </div>
@@ -489,7 +492,7 @@ export default function Profile() {
                       <UserAvatar user={request.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
-                      <Link to={`/u/${request.user.id}`} className="profile__friend-name">{request.user.username}</Link>
+                      <Link to={`/u/${request.user.id}`} state={publicProfileLinkState} className="profile__friend-name">{request.user.username}</Link>
                       <span className="profile__friend-subtext">{request.user.bio?.trim() || 'Wants to connect'}</span>
                     </div>
                   </div>
@@ -513,7 +516,7 @@ export default function Profile() {
                       <UserAvatar user={request.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
-                      <Link to={`/u/${request.user.id}`} className="profile__friend-name">{request.user.username}</Link>
+                      <Link to={`/u/${request.user.id}`} state={publicProfileLinkState} className="profile__friend-name">{request.user.username}</Link>
                       <span className="profile__friend-subtext">{request.user.bio?.trim() || 'Awaiting response'}</span>
                     </div>
                   </div>

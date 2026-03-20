@@ -1,5 +1,5 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
@@ -12,9 +12,11 @@ import CollectionGrid from '../components/Collection/CollectionGrid';
 import BlobBackground from '../components/UI/BlobBackground';
 import UserAvatar, { getToneShade } from '../components/UI/UserAvatar';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import { getPublicProfileLinkState } from '../utils/helpers';
 import './Explore.scss';
 
 export default function Explore() {
+  const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   const publicCollectionsFromStore = useStore((s) => s.publicCollections);
   const isAuthenticated = useStore((s) => s.isAuthenticated);
@@ -226,7 +228,7 @@ export default function Explore() {
                     {user.bio && <p className="explore__user-bio">{user.bio}</p>}
                     <Link
                       to={`/u/${user.id}`}
-                      state={{ from: `/explore${searchParams.toString() ? `?${searchParams.toString()}` : ''}` }}
+                      state={getPublicProfileLinkState(location)}
                       className="explore__user-link"
                     >
                       View profile

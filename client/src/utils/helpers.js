@@ -57,3 +57,17 @@ export function optimizeImageUrl(url, options = {}) {
   const transformString = transforms.join(',');
   return url.replace('/upload/', `/upload/${transformString}/`);
 }
+
+export function getReturnPath(locationOrPath, fallback = '/explore') {
+  if (!locationOrPath) return fallback;
+  if (typeof locationOrPath === 'string') return locationOrPath;
+
+  const pathname = locationOrPath.pathname || fallback;
+  const search = locationOrPath.search || '';
+  const hash = locationOrPath.hash || '';
+  return `${pathname}${search}${hash}`;
+}
+
+export function getPublicProfileLinkState(locationOrPath, fallback = '/explore') {
+  return { from: getReturnPath(locationOrPath, fallback) };
+}

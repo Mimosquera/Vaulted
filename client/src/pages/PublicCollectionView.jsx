@@ -1,5 +1,5 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
 import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
@@ -14,7 +14,7 @@ import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import SafeImage from '../components/UI/SafeImage';
 import '../components/Collection/ItemCard.scss';
-import { getCategoryLabel, isCloudUrl, optimizeImageUrl, timeAgo } from '../utils/helpers';
+import { getCategoryLabel, getPublicProfileLinkState, isCloudUrl, optimizeImageUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import useStore from '../store/useStore';
 import './CollectionView.scss';
@@ -64,6 +64,8 @@ function PublicItemCard({ item, index = 0, onExpand }) {
 
 export default function PublicCollectionView() {
   const { id } = useParams();
+  const location = useLocation();
+  const backTo = location.state?.from || '/explore';
   const prefetchImages = useStore((s) => s.prefetchImages);
   const [collection, setCollection] = useState(null);
   const [errorById, setErrorById] = useState({ id: null, message: null });
@@ -138,7 +140,7 @@ export default function PublicCollectionView() {
         <div className="container">
           <div className="collection-view__not-found">
             <h2>{currentError}</h2>
-            <Link to="/explore" className="btn btn--secondary">
+            <Link to={backTo} className="btn btn--secondary">
               <ArrowLeft weight="bold" />
               Back to Explore
             </Link>
@@ -183,7 +185,7 @@ export default function PublicCollectionView() {
         <div className="collection-view__cover-fade" />
 
         <div className="collection-view__cover-nav container">
-          <Link to="/explore" className="collection-view__back">
+          <Link to={backTo} className="collection-view__back">
             <ArrowLeft weight="bold" size={18} />
             Back
           </Link>
@@ -202,7 +204,11 @@ export default function PublicCollectionView() {
             <p className="collection-view__desc">{collection.description}</p>
           )}
           <div className="collection-view__visitor-meta">
-            <Link className="collection-view__owner" to={`/u/${collection.userId}`}>
+            <Link
+              className="collection-view__owner"
+              to={`/u/${collection.userId}`}
+              state={getPublicProfileLinkState(location)}
+            >
               <User weight="bold" size={14} /> {collection.username}
             </Link>
             <span className="collection-view__count">
