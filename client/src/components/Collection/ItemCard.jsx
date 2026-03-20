@@ -47,8 +47,7 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-      transition={{ delay: index * 0.04, type: 'spring', stiffness: 120, damping: 14 }}
-      layout
+      transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
     >
       <Tilt
         tiltMaxAngleX={6}

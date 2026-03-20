@@ -36,6 +36,11 @@ body {
   flex-direction: column;
   -webkit-user-select: none;
   user-select: none;
+  opacity: 0;
+
+  &.ready {
+    opacity: 1;
+  }
 }
 
 // ── Scrollbar ──

@@ -15,6 +15,7 @@ import AddItemModal from '../components/Modals/AddItemModal';
 import EditItemModal from '../components/Modals/EditItemModal';
 import EditCollectionModal from '../components/Modals/EditCollectionModal';
 import ShareModal from '../components/Modals/ShareModal';
+import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import { getCategoryLabel, isCloudUrl } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
@@ -128,6 +129,8 @@ export default function CollectionView() {
 
   return (
     <div className="collection-view page">
+      <BlobBackground />
+
       {/* ── Cover Banner ── */}
       <motion.div
         className="collection-view__cover"

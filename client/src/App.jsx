@@ -20,6 +20,15 @@ const Profile = lazy(() => import('./pages/Profile'));
 const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 
+// Renders only after Suspense resolves (lazy component loaded).
+// Reveals #root so navbar/footer snap visible while the route animates in.
+function ReadyGate({ children }) {
+  useEffect(() => {
+    document.getElementById('root').classList.add('ready');
+  }, []);
+  return children;
+}
+
 function AnimatedRoutes() {
   const location = useLocation();
 
@@ -34,16 +43,18 @@ function AnimatedRoutes() {
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
         <Suspense fallback={null}>
-          <Routes location={location}>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
-            <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/explore/:id" element={<PublicCollectionView />} />
-            <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-          </Routes>
+          <ReadyGate>
+            <Routes location={location}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+              <Route path="/collection/:id" element={<ProtectedRoute><CollectionView /></ProtectedRoute>} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/explore/:id" element={<PublicCollectionView />} />
+              <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+            </Routes>
+          </ReadyGate>
         </Suspense>
       </motion.div>
     </AnimatePresence>

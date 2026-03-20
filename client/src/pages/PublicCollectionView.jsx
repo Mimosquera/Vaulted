@@ -10,6 +10,7 @@ import { ImageIcon } from '@phosphor-icons/react/Image';
 import { SpinnerGapIcon as SpinnerGap } from '@phosphor-icons/react/SpinnerGap';
 import { fetchPublicCollection, getImageUrl } from '../api/client';
 import ItemLightbox from '../components/Collection/ItemLightbox';
+import BlobBackground from '../components/UI/BlobBackground';
 import CategoryIcon from '../components/UI/CategoryIcon';
 import { getCategoryLabel, isCloudUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
@@ -24,8 +25,7 @@ function PublicItemCard({ item, index = 0, onExpand }) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.04, type: 'spring', stiffness: 120, damping: 14 }}
-      layout
+      transition={{ delay: index * 0.04, duration: 0.35, ease: 'easeOut' }}
     >
       <div className="item-card">
         <div className="item-card__image" onClick={() => onExpand && onExpand(item, imageUrl)} style={{ cursor: 'pointer' }}>
@@ -115,6 +115,8 @@ export default function PublicCollectionView() {
 
   return (
     <div className="collection-view page">
+      <BlobBackground />
+
       {/* ── Cover Banner ── */}
       <motion.div
         className="collection-view__cover"
