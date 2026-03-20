@@ -16,6 +16,7 @@ import SafeImage from '../components/UI/SafeImage';
 import '../components/Collection/ItemCard.scss';
 import { getCategoryLabel, isCloudUrl, optimizeImageUrl, timeAgo } from '../utils/helpers';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
+import useStore from '../store/useStore';
 import './CollectionView.scss';
 
 const MASONRY_COLS = { default: 4, 1100: 3, 700: 2 };
@@ -62,6 +63,7 @@ function PublicItemCard({ item, index = 0, onExpand }) {
 
 export default function PublicCollectionView() {
   const { id } = useParams();
+  const prefetchImages = useStore((s) => s.prefetchImages);
   const [collection, setCollection] = useState(null);
   const [errorById, setErrorById] = useState({ id: null, message: null });
   const [search, setSearch] = useState('');
@@ -105,6 +107,15 @@ export default function PublicCollectionView() {
       (item) => item.name.toLowerCase().includes(q) || item.note?.toLowerCase().includes(q)
     );
   }, [collection, debouncedSearch]);
+
+  useEffect(() => {
+    if (!filteredItems.length) return;
+
+    prefetchImages(
+      filteredItems.map((item) => item.imageUrl).filter(Boolean),
+      { limit: 10 }
+    );
+  }, [filteredItems, prefetchImages]);
 
   if (loading) {
     return (

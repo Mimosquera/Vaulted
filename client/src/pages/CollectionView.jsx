@@ -33,6 +33,7 @@ export default function CollectionView() {
   const updateCollection = useStore((s) => s.updateCollection);
   const togglePublic = useStore((s) => s.togglePublic);
   const getImageUrl = useStore((s) => s.getImageUrl);
+  const prefetchImages = useStore((s) => s.prefetchImages);
 
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [editItemModalOpen, setEditItemModalOpen] = useState(false);
@@ -82,6 +83,15 @@ export default function CollectionView() {
       (item) => item.name.toLowerCase().includes(q) || item.note?.toLowerCase().includes(q)
     );
   }, [collection, debouncedSearch]);
+
+  useEffect(() => {
+    if (!filteredItems.length) return;
+
+    prefetchImages(
+      filteredItems.map((item) => item.imageUrl).filter(Boolean),
+      { limit: 12 }
+    );
+  }, [filteredItems, prefetchImages]);
 
   if (!collection) {
     return (

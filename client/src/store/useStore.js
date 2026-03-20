@@ -8,6 +8,8 @@ import { isCloudUrl } from '../utils/helpers';
 
 const imageStore = localforage.createInstance({ name: 'vaulted-images' });
 const dataStore = localforage.createInstance({ name: 'vaulted-data' });
+const imageUrlCache = new Map();
+const imagePromiseCache = new Map();
 
 function isOffline() {
   return typeof navigator !== 'undefined' && navigator.onLine === false;
@@ -15,6 +17,51 @@ function isOffline() {
 
 function isLocalImageId(imageId) {
   return typeof imageId === 'string' && /^(img|cover)-/.test(imageId);
+}
+
+function canPrefetchImages() {
+  if (isOffline()) return false;
+  if (typeof navigator === 'undefined') return true;
+
+  const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  if (!connection) return true;
+  if (connection.saveData) return false;
+
+  const slowTypes = new Set(['slow-2g', '2g']);
+  return !slowTypes.has(connection.effectiveType);
+}
+
+function schedulePrefetch(task) {
+  if (typeof window !== 'undefined' && typeof window.requestIdleCallback === 'function') {
+    window.requestIdleCallback(task, { timeout: 1500 });
+    return;
+  }
+
+  setTimeout(task, 120);
+}
+
+function revokeIfBlobUrl(url) {
+  if (typeof url === 'string' && url.startsWith('blob:')) {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function invalidateImageCache(imageId) {
+  if (!imageId) return;
+
+  const cachedUrl = imageUrlCache.get(imageId);
+  revokeIfBlobUrl(cachedUrl);
+  imageUrlCache.delete(imageId);
+  imagePromiseCache.delete(imageId);
+}
+
+function clearImageCaches() {
+  for (const cachedUrl of imageUrlCache.values()) {
+    revokeIfBlobUrl(cachedUrl);
+  }
+
+  imageUrlCache.clear();
+  imagePromiseCache.clear();
 }
 
 
@@ -129,6 +176,7 @@ const useStore = create((set, get) => ({
   logout: () => {
     api.logout();
     get().stopSyncPolling();
+    clearImageCaches();
     set({
       user: null,
       token: null,
@@ -147,6 +195,7 @@ const useStore = create((set, get) => ({
   logoutWithMessage: (message) => {
     api.logout();
     get().stopSyncPolling();
+    clearImageCaches();
     set({
       user: null,
       token: null,
@@ -475,7 +524,9 @@ const useStore = create((set, get) => ({
   deleteCollection: async (id) => {
     const col = get().collections.find((c) => c.id === id);
     if (col) {
+      invalidateImageCache(col.coverImageUrl);
       for (const item of col.items) {
+        invalidateImageCache(item.imageUrl);
         if (item.imageUrl) await imageStore.removeItem(item.imageUrl);
       }
     }
@@ -648,6 +699,7 @@ const useStore = create((set, get) => ({
   deleteItem: async (collectionId, itemId) => {
     const col = get().collections.find((c) => c.id === collectionId);
     const item = col?.items.find((i) => i.id === itemId);
+    invalidateImageCache(item?.imageUrl);
     if (item?.imageUrl) await imageStore.removeItem(item.imageUrl);
 
     set((state) => ({
@@ -682,25 +734,78 @@ const useStore = create((set, get) => ({
   getImageUrl: async (imageId) => {
     if (!imageId) return null;
 
-    if (isCloudUrl(imageId)) {
-      return imageId;
+    if (imageUrlCache.has(imageId)) {
+      return imageUrlCache.get(imageId);
     }
 
-    // Local image IDs should resolve from IndexedDB first to avoid broken network fetches.
-    if (isLocalImageId(imageId)) {
-      const localBlob = await imageStore.getItem(imageId);
-      return localBlob ? URL.createObjectURL(localBlob) : null;
+    if (imagePromiseCache.has(imageId)) {
+      return imagePromiseCache.get(imageId);
     }
 
-    // If authenticated, try server first
-    if (get().isAuthenticated) {
-      return api.getImageUrl(imageId);
+    const resolveImageUrl = async () => {
+      if (isCloudUrl(imageId)) {
+        return imageId;
+      }
+
+      // Local image IDs should resolve from IndexedDB first to avoid broken network fetches.
+      if (isLocalImageId(imageId)) {
+        const localBlob = await imageStore.getItem(imageId);
+        return localBlob ? URL.createObjectURL(localBlob) : null;
+      }
+
+      // If authenticated, try server first
+      if (get().isAuthenticated) {
+        return api.getImageUrl(imageId);
+      }
+
+      // Fall back to local storage
+      const blob = await imageStore.getItem(imageId);
+      if (!blob) return null;
+      return URL.createObjectURL(blob);
+    };
+
+    const pending = resolveImageUrl()
+      .then((resolvedUrl) => {
+        if (resolvedUrl) {
+          imageUrlCache.set(imageId, resolvedUrl);
+        }
+        return resolvedUrl;
+      })
+      .finally(() => {
+        imagePromiseCache.delete(imageId);
+      });
+
+    imagePromiseCache.set(imageId, pending);
+    return pending;
+  },
+
+  prefetchImages: (imageIds = [], options = {}) => {
+    if (!Array.isArray(imageIds) || imageIds.length === 0) return;
+    if (!canPrefetchImages()) return;
+
+    const { limit = 12 } = options;
+    const seen = new Set();
+    const targets = [];
+
+    for (const imageId of imageIds) {
+      if (!imageId || seen.has(imageId)) continue;
+      seen.add(imageId);
+
+      if (imageUrlCache.has(imageId) || imagePromiseCache.has(imageId)) continue;
+
+      targets.push(imageId);
+      if (targets.length >= limit) break;
     }
 
-    // Fall back to local storage
-    const blob = await imageStore.getItem(imageId);
-    if (!blob) return null;
-    return URL.createObjectURL(blob);
+    if (targets.length === 0) return;
+
+    schedulePrefetch(() => {
+      for (const imageId of targets) {
+        get().getImageUrl(imageId).catch(() => {
+          // Prefetch should never surface errors to the UI.
+        });
+      }
+    });
   },
 
   // ── Clean up local-only images not synced to cloud ──
@@ -711,6 +816,10 @@ const useStore = create((set, get) => ({
     // Filter out items with local-only image IDs
     const validItems = col.items.filter((item) => !item.imageUrl || isCloudUrl(item.imageUrl));
     const brokenItems = col.items.filter((item) => item.imageUrl && !isCloudUrl(item.imageUrl));
+
+    for (const item of brokenItems) {
+      invalidateImageCache(item.imageUrl);
+    }
 
     if (brokenItems.length > 0) {
       set((state) => ({
