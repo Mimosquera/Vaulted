@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion, useScroll, useSpring, useTransform } from 'framer-motion';
 
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
@@ -72,8 +72,17 @@ export default function Home() {
 
   // Scroll parallax for hero
   const { scrollYProgress } = useScroll();
-  const heroOpacity = useTransform(scrollYProgress, [0, 0.2], [1, 0]);
-  const heroScale = useTransform(scrollYProgress, [0, 0.2], [1, 0.95]);
+  const heroOpacityProgress = useTransform(
+    scrollYProgress,
+    [0, 0.12, 0.28, 0.45],
+    [1, 0.85, 0.5, 0.12],
+  );
+  const heroOpacity = useSpring(heroOpacityProgress, {
+    stiffness: 120,
+    damping: 28,
+    mass: 0.35,
+  });
+  const heroScale = useTransform(scrollYProgress, [0, 0.45], [1, 0.95]);
 
   // Check if mobile on mount and window resize
   useEffect(() => {
@@ -228,7 +237,7 @@ export default function Home() {
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true }}
           >
-            <h2>Ready to start collecting?</h2>
+            <h2>Start collecting!</h2>
             <p>Works offline, syncs across devices, and it's free.</p>
             <Link to="/dashboard" className="btn btn--primary btn--lg">
               <ArrowRight weight="bold" />
