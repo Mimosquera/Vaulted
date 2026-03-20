@@ -44,9 +44,11 @@ body {
 }
 
 // ── Scrollbar ──
-* {
-  scrollbar-color: #3b0764 $bg-secondary;
-  scrollbar-width: thin;
+@supports (scrollbar-width: thin) {
+  * {
+    scrollbar-color: #3b0764 $bg-secondary;
+    scrollbar-width: thin;
+  }
 }
 
 ::-webkit-scrollbar {

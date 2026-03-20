@@ -228,6 +228,13 @@ export async function fetchPublicProfileAPI(userId) {
   return request(`/api/users/${userId}/profile`);
 }
 
+export async function updateMyProfileAPI(payload) {
+  return request('/api/users/me/profile', {
+    method: 'PUT',
+    body: JSON.stringify(payload),
+  });
+}
+
 // ── Items ──
 export async function fetchItems(collectionId) {
   return request(`/api/collections/${collectionId}/items`);

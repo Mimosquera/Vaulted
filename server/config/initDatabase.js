@@ -10,10 +10,30 @@ export const initDatabase = async () => {
         email VARCHAR(255) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         username VARCHAR(100),
+        avatar_image_url TEXT,
+        avatar_icon_color VARCHAR(7) DEFAULT '#8b5cf6',
+        bio VARCHAR(180),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       );
     `);
+
+    const userProfileColumns = [
+      { sql: "ALTER TABLE users ADD COLUMN avatar_image_url TEXT;", label: 'avatar_image_url' },
+      { sql: "ALTER TABLE users ADD COLUMN avatar_icon_color VARCHAR(7) DEFAULT '#8b5cf6';", label: 'avatar_icon_color' },
+      { sql: 'ALTER TABLE users ADD COLUMN bio VARCHAR(180);', label: 'bio' },
+    ];
+
+    for (const column of userProfileColumns) {
+      try {
+        await pool.query(column.sql);
+        console.log(`✓ Added users.${column.label} column`);
+      } catch (err) {
+        if (!err.message.includes('already exists')) {
+          console.error(`Error adding users.${column.label}:`, err.message);
+        }
+      }
+    }
 
     await pool.query(`
       CREATE TABLE IF NOT EXISTS collections (

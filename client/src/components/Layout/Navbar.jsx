@@ -6,13 +6,13 @@ import { Squash as Hamburger } from 'hamburger-react';
 import { HouseIcon as House } from '@phosphor-icons/react/House';
 import { VaultIcon as Vault } from '@phosphor-icons/react/Vault';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
-import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
 import { SignInIcon as SignIn } from '@phosphor-icons/react/SignIn';
 import { SignOutIcon as SignOut } from '@phosphor-icons/react/SignOut';
 import { WarningIcon as Warning } from '@phosphor-icons/react/Warning';
 import { useInitialLoad } from '../../contexts/useInitialLoad';
 import useStore from '../../store/useStore';
 import VaultLogo from '../VaultLogo';
+import UserAvatar from '../UI/UserAvatar';
 import './Navbar.scss';
 
 export default function Navbar() {
@@ -25,6 +25,7 @@ export default function Navbar() {
 
   const isAuthenticated = useStore((s) => s.isAuthenticated);
   const username = useStore((s) => s.username);
+  const user = useStore((s) => s.user);
   const logout = useStore((s) => s.logout);
   const syncError = useStore((s) => s.syncError);
   const syncToCloud = useStore((s) => s.syncToCloud);
@@ -82,7 +83,7 @@ export default function Navbar() {
         { to: '/', label: 'Home', icon: <House weight="duotone" /> },
         { to: '/dashboard', label: 'My Vault', icon: <Vault weight="duotone" /> },
         { to: '/explore', label: 'Explore', icon: <Compass weight="duotone" /> },
-        { to: '/profile', label: 'Profile', icon: <UserCircle weight="duotone" /> },
+        { to: '/profile', label: 'Profile', icon: <UserAvatar user={user} size={22} className="navbar__profile-avatar" decorative /> },
       ]
     : [
         { to: '/', label: 'Home', icon: <House weight="duotone" /> },

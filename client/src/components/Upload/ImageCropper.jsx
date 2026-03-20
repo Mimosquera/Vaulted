@@ -8,7 +8,7 @@ import './ImageCropper.scss';
 
 // ── Canvas helper ──────────────────────────────────────────────────────────
 
-async function getCroppedBlob(image, crop, mimeType = 'image/jpeg') {
+async function getCroppedBlob(image, crop, mimeType = 'image/jpeg', cropShape = 'rect') {
   const canvas = document.createElement('canvas');
   const scaleX = image.naturalWidth / image.width;
   const scaleY = image.naturalHeight / image.height;
@@ -18,6 +18,13 @@ async function getCroppedBlob(image, crop, mimeType = 'image/jpeg') {
 
   const ctx = canvas.getContext('2d');
   ctx.imageSmoothingQuality = 'high';
+
+  if (cropShape === 'circle') {
+    ctx.beginPath();
+    ctx.arc(canvas.width / 2, canvas.height / 2, Math.min(canvas.width, canvas.height) / 2, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+  }
 
   ctx.drawImage(
     image,
@@ -53,20 +60,22 @@ function makeCenteredCrop(mediaWidth, mediaHeight, aspect) {
 
 // ── Component ─────────────────────────────────────────────────────────────
 
-export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCropDone, onCancel }) {
+export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCropDone, onCancel, cropShape = 'rect' }) {
   const imgRef = useRef(null);
   const [crop, setCrop] = useState(undefined);
   const [completedCrop, setCompletedCrop] = useState(null);
-  const [aspect, setAspect] = useState(undefined);
+  const [aspect, setAspect] = useState(cropShape === 'circle' ? 1 : undefined);
   const [applying, setApplying] = useState(false);
 
   const onImageLoad = useCallback((e) => {
     const { width, height } = e.currentTarget;
     // Full-image free selection so Apply works immediately
-    const initial = { unit: '%', x: 0, y: 0, width: 100, height: 100 };
+    const initial = cropShape === 'circle'
+      ? makeCenteredCrop(width, height, 1)
+      : { unit: '%', x: 0, y: 0, width: 100, height: 100 };
     setCrop(initial);
     setCompletedCrop(convertToPixelCrop(initial, width, height));
-  }, []);
+  }, [cropShape]);
 
   const handleAspectChange = (value) => {
     setAspect(value);
@@ -83,7 +92,8 @@ export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCrop
     if (!imgRef.current) return;
     setApplying(true);
     try {
-      const blob = await getCroppedBlob(imgRef.current, completedCrop, mimeType);
+      const outputMimeType = cropShape === 'circle' ? 'image/png' : mimeType;
+      const blob = await getCroppedBlob(imgRef.current, completedCrop, outputMimeType, cropShape);
       onCropDone(blob);
     } catch {
       onCropDone(null);
@@ -103,18 +113,20 @@ export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCrop
       {/* Header row */}
       <div className="image-cropper__topbar">
         <span className="image-cropper__title">Crop image</span>
-        <div className="image-cropper__aspect-pills">
-          {ASPECT_RATIOS.map((r) => (
-            <button
-              key={r.label}
-              type="button"
-              className={`image-cropper__aspect-pill${aspect === r.value ? ' image-cropper__aspect-pill--active' : ''}`}
-              onClick={() => handleAspectChange(r.value)}
-            >
-              {r.label}
-            </button>
-          ))}
-        </div>
+        {cropShape !== 'circle' && (
+          <div className="image-cropper__aspect-pills">
+            {ASPECT_RATIOS.map((r) => (
+              <button
+                key={r.label}
+                type="button"
+                className={`image-cropper__aspect-pill${aspect === r.value ? ' image-cropper__aspect-pill--active' : ''}`}
+                onClick={() => handleAspectChange(r.value)}
+              >
+                {r.label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Crop canvas area */}
@@ -124,6 +136,7 @@ export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCrop
           onChange={(_, percentCrop) => setCrop(percentCrop)}
           onComplete={(c) => setCompletedCrop(c)}
           aspect={aspect}
+          circularCrop={cropShape === 'circle'}
           minWidth={20}
           minHeight={20}
           keepSelection

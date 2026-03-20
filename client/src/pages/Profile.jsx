@@ -1,8 +1,9 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Edit2, Check } from 'lucide-react';
-import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
+import { PaintBrushIcon as PaintBrush } from '@phosphor-icons/react/PaintBrush';
 import { FolderIcon as Folder } from '@phosphor-icons/react/Folder';
 import { PackageIcon as Package } from '@phosphor-icons/react/Package';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
@@ -15,11 +16,17 @@ import useStore from '../store/useStore';
 import BlobBackground from '../components/UI/BlobBackground';
 import AnimatedCounter from '../components/UI/AnimatedCounter';
 import CategoryIcon from '../components/UI/CategoryIcon';
+import UserAvatar, { getToneShade } from '../components/UI/UserAvatar';
+import ImageUploader from '../components/Upload/ImageUploader';
+import { uploadImageAPI } from '../api/client';
+import { AVATAR_THEME_COLORS } from '../constants/colors';
 import './Profile.scss';
 
 export default function Profile() {
+  const avatarColorOptions = AVATAR_THEME_COLORS;
   const username = useStore((s) => s.username);
   const setUsername = useStore((s) => s.setUsername);
+  const updateUserProfile = useStore((s) => s.updateUserProfile);
   const collections = useStore((s) => s.collections);
   const user = useStore((s) => s.user);
   const syncing = useStore((s) => s.syncingVisible);
@@ -34,10 +41,50 @@ export default function Profile() {
   const removeFriend = useStore((s) => s.removeFriend);
   const [editing, setEditing] = useState(false);
   const [nameInput, setNameInput] = useState(username);
+  const [bioInput, setBioInput] = useState(user?.bio || '');
+  const [avatarColor, setAvatarColor] = useState(user?.avatarIconColor || '#8b5cf6');
+  const [avatarEditorOpen, setAvatarEditorOpen] = useState(false);
+  const [avatarMode, setAvatarMode] = useState(user?.avatarImageUrl ? 'image' : 'icon');
+  const [bioFocused, setBioFocused] = useState(false);
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+    const [pendingAvatarFile, setPendingAvatarFile] = useState(null);
+    const [avatarUploadProgress, setAvatarUploadProgress] = useState(0);
+    const [uploaderKey, setUploaderKey] = useState(0);
+    const shellTone = useMemo(() => getToneShade(avatarColor), [avatarColor]);
+  const avatarEditorRef = useRef(null);
 
   useEffect(() => {
     fetchFriends();
   }, [fetchFriends]);
+
+  useEffect(() => {
+    setNameInput(username);
+  }, [username]);
+
+  useEffect(() => {
+    setBioInput(user?.bio || '');
+    setAvatarColor(user?.avatarIconColor || '#8b5cf6');
+    setAvatarMode(user?.avatarImageUrl ? 'image' : 'icon');
+  }, [user]);
+
+  useEffect(() => {
+    if (!avatarEditorOpen) return undefined;
+
+    const handlePointerDown = (event) => {
+      if (!avatarEditorRef.current) return;
+      if (!avatarEditorRef.current.contains(event.target)) {
+        setAvatarEditorOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handlePointerDown);
+    document.addEventListener('touchstart', handlePointerDown);
+    return () => {
+      document.removeEventListener('mousedown', handlePointerDown);
+      document.removeEventListener('touchstart', handlePointerDown);
+    };
+  }, [avatarEditorOpen]);
 
   const stats = useMemo(() => {
     const totalItems = collections.reduce((sum, c) => sum + (c.items?.length || 0), 0);
@@ -57,6 +104,100 @@ export default function Profile() {
     setEditing(false);
   };
 
+  const hasBioChanges = (bioInput.trim() || '') !== (user?.bio || '');
+
+  const handleSaveProfile = async () => {
+    if (!hasBioChanges || savingProfile) return;
+
+    setSavingProfile(true);
+    try {
+      await updateUserProfile({ bio: bioInput.trim() });
+      toast.success('Profile updated');
+    } catch {
+      toast.error('Unable to save profile right now');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleAvatarUpload = async () => {
+    if (!pendingAvatarFile || uploadingAvatar) return;
+
+    setUploadingAvatar(true);
+    try {
+      const upload = await uploadImageAPI(pendingAvatarFile, (pct) => setAvatarUploadProgress(pct));
+      await updateUserProfile({ avatarImageUrl: upload.url });
+      setAvatarMode('image');
+      setPendingAvatarFile(null);
+      setUploaderKey((k) => k + 1);
+      toast.success('Profile photo updated');
+    } catch {
+      toast.error('Unable to upload that image. Try another file.');
+    } finally {
+      setUploadingAvatar(false);
+      setAvatarUploadProgress(0);
+    }
+  };
+
+  const handleAvatarFileSelect = (file) => {
+    if (file) {
+      setPendingAvatarFile(file);
+    } else if (pendingAvatarFile) {
+      // User cancelled new selection via X — reset uploader to show existing avatar
+      setPendingAvatarFile(null);
+      setUploaderKey((k) => k + 1);
+    } else {
+      // User removed the currently-displayed photo — clear from server
+      handleUseIcon();
+    }
+  };
+
+  const handleIconTabClick = () => {
+    if (pendingAvatarFile) {
+      setPendingAvatarFile(null);
+      setUploaderKey((k) => k + 1);
+      setAvatarMode('icon');
+    } else if (avatarMode !== 'icon') {
+      handleUseIcon();
+    }
+  };
+
+  const handleUseIcon = async () => {
+    setSavingProfile(true);
+    try {
+      await updateUserProfile({ avatarImageUrl: null });
+      setAvatarMode('icon');
+      toast.success('Using icon avatar');
+    } catch {
+      toast.error('Unable to update avatar');
+    } finally {
+      setSavingProfile(false);
+    }
+  };
+
+  const handleAvatarColorSelect = async (color) => {
+    if (color === avatarColor || savingProfile) return;
+    setAvatarColor(color);
+
+    try {
+      await updateUserProfile({ avatarIconColor: color });
+    } catch {
+      toast.error('Unable to update icon color');
+      setAvatarColor(user?.avatarIconColor || '#8b5cf6');
+    }
+  };
+
+  const getAvatarToneStyle = (avatarIconColor) => {
+    const tone = getToneShade(avatarIconColor || '#8b5cf6');
+    return {
+      '--avatar-icon-bg': tone.bg,
+      '--avatar-icon-ring': tone.ring,
+      '--avatar-icon-glow': tone.glow,
+      '--avatar-icon-complement-glow': tone.complementGlow,
+      '--avatar-icon-complement-soft': tone.complementSoft,
+    };
+  };
+
   return (
     <div className="profile page">
       <BlobBackground color1="#b91c1c" color2="#92400e" />
@@ -67,13 +208,92 @@ export default function Profile() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <motion.div
-            className="profile__avatar"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: 'spring', stiffness: 300 }}
+          <div
+            ref={avatarEditorRef}
+            className="profile__avatar-editor-shell"
+            style={{
+              '--avatar-icon-bg': shellTone.bg,
+              '--avatar-icon-ring': shellTone.ring,
+              '--avatar-icon-glow': shellTone.glow,
+              '--avatar-icon-complement-glow': shellTone.complementGlow,
+              '--avatar-icon-complement-soft': shellTone.complementSoft,
+            }}
           >
-            <UserCircle weight="duotone" size={90} />
-          </motion.div>
+            <motion.div className="profile__avatar-wrap" whileHover={{ scale: 1.05 }} transition={{ type: 'spring', stiffness: 300 }}>
+              <div className="profile__avatar">
+                <UserAvatar user={user} size={96} alt={`${username} avatar`} />
+              </div>
+              <button
+                type="button"
+                className="profile__avatar-edit-trigger"
+                onClick={() => setAvatarEditorOpen((open) => !open)}
+                disabled={savingProfile || uploadingAvatar}
+              >
+                <Edit2 strokeWidth={2} size={13} /> Edit avatar
+              </button>
+            </motion.div>
+
+            <div
+              className={`profile__avatar-editor ${avatarEditorOpen ? 'profile__avatar-editor--open' : ''}`}
+              style={avatarEditorOpen ? { '--editor-max-h': avatarMode === 'image' ? '520px' : '240px' } : {}}
+            >
+              <div className="profile__avatar-mode-switch" role="tablist" aria-label="Avatar mode">
+                <button
+                  type="button"
+                  className={`profile__avatar-mode-btn ${avatarMode === 'image' ? 'profile__avatar-mode-btn--active' : ''}`}
+                  onClick={() => setAvatarMode('image')}
+                >
+                  Photo
+                </button>
+                <button
+                  type="button"
+                  className={`profile__avatar-mode-btn ${avatarMode === 'icon' ? 'profile__avatar-mode-btn--active' : ''}`}
+                    onClick={handleIconTabClick}
+                  disabled={savingProfile || uploadingAvatar}
+                >
+                  Icon
+                </button>
+              </div>
+              {avatarMode === 'image' ? (
+                <div className="profile__avatar-uploader-wrap">
+                  <ImageUploader
+                    key={uploaderKey}
+                    currentPreview={user?.avatarImageUrl || null}
+                    onFileSelect={handleAvatarFileSelect}
+                    isUploading={uploadingAvatar}
+                    uploadProgress={avatarUploadProgress}
+                    cropShape="circle"
+                  />
+                  {pendingAvatarFile && !uploadingAvatar && (
+                    <button
+                      type="button"
+                      className="btn btn--primary btn--sm profile__avatar-confirm-btn"
+                      onClick={handleAvatarUpload}
+                    >
+                      Set as avatar
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <div className="profile__avatar-color-row">
+                  <span className="profile__avatar-color-label"><PaintBrush weight="duotone" size={14} /> Icon color</span>
+                  <div className="profile__avatar-swatch-list" role="radiogroup" aria-label="Avatar icon color">
+                    {avatarColorOptions.map((color) => (
+                      <button
+                        key={color}
+                        type="button"
+                        className={`profile__avatar-swatch ${avatarColor === color ? 'profile__avatar-swatch--active' : ''}`}
+                        style={{ backgroundColor: color }}
+                        onClick={() => handleAvatarColorSelect(color)}
+                        aria-label={`Use ${color} avatar color`}
+                        aria-pressed={avatarColor === color}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
 
           <div className="profile__name-row">
             {editing ? (
@@ -99,7 +319,31 @@ export default function Profile() {
               </div>
             )}
           </div>
-          <p className="profile__tagline">Curating since {new Date().getFullYear()}</p>
+          <div className="profile__bio-row">
+            <input
+              id="profile-bio"
+              className="profile__bio-input"
+              value={bioInput}
+              onChange={(e) => setBioInput(e.target.value.slice(0, 180))}
+              onFocus={() => setBioFocused(true)}
+              onBlur={() => setBioFocused(false)}
+              placeholder="Bio (optional)"
+            />
+            {bioFocused && (
+              <div className="profile__bio-actions">
+                <span className="profile__bio-count">{bioInput.length}/180</span>
+                <button
+                  type="button"
+                  className="btn btn--secondary btn--sm"
+                  onMouseDown={(event) => event.preventDefault()}
+                  onClick={handleSaveProfile}
+                  disabled={!hasBioChanges || savingProfile || uploadingAvatar}
+                >
+                  {savingProfile ? 'Saving...' : 'Save'}
+                </button>
+              </div>
+            )}
+          </div>
           {user && (
             <div className="profile__account">
               <span className="profile__email">
@@ -218,12 +462,12 @@ export default function Profile() {
               {friends.length === 0 ? <p className="profile__muted">No friends yet</p> : friends.map((friend) => (
                 <div key={friend.id} className="profile__friend-row">
                   <div className="profile__friend-user">
-                    <span className="profile__friend-avatar" aria-hidden="true">
-                      <UserCircle weight="duotone" size={24} />
+                    <span className="profile__friend-avatar" aria-hidden="true" style={getAvatarToneStyle(friend.user?.avatarIconColor)}>
+                      <UserAvatar user={friend.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
                       <Link to={`/u/${friend.user.id}`} className="profile__friend-name">{friend.user.username}</Link>
-                      <span className="profile__friend-subtext">Connected</span>
+                      <span className="profile__friend-subtext">{friend.user.bio?.trim() || 'Connected'}</span>
                     </div>
                   </div>
                   <button className="btn btn--ghost btn--sm" onClick={() => removeFriend(friend.user.id)}>
@@ -241,12 +485,12 @@ export default function Profile() {
               {incomingFriendRequests.length === 0 ? <p className="profile__muted">No pending requests</p> : incomingFriendRequests.map((request) => (
                 <div key={request.id} className="profile__friend-row">
                   <div className="profile__friend-user">
-                    <span className="profile__friend-avatar" aria-hidden="true">
-                      <UserCircle weight="duotone" size={24} />
+                    <span className="profile__friend-avatar" aria-hidden="true" style={getAvatarToneStyle(request.user?.avatarIconColor)}>
+                      <UserAvatar user={request.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
                       <Link to={`/u/${request.user.id}`} className="profile__friend-name">{request.user.username}</Link>
-                      <span className="profile__friend-subtext">Wants to connect</span>
+                      <span className="profile__friend-subtext">{request.user.bio?.trim() || 'Wants to connect'}</span>
                     </div>
                   </div>
                   <div className="profile__friend-actions">
@@ -265,12 +509,12 @@ export default function Profile() {
               {outgoingFriendRequests.length === 0 ? <p className="profile__muted">No outgoing requests</p> : outgoingFriendRequests.map((request) => (
                 <div key={request.id} className="profile__friend-row">
                   <div className="profile__friend-user">
-                    <span className="profile__friend-avatar" aria-hidden="true">
-                      <UserCircle weight="duotone" size={24} />
+                    <span className="profile__friend-avatar" aria-hidden="true" style={getAvatarToneStyle(request.user?.avatarIconColor)}>
+                      <UserAvatar user={request.user} size={26} decorative />
                     </span>
                     <div className="profile__friend-meta">
                       <Link to={`/u/${request.user.id}`} className="profile__friend-name">{request.user.username}</Link>
-                      <span className="profile__friend-subtext">Awaiting response</span>
+                      <span className="profile__friend-subtext">{request.user.bio?.trim() || 'Awaiting response'}</span>
                     </div>
                   </div>
                   <span className="profile__pending">Pending</span>

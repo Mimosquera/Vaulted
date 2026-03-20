@@ -5,6 +5,26 @@ export const COLLECTION_COLORS = [
   '#8b5cf6', '#f97316', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'
 ];
 
+// Avatar icon color options: includes app theme colors plus balanced supporting tones.
+export const AVATAR_THEME_COLORS = [
+  '#dc2626', // accent-secondary
+  '#ef4444',
+  '#c2410c', // gradient-fire support
+  '#f59e0b',
+  '#d4a017', // accent-gold
+  '#16a34a', // accent-green
+  '#10b981',
+  '#00c4cc', // neon-cyan
+  '#06b6d4',
+  '#2563eb', // accent-tertiary
+  '#4f46e5',
+  '#9333ea', // neon-violet
+  '#7c3aed', // accent-primary
+  '#8b5cf6',
+  '#4c1d95', // deep purple
+  '#ec4899',
+];
+
 // Create gradients for each color (base color to lighter/rotated variation)
 export const COLLECTION_GRADIENTS = [
   'linear-gradient(135deg, #7c3aed 0%, #a855f7 100%)', // Purple

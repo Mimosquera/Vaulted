@@ -140,8 +140,51 @@ const useStore = create((set, get) => ({
   },
 
   setUsername: async (name) => {
-    set({ username: name });
-    await dataStore.setItem('username', name);
+    const trimmedName = name?.trim();
+    if (!trimmedName) return;
+
+    const previousUser = get().user;
+    const previousName = get().username;
+
+    set((state) => ({
+      username: trimmedName,
+      user: state.user ? { ...state.user, username: trimmedName } : state.user,
+    }));
+    await dataStore.setItem('username', trimmedName);
+
+    if (get().isAuthenticated) {
+      try {
+        const updated = await api.updateMyProfileAPI({ username: trimmedName });
+        set({ username: updated.username, user: updated });
+        await dataStore.setItem('user', updated);
+        await dataStore.setItem('username', updated.username);
+      } catch {
+        set({ username: previousName, user: previousUser });
+        await dataStore.setItem('username', previousName);
+      }
+    }
+  },
+
+  updateUserProfile: async (updates) => {
+    const previousUser = get().user;
+    if (!previousUser) return null;
+
+    const optimisticUser = { ...previousUser, ...updates };
+    set({ user: optimisticUser, username: optimisticUser.username || get().username });
+    await dataStore.setItem('user', optimisticUser);
+
+    try {
+      const updated = await api.updateMyProfileAPI(updates);
+      set({ user: updated, username: updated.username || get().username });
+      await dataStore.setItem('user', updated);
+      await dataStore.setItem('username', updated.username || get().username);
+      return updated;
+    } catch (error) {
+      set({ user: previousUser, username: previousUser.username || get().username });
+      await dataStore.setItem('user', previousUser);
+      await dataStore.setItem('username', previousUser.username || get().username);
+      throw error;
+    }
   },
 
   // ── Persist helper ──

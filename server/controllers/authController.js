@@ -14,6 +14,8 @@ const loginSchema = Joi.object({
   password: Joi.string().max(128).required(),
 });
 
+const USER_PROFILE_SELECT = 'id, email, username, avatar_image_url, avatar_icon_color, bio';
+
 export const register = async (req, res) => {
   try {
     const { error, value } = registerSchema.validate(req.body);
@@ -31,7 +33,9 @@ export const register = async (req, res) => {
     const hashedPassword = await bcryptjs.hash(password, 12);
 
     const result = await pool.query(
-      'INSERT INTO users (email, password_hash, username) VALUES ($1, $2, $3) RETURNING id, email, username',
+      `INSERT INTO users (email, password_hash, username)
+       VALUES ($1, $2, $3)
+       RETURNING ${USER_PROFILE_SELECT}`,
       [email, hashedPassword, username || email.split('@')[0]]
     );
 
@@ -41,7 +45,17 @@ export const register = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
 
-    res.json({ user, token });
+    res.json({
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatarImageUrl: user.avatar_image_url,
+        avatarIconColor: user.avatar_icon_color,
+        bio: user.bio,
+      },
+      token,
+    });
   } catch {
     res.status(500).json({ error: 'Registration failed' });
   }
@@ -56,7 +70,7 @@ export const login = async (req, res) => {
 
     const { email, password } = value;
 
-    const result = await pool.query('SELECT id, email, password_hash, username FROM users WHERE email = $1', [
+    const result = await pool.query(`SELECT ${USER_PROFILE_SELECT}, password_hash FROM users WHERE email = $1`, [
       email,
     ]);
 
@@ -81,6 +95,9 @@ export const login = async (req, res) => {
         id: user.id,
         email: user.email,
         username: user.username,
+        avatarImageUrl: user.avatar_image_url,
+        avatarIconColor: user.avatar_icon_color,
+        bio: user.bio,
       },
       token,
     });
@@ -97,11 +114,34 @@ export const refreshToken = async (req, res) => {
       return res.status(401).json({ error: 'Unauthorized' });
     }
 
+    const userResult = await pool.query(
+      `SELECT ${USER_PROFILE_SELECT}
+       FROM users
+       WHERE id = $1`,
+      [userId]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
+
+    const user = userResult.rows[0];
+
     const token = jwt.sign({ id: userId, email: userEmail }, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || '7d',
     });
 
-    res.json({ token });
+    res.json({
+      token,
+      user: {
+        id: user.id,
+        email: user.email,
+        username: user.username,
+        avatarImageUrl: user.avatar_image_url,
+        avatarIconColor: user.avatar_icon_color,
+        bio: user.bio,
+      },
+    });
   } catch {
     res.status(500).json({ error: 'Token refresh failed' });
   }

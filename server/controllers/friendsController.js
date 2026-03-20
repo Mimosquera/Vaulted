@@ -16,6 +16,9 @@ function normalizeFriendship(row, viewerId) {
       id: outbound ? row.addressee_id : row.requester_id,
       username: outbound ? row.addressee_username : row.requester_username,
       email: outbound ? row.addressee_email : row.requester_email,
+      avatarImageUrl: outbound ? row.addressee_avatar_image_url : row.requester_avatar_image_url,
+      avatarIconColor: outbound ? row.addressee_avatar_icon_color : row.requester_avatar_icon_color,
+      bio: outbound ? row.addressee_bio : row.requester_bio,
     },
     direction: outbound ? 'outgoing' : 'incoming',
   };
@@ -31,7 +34,7 @@ export const searchUsers = async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT u.id, u.username,
+      `SELECT u.id, u.username, u.avatar_image_url, u.avatar_icon_color, u.bio,
               EXISTS (
                 SELECT 1
                 FROM friendships f
@@ -136,8 +139,14 @@ export const getFriendships = async (req, res) => {
       `SELECT f.*,
               requester.username AS requester_username,
               requester.email AS requester_email,
+              requester.avatar_image_url AS requester_avatar_image_url,
+              requester.avatar_icon_color AS requester_avatar_icon_color,
+              requester.bio AS requester_bio,
               addressee.username AS addressee_username,
-              addressee.email AS addressee_email
+              addressee.email AS addressee_email,
+              addressee.avatar_image_url AS addressee_avatar_image_url,
+              addressee.avatar_icon_color AS addressee_avatar_icon_color,
+              addressee.bio AS addressee_bio
        FROM friendships f
        JOIN users requester ON requester.id = f.requester_id
        JOIN users addressee ON addressee.id = f.addressee_id

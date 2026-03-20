@@ -27,7 +27,6 @@ body.modal-open {
   max-height: 90vh;
   max-height: 90svh;
   overflow-y: auto;
-  -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
   background: $bg-secondary;
   border: 1px solid rgba(255, 255, 255, 0.08);

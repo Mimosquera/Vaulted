@@ -1,4 +1,5 @@
 import pool from '../config/database.js';
+import Joi from 'joi';
 import { toCamelCase } from '../utils/helpers.js';
 
 function buildVisibilityFilter(viewerId, ownerAlias = 'u', collectionAlias = 'c') {
@@ -32,7 +33,7 @@ export const getPublicProfile = async (req, res) => {
     }
 
     const user = await pool.query(
-      `SELECT id, username, created_at
+      `SELECT id, username, created_at, avatar_image_url, avatar_icon_color, bio
        FROM users
        WHERE id = $1`,
       [requestedUserId]
@@ -98,5 +99,62 @@ export const getPublicProfile = async (req, res) => {
     });
   } catch {
     res.status(500).json({ error: 'Failed to fetch profile' });
+  }
+};
+
+const updateProfileSchema = Joi.object({
+  username: Joi.string().trim().min(2).max(30).optional(),
+  avatarImageUrl: Joi.string().uri({ scheme: ['http', 'https'] }).allow(null).optional(),
+  avatarIconColor: Joi.string().trim().pattern(/^#([A-Fa-f0-9]{6})$/).optional(),
+  bio: Joi.string().trim().max(180).allow('', null).optional(),
+}).or('username', 'avatarImageUrl', 'avatarIconColor', 'bio');
+
+export const updateMyProfile = async (req, res) => {
+  try {
+    const { userId } = req;
+    const { error, value } = updateProfileSchema.validate(req.body);
+
+    if (error) {
+      return res.status(400).json({ error: error.details[0].message });
+    }
+
+    // Use hasOwnProperty to distinguish "explicitly set to null" from "not provided"
+    const avatarImageUrlProvided = Object.prototype.hasOwnProperty.call(req.body, 'avatarImageUrl');
+    const username = value.username !== undefined ? value.username : null;
+    const avatarImageUrl = value.avatarImageUrl !== undefined ? value.avatarImageUrl : null;
+    const avatarIconColor = value.avatarIconColor !== undefined ? value.avatarIconColor : null;
+    const bio = value.bio !== undefined ? value.bio : null;
+
+    const result = await pool.query(
+      `UPDATE users
+       SET username = COALESCE($1, username),
+           avatar_image_url = CASE WHEN $6 THEN $2 ELSE avatar_image_url END,
+           avatar_icon_color = COALESCE($3, avatar_icon_color),
+           bio = CASE
+             WHEN $4::text IS NULL THEN bio
+             WHEN NULLIF(TRIM($4), '') IS NULL THEN NULL
+             ELSE LEFT(TRIM($4), 180)
+           END,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = $5
+       RETURNING id, email, username, avatar_image_url, avatar_icon_color, bio`,
+      [username, avatarImageUrl, avatarIconColor, bio, userId, avatarImageUrlProvided]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    const user = result.rows[0];
+    res.json({
+      id: user.id,
+      email: user.email,
+      username: user.username,
+      avatarImageUrl: user.avatar_image_url,
+      avatarIconColor: user.avatar_icon_color,
+      bio: user.bio,
+    });
+  } catch {
+    res.status(500).json({ error: 'Failed to update profile' });
   }
 };

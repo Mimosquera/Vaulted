@@ -1,28 +1,29 @@
 import { useMemo, useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { CompassIcon as Compass } from '@phosphor-icons/react/Compass';
 import { MagnifyingGlassIcon as MagnifyingGlass } from '@phosphor-icons/react/MagnifyingGlass';
 import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
 import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import { UserPlusIcon as UserPlus } from '@phosphor-icons/react/UserPlus';
-import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
 import { CheckIcon as Check } from '@phosphor-icons/react/Check';
 import useStore, { CATEGORIES } from '../store/useStore';
 import CollectionGrid from '../components/Collection/CollectionGrid';
 import BlobBackground from '../components/UI/BlobBackground';
+import UserAvatar, { getToneShade } from '../components/UI/UserAvatar';
 import { useDebouncedValue } from '../hooks/useDebouncedValue';
 import './Explore.scss';
 
 export default function Explore() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const publicCollectionsFromStore = useStore((s) => s.publicCollections);
   const isAuthenticated = useStore((s) => s.isAuthenticated);
   const searchUsers = useStore((s) => s.searchUsers);
   const sendFriendRequest = useStore((s) => s.sendFriendRequest);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(() => searchParams.get('q') || '');
   const debouncedSearch = useDebouncedValue(search);
-  const [filterCategory, setFilterCategory] = useState('');
-  const [viewMode, setViewMode] = useState('collections');
+  const [filterCategory, setFilterCategory] = useState(() => searchParams.get('cat') || '');
+  const [viewMode, setViewMode] = useState(() => (searchParams.get('view') === 'users' ? 'users' : 'collections'));
   const [users, setUsers] = useState([]);
   const [sendingRequestFor, setSendingRequestFor] = useState(null);
 
@@ -30,6 +31,25 @@ export default function Explore() {
   useEffect(() => {
     useStore.getState().fetchPublicCollections();
   }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    const trimmedSearch = search.trim();
+
+    if (trimmedSearch) {
+      params.set('q', trimmedSearch);
+    }
+
+    if (viewMode !== 'collections') {
+      params.set('view', viewMode);
+    }
+
+    if (filterCategory && viewMode === 'collections') {
+      params.set('cat', filterCategory);
+    }
+
+    setSearchParams(params, { replace: true });
+  }, [search, filterCategory, viewMode, setSearchParams]);
 
   useEffect(() => {
     let cancelled = false;
@@ -180,15 +200,37 @@ export default function Explore() {
 
         {viewMode === 'users' && isAuthenticated && (
           <div className="explore__users">
-            {users.map((user) => (
-              <motion.div key={user.id} className="explore__user-card" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}>
+            {users.map((user) => {
+              const userTone = getToneShade(user?.avatarIconColor || '#8b5cf6');
+
+              return (
+                <motion.div
+                  key={user.id}
+                  className="explore__user-card"
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  style={{
+                    '--avatar-icon-bg': userTone.bg,
+                    '--avatar-icon-ring': userTone.ring,
+                    '--avatar-icon-glow': userTone.glow,
+                    '--avatar-icon-complement-glow': userTone.complementGlow,
+                    '--avatar-icon-complement-soft': userTone.complementSoft,
+                  }}
+                >
                 <div className="explore__user-main">
                   <div className="explore__user-avatar" aria-hidden="true">
-                    <UserCircle weight="duotone" size={28} />
+                    <UserAvatar user={user} size={30} decorative />
                   </div>
                   <div className="explore__user-meta">
                     <h3>{user.username}</h3>
-                    <Link to={`/u/${user.id}`} className="explore__user-link">View profile</Link>
+                    {user.bio && <p className="explore__user-bio">{user.bio}</p>}
+                    <Link
+                      to={`/u/${user.id}`}
+                      state={{ from: `/explore${searchParams.toString() ? `?${searchParams.toString()}` : ''}` }}
+                      className="explore__user-link"
+                    >
+                      View profile
+                    </Link>
                   </div>
                 </div>
                 <button
@@ -210,8 +252,9 @@ export default function Explore() {
                   {!user.isFriend && user.hasPendingRequest ? <span className="explore__status-chip">Pending</span> : null}
                   {!user.isFriend && !user.hasPendingRequest ? <><UserPlus weight="bold" size={14} /> Add Friend</> : null}
                 </button>
-              </motion.div>
-            ))}
+                </motion.div>
+              );
+            })}
             {debouncedSearch && users.length === 0 && (
               <div className="explore__empty">
                 <h3>No users found</h3>

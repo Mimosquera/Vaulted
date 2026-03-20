@@ -19,7 +19,7 @@ const inferMimeFromUrl = (url) => {
   return 'image/jpeg';
 };
 
-export default function ImageUploader({ onFileSelect, currentPreview = null, isUploading = false, uploadProgress = 0 }) {
+export default function ImageUploader({ onFileSelect, currentPreview = null, isUploading = false, uploadProgress = 0, cropShape = 'rect' }) {
   const [preview, setPreview] = useState(undefined);
   const [cropOpen, setCropOpen] = useState(false);
   const [originalSrc, setOriginalSrc] = useState(undefined);    // undefined means follow currentPreview
@@ -30,6 +30,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
   const resolvedPreview = preview === undefined ? currentPreview : preview;
   const resolvedOriginalSrc = originalSrc === undefined ? currentPreview : originalSrc;
   const resolvedOriginalMime = originalMime ?? inferMimeFromUrl(currentPreview);
+  const isCircleCrop = cropShape === 'circle';
 
   // Revoke any lingering crop source URL when component unmounts
   useEffect(() => {
@@ -64,7 +65,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
 
     if (isBlobUrl(revokeCroppedRef.current)) URL.revokeObjectURL(revokeCroppedRef.current);
 
-    const mime = originalMime ?? inferMimeFromUrl(currentPreview);
+    const mime = cropShape === 'circle' ? 'image/png' : (originalMime ?? inferMimeFromUrl(currentPreview));
     const ext = mime === 'image/png' ? 'png' : mime === 'image/webp' ? 'webp' : 'jpg';
     const croppedFile = new File([blob], `cropped.${ext}`, { type: mime });
     const previewUrl = URL.createObjectURL(blob);
@@ -72,7 +73,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
 
     setPreview(previewUrl);
     onFileSelect(croppedFile);
-  }, [onFileSelect, originalMime, currentPreview]);
+  }, [onFileSelect, originalMime, currentPreview, cropShape]);
 
   const handleCropCancel = useCallback(() => {
     setCropOpen(false);
@@ -112,6 +113,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
           <ImageCropper
             imageSrc={resolvedOriginalSrc}
             mimeType={resolvedOriginalMime}
+            cropShape={cropShape}
             onCropDone={handleCropDone}
             onCancel={handleCropCancel}
           />
@@ -122,7 +124,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
       {!cropOpen && (
         <div
           {...getRootProps()}
-          className={`image-uploader__dropzone ${isDragActive ? 'image-uploader__dropzone--active' : ''} ${resolvedPreview ? 'image-uploader__dropzone--has-image' : ''}`}
+          className={`image-uploader__dropzone ${isDragActive ? 'image-uploader__dropzone--active' : ''} ${resolvedPreview ? 'image-uploader__dropzone--has-image' : ''} ${isCircleCrop ? 'image-uploader__dropzone--circle' : ''}`}
         >
           <input {...getInputProps()} />
 
@@ -130,7 +132,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
             {resolvedPreview ? (
               <motion.div
                 key="preview"
-                className="image-uploader__preview"
+                className={`image-uploader__preview ${isCircleCrop ? 'image-uploader__preview--circle' : ''}`}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.9 }}
@@ -138,9 +140,9 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
                 <SafeImage
                   src={resolvedPreview}
                   alt="Preview"
-                  aspectRatio="4 / 3"
-                  wrapperClassName="image-uploader__preview-media"
-                  imageClassName="image-uploader__preview-img"
+                  aspectRatio={isCircleCrop ? '1 / 1' : '4 / 3'}
+                  wrapperClassName={`image-uploader__preview-media ${isCircleCrop ? 'image-uploader__preview-media--circle' : ''}`.trim()}
+                  imageClassName={`image-uploader__preview-img ${isCircleCrop ? 'image-uploader__preview-img--circle' : ''}`.trim()}
                   loading="eager"
                   widthHint={1000}
                   metricContext="uploader-preview"

@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { UserCircleIcon as UserCircle } from '@phosphor-icons/react/UserCircle';
 import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { UserPlusIcon as UserPlus } from '@phosphor-icons/react/UserPlus';
 import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
@@ -11,10 +10,13 @@ import useStore from '../store/useStore';
 import { fetchPublicProfileAPI } from '../api/client';
 import CollectionGrid from '../components/Collection/CollectionGrid';
 import BlobBackground from '../components/UI/BlobBackground';
+import UserAvatar, { getToneShade } from '../components/UI/UserAvatar';
 import './PublicProfile.scss';
 
 export default function PublicProfile() {
   const { userId } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
   const isAuthenticated = useStore((s) => s.isAuthenticated);
   const sendFriendRequest = useStore((s) => s.sendFriendRequest);
   const removeFriend = useStore((s) => s.removeFriend);
@@ -71,24 +73,47 @@ export default function PublicProfile() {
   const friendshipStatus = profile.friendshipStatus || 'none';
   const showAddButton = isAuthenticated && !profile.isSelf && friendshipStatus === 'none' && !requestSent;
   const showRemoveButton = isAuthenticated && !profile.isSelf && (profile.isFriend || friendshipStatus === 'accepted');
+  const profileTone = getToneShade(profile.user?.avatarIconColor || '#8b5cf6');
+  const profileBio = (profile.user?.bio || '').trim();
+
+  const handleBack = () => {
+    if (window.history.length > 1) {
+      navigate(-1);
+      return;
+    }
+
+    navigate(location.state?.from || '/explore');
+  };
 
   return (
     <div className="public-profile page">
       <BlobBackground color1="#312e81" color2="#5b21b6" />
       <div className="container">
         <div className="public-profile__topbar">
-          <Link to="/explore" className="public-profile__back-link">
+          <button type="button" className="public-profile__back-link" onClick={handleBack}>
             <ArrowLeft weight="bold" size={14} /> Back
-          </Link>
+          </button>
         </div>
 
-        <motion.div className="public-profile__header" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <motion.div
+          className="public-profile__header"
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            '--avatar-icon-bg': profileTone.bg,
+            '--avatar-icon-ring': profileTone.ring,
+            '--avatar-icon-glow': profileTone.glow,
+            '--avatar-icon-complement-glow': profileTone.complementGlow,
+            '--avatar-icon-complement-soft': profileTone.complementSoft,
+          }}
+        >
           <div className="public-profile__identity">
             <div className="public-profile__avatar">
-              <UserCircle weight="duotone" size={72} />
+              <UserAvatar user={profile.user} size={72} alt={`${profile.user.username} avatar`} />
             </div>
             <div>
               <h1>{profile.user.username}</h1>
+              {profileBio ? <p className="public-profile__bio">{profileBio}</p> : null}
               <p>{visibleCollections.length} visible collection{visibleCollections.length !== 1 ? 's' : ''}</p>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, useNavigationType } from 'react-router-dom';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Toaster } from 'react-hot-toast';
 import useStore from './store/useStore';
@@ -33,14 +33,22 @@ function ReadyGate({ children }) {
 
 function AnimatedRoutes() {
   const location = useLocation();
+  const navigationType = useNavigationType();
 
   return (
-    <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo({ top: 0, behavior: 'instant' })}>
+    <AnimatePresence
+      mode="wait"
+      onExitComplete={() => {
+        // Keep browser-managed scroll position on back/forward navigation.
+        if (navigationType === 'POP') return;
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }}
+    >
       <motion.div
         key={location.pathname}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.3, ease: 'easeInOut' }}
         style={{ flex: 1, display: 'flex', flexDirection: 'column' }}
       >
