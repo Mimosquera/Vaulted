@@ -176,6 +176,13 @@ NODE_ENV=development
 BODY_LIMIT=2mb
 REQUEST_TIMEOUT_MS=20000
 TRUST_PROXY=false
+LOG_LEVEL=debug
+LOG_REQUEST_BODY=false
+METRICS_ENABLED=true
+METRICS_ALERT_WINDOW=200
+METRICS_ERROR_RATE_ALERT_PCT=5
+METRICS_LATENCY_ALERT_MS=800
+METRICS_ALERT_COOLDOWN_MS=60000
 
 # JWT
 JWT_SECRET=your_secret_key
@@ -205,15 +212,18 @@ curl -X POST http://localhost:5000/auth/login \
 # Get collections (requires token)
 curl -X GET http://localhost:5000/api/collections \
   -H "Authorization: Bearer YOUR_TOKEN"
+
+# Metrics snapshot
+curl -X GET http://localhost:5000/metrics
 ```
 
 ---
 
 ## Future Enhancements
 
-- [ ] Rate limiting
+- [x] Rate limiting
 - [ ] Request validation with Joi
-- [ ] Logging (Winston/Pino)
+- [x] Structured JSON request logging
 - [ ] API versioning
 - [ ] Automated backups
 - [ ] WebSocket for real-time sync
