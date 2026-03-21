@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Masonry from 'react-masonry-css';
 import { Plus, Trash2, Edit2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 import { ArrowLeftIcon as ArrowLeft } from '@phosphor-icons/react/ArrowLeft';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
 import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
@@ -32,6 +33,7 @@ export default function CollectionView() {
   const updateItem = useStore((s) => s.updateItem);
   const deleteCollection = useStore((s) => s.deleteCollection);
   const updateCollection = useStore((s) => s.updateCollection);
+  const setCollectionVisibility = useStore((s) => s.setCollectionVisibility);
   const getImageUrl = useStore((s) => s.getImageUrl);
   const prefetchImages = useStore((s) => s.prefetchImages);
 
@@ -39,6 +41,8 @@ export default function CollectionView() {
   const [editItemModalOpen, setEditItemModalOpen] = useState(false);
   const [editCollectionModalOpen, setEditCollectionModalOpen] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  const [visMenuOpen, setVisMenuOpen] = useState(false);
+  const visMenuRef = useRef(null);
   const [editingItem, setEditingItem] = useState(null);
   const [search, setSearch] = useState('');
   const debouncedSearch = useDebouncedValue(search);
@@ -46,6 +50,21 @@ export default function CollectionView() {
   const [lightboxImageUrl, setLightboxImageUrl] = useState(null);
   const [coverUrl, setCoverUrl] = useState(null);
   const mountedRef = useRef(true);
+
+  useEffect(() => {
+    if (!visMenuOpen) return;
+    const handleOutside = (e) => {
+      if (visMenuRef.current && !visMenuRef.current.contains(e.target)) {
+        setVisMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [visMenuOpen]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -112,6 +131,17 @@ export default function CollectionView() {
   const handleDelete = () => {
     deleteCollection(collection.id);
     navigate('/dashboard');
+  };
+
+  const handleSetVisibility = async (next) => {
+    setVisMenuOpen(false);
+    try {
+      await setCollectionVisibility(collection.id, next);
+      const label = next === 'friends_only' ? 'Friends only' : next.charAt(0).toUpperCase() + next.slice(1);
+      toast.success(`Visibility set to ${label}`);
+    } catch {
+      toast.error('Unable to update visibility. Please try again.');
+    }
   };
 
   const handleEditItem = (item) => {
@@ -212,24 +242,43 @@ export default function CollectionView() {
           <div className="collection-view__toolbar-left">
             <button className="btn btn--primary" onClick={() => setAddModalOpen(true)}>
               <Plus strokeWidth={2} size={16} />
-              Add Item
-            </button>
-            <button className="btn btn--secondary" onClick={() => setEditCollectionModalOpen(true)}>
-              <Edit2 strokeWidth={2} size={14} />
-              Edit
+              <span>Add Item</span>
             </button>
           </div>
           <div className="collection-view__toolbar-right">
+            <button className="btn btn--secondary" onClick={() => setEditCollectionModalOpen(true)}>
+              <Edit2 strokeWidth={2} size={14} />
+              <span>Edit</span>
+            </button>
             <button className="btn btn--secondary" onClick={() => setShareModalOpen(true)}>
               <ShareNetwork weight="bold" size={16} />
-              Share
+              <span>Share</span>
             </button>
-            <button className="btn btn--ghost" onClick={() => setShareModalOpen(true)}>
-              {visibility === 'public' && <Eye weight="bold" size={16} />}
-              {visibility === 'friends_only' && <UsersThree weight="bold" size={16} />}
-              {visibility === 'private' && <EyeSlash weight="bold" size={16} />}
-              {visibility === 'public' ? 'Public' : visibility === 'friends_only' ? 'Friends' : 'Private'}
-            </button>
+            <div ref={visMenuRef} className="collection-view__vis-wrap">
+              <button className="btn btn--ghost" onClick={() => setVisMenuOpen(!visMenuOpen)}>
+                {visibility === 'public' && <Eye weight="bold" size={16} />}
+                {visibility === 'friends_only' && <UsersThree weight="bold" size={16} />}
+                {visibility === 'private' && <EyeSlash weight="bold" size={16} />}
+                <span>{visibility === 'public' ? 'Public' : visibility === 'friends_only' ? 'Friends' : 'Private'}</span>
+              </button>
+              {visMenuOpen && (
+                <motion.div
+                  className="collection-view__vis-menu"
+                  initial={{ opacity: 0, scale: 0.9, y: -4 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                >
+                  <button className={visibility === 'private' ? 'active' : ''} onClick={() => handleSetVisibility('private')}>
+                    <EyeSlash size={15} /> Private
+                  </button>
+                  <button className={visibility === 'friends_only' ? 'active' : ''} onClick={() => handleSetVisibility('friends_only')}>
+                    <UsersThree size={15} /> Friends only
+                  </button>
+                  <button className={visibility === 'public' ? 'active' : ''} onClick={() => handleSetVisibility('public')}>
+                    <Eye size={15} /> Public
+                  </button>
+                </motion.div>
+              )}
+            </div>
             <button className="btn btn--danger btn--sm" onClick={handleDelete}>
               <Trash2 strokeWidth={2} size={14} />
             </button>

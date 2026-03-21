@@ -118,6 +118,7 @@ export default memo(function CollectionCard({ collection, index = 0, isVisitor =
   return (
     <>
       <motion.div
+        style={{ position: 'relative', zIndex: menuOpen ? 10 : 0 }}
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9 }}

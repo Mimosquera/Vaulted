@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import Tilt from 'react-parallax-tilt';
 import { Trash2, Edit2 } from 'lucide-react';
 import { ImageIcon } from '@phosphor-icons/react/Image';
+import { DotsThreeIcon as DotsThree } from '@phosphor-icons/react/DotsThree';
 import useStore from '../../store/useStore';
 import useHasHover from '../../hooks/useHasHover';
 import { timeAgo, isCloudUrl } from '../../utils/helpers';
@@ -11,11 +12,27 @@ import './ItemCard.scss';
 
 export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, onExpand }) {
   const [imageUrl, setImageUrl] = useState(null);
-  const [hovering, setHovering] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
   const deleteItem = useStore((s) => s.deleteItem);
   const getImageUrl = useStore((s) => s.getImageUrl);
   const hasHover = useHasHover();
   const mountedRef = useRef(true);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleOutside);
+    document.addEventListener('touchstart', handleOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleOutside);
+      document.removeEventListener('touchstart', handleOutside);
+    };
+  }, [menuOpen]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -44,8 +61,21 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
     onExpand(item, imageUrl);
   };
 
+  const handleEdit = (e) => {
+    e.stopPropagation();
+    if (onEdit) onEdit(item);
+    setMenuOpen(false);
+  };
+
+  const handleDelete = (e) => {
+    e.stopPropagation();
+    deleteItem(collectionId, item.id);
+    setMenuOpen(false);
+  };
+
   return (
     <motion.div
+      style={{ position: 'relative', zIndex: menuOpen ? 10 : 0 }}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
@@ -60,11 +90,7 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
         transitionSpeed={300}
         tiltEnable={hasHover}
       >
-        <div
-          className="item-card"
-          onMouseEnter={() => setHovering(true)}
-          onMouseLeave={() => setHovering(false)}
-        >
+        <div className="item-card">
           <div className="item-card__image" onClick={handleExpand} style={{ cursor: 'pointer' }}>
             <SafeImage
               src={imageUrl}
@@ -75,31 +101,36 @@ export default memo(function ItemCard({ item, collectionId, index = 0, onEdit, o
               widthHint={360}
               metricContext="item-card"
             />
-
             {!imageUrl && (
               <div className="item-card__placeholder">
                 <ImageIcon weight="thin" size={40} />
               </div>
             )}
+          </div>
 
-            <motion.div
-              className="item-card__actions"
-              initial={false}
-              animate={{ opacity: hovering ? 1 : 0 }}
-              transition={{ duration: 0.15 }}
+          <div ref={menuRef} className="item-card__menu-wrap">
+            <button
+              className="item-card__menu-btn"
+              onClick={(e) => { e.stopPropagation(); setMenuOpen(!menuOpen); }}
             >
-              {onEdit && (
-                <button className="item-card__action" onClick={(e) => { e.stopPropagation(); onEdit(item); }}>
-                  <Edit2 strokeWidth={2} size={14} />
-                </button>
-              )}
-              <button
-                className="item-card__action item-card__action--danger"
-                onClick={(e) => { e.stopPropagation(); deleteItem(collectionId, item.id); }}
+              <DotsThree weight="bold" size={20} />
+            </button>
+            {menuOpen && (
+              <motion.div
+                className="item-card__menu"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
               >
-                <Trash2 strokeWidth={2} size={14} />
-              </button>
-            </motion.div>
+                {onEdit && (
+                  <button onClick={handleEdit}>
+                    <Edit2 strokeWidth={2} size={14} /> Edit
+                  </button>
+                )}
+                <button className="item-card__menu-danger" onClick={handleDelete}>
+                  <Trash2 strokeWidth={2} size={14} /> Delete
+                </button>
+              </motion.div>
+            )}
           </div>
 
           <div className="item-card__info">

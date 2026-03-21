@@ -2,22 +2,19 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Copy, Check } from 'lucide-react';
 import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNetwork';
-import { EyeIcon as Eye } from '@phosphor-icons/react/Eye';
 import { EyeSlashIcon as EyeSlash } from '@phosphor-icons/react/EyeSlash';
-import { UsersThreeIcon as UsersThree } from '@phosphor-icons/react/UsersThree';
 import toast from 'react-hot-toast';
-import useStore from '../../store/useStore';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import './Modal.scss';
 
 export default function ShareModal({ isOpen, onClose, collection }) {
   const [copied, setCopied] = useState(false);
-  const setCollectionVisibility = useStore((s) => s.setCollectionVisibility);
 
   useModalScrollLock(isOpen);
 
   if (!collection) return null;
 
+  const visibility = collection.visibility || (collection.isPublic ? 'public' : 'private');
   const shareUrl = `${window.location.origin}/explore/${collection.id}`;
 
   const handleCopy = async () => {
@@ -28,12 +25,6 @@ export default function ShareModal({ isOpen, onClose, collection }) {
     } catch {
       toast.error('Unable to copy to clipboard');
     }
-  };
-
-  const visibility = collection.visibility || (collection.isPublic ? 'public' : 'private');
-
-  const handleSetVisibility = async (nextVisibility) => {
-    await setCollectionVisibility(collection.id, nextVisibility);
   };
 
   return (
@@ -62,26 +53,12 @@ export default function ShareModal({ isOpen, onClose, collection }) {
             </div>
 
             <div className="modal__body">
-              <div className="modal__share-status">
-                <span className={`modal__visibility ${visibility === 'public' ? 'modal__visibility--public' : ''}`}>
-                  {visibility === 'public' && <><Eye weight="bold" size={16} /> Public (visible to everyone)</>}
-                  {visibility === 'friends_only' && <><UsersThree weight="bold" size={16} /> Friends only (visible to approved friends)</>}
-                  {visibility === 'private' && <><EyeSlash weight="bold" size={16} /> Private (only you)</>}
-                </span>
-              </div>
-
-              <div className="modal__visibility-options">
-                <button type="button" className={`modal__visibility-option ${visibility === 'private' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('private')}>
-                  <EyeSlash size={16} /> Private
-                </button>
-                <button type="button" className={`modal__visibility-option ${visibility === 'friends_only' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('friends_only')}>
-                  <UsersThree size={16} /> Friends
-                </button>
-                <button type="button" className={`modal__visibility-option ${visibility === 'public' ? 'modal__visibility-option--active' : ''}`} onClick={() => handleSetVisibility('public')}>
-                  <Eye size={16} /> Public
-                </button>
-              </div>
-
+              {visibility === 'private' && (
+                <p className="modal__share-note">
+                  <EyeSlash weight="bold" size={14} />
+                  This collection is private — only you can see it. Change visibility to let others open this link.
+                </p>
+              )}
               <div className="modal__field">
                 <label>Share Link</label>
                 <div className="modal__copy-row">

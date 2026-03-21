@@ -38,9 +38,10 @@ body.modal-open {
   }
 
   &__header {
+    position: relative;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     padding: $space-lg $space-xl;
     border-bottom: 1px solid rgba(255, 255, 255, 0.06);
 
@@ -50,12 +51,17 @@ body.modal-open {
       display: flex;
       align-items: center;
       gap: $space-sm;
+      text-align: center;
     }
   }
 
   &__close {
-    width: 44px;
-    height: 44px;
+    position: absolute;
+    right: $space-lg;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: $radius-sm;
     display: flex;
@@ -216,6 +222,25 @@ body.modal-open {
     height: 100%;
     object-fit: cover;
     border-radius: $radius-md;
+  }
+
+  &__share-note {
+    display: flex;
+    align-items: center;
+    gap: $space-sm;
+    font-size: $fs-sm;
+    color: $text-muted;
+    padding: $space-sm $space-md;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: $radius-md;
+    margin-bottom: $space-sm;
+    line-height: 1.5;
+
+    svg {
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
   }
 
   &__share-status {

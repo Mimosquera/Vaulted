@@ -7,7 +7,6 @@ import { ShareNetworkIcon as ShareNetwork } from '@phosphor-icons/react/ShareNet
 import { CameraIcon as Camera } from '@phosphor-icons/react/Camera';
 import { ArrowRightIcon as ArrowRight } from '@phosphor-icons/react/ArrowRight';
 import { ShieldCheckIcon as ShieldCheck } from '@phosphor-icons/react/ShieldCheck';
-import { SparkleIcon as Sparkle } from '@phosphor-icons/react/Sparkle';
 import { StackIcon as Stack } from '@phosphor-icons/react/Stack';
 import { VinylRecordIcon as VinylRecord } from '@phosphor-icons/react/VinylRecord';
 import { PersonArmsSpreadIcon as PersonArmsSpread } from '@phosphor-icons/react/PersonArmsSpread';
@@ -131,7 +130,6 @@ export default function Home() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={isInitialLoad ? { delay: 0.2, duration: 0.6, ease: 'easeOut' } : { duration: 0 }}
           >
-            <Sparkle weight="fill" size={14} />
             <span>for collectors</span>
           </motion.div>
 
@@ -235,8 +233,8 @@ export default function Home() {
             <h2>Build your vault.</h2>
             <p>Free to use. Works offline. No ads, no nonsense.</p>
             <Link to="/dashboard" className="btn btn--primary btn--lg home__cta-btn">
-              <ArrowRight weight="bold" />
               Let's Go
+              <ArrowRight weight="bold" />
             </Link>
           </motion.div>
         </div>

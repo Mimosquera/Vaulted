@@ -1,10 +1,11 @@
 @use '../../styles/variables' as *;
 
 .item-card {
+  position: relative;
   background: $bg-card;
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: $radius-md;
-  overflow: hidden;
+  overflow: visible;
   transition: border-color $transition-base, box-shadow $transition-base;
   -webkit-user-select: none;
   user-select: none;
@@ -23,6 +24,7 @@
     aspect-ratio: 1;
     overflow: hidden;
     background: $bg-secondary;
+    border-radius: $radius-md $radius-md 0 0;
   }
 
   &__media {
@@ -50,39 +52,76 @@
     pointer-events: none;
   }
 
-  &__actions {
+  // dots menu
+  &__menu-wrap {
     position: absolute;
     top: $space-sm;
     right: $space-sm;
-    display: flex;
-    gap: $space-xs;
+    z-index: 10;
   }
 
-  &__action {
-    width: 44px;
-    height: 44px;
+  &__menu-btn {
+    width: 32px;
+    height: 32px;
     border-radius: $radius-sm;
-    background: rgba(0, 0, 0, 0.6);
+    background: rgba(0, 0, 0, 0.5);
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     color: white;
-    transition: background $transition-fast;
+    opacity: 0;
+    transition: opacity $transition-fast;
+  }
 
-    &:hover {
-      background: rgba(0, 0, 0, 0.8);
-    }
-
-    &--danger:hover {
-      background: rgba($accent-primary, 0.8);
+  @media (hover: hover) {
+    &:hover &__menu-btn {
+      opacity: 1;
     }
   }
 
   @media (hover: none) {
-    &__actions {
-      opacity: 1 !important;
+    &__menu-btn {
+      opacity: 1;
+    }
+  }
+
+  &__menu {
+    position: absolute;
+    top: 36px;
+    right: 0;
+    z-index: 50;
+    background: $bg-elevated;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: $radius-sm;
+    padding: $space-xs;
+    min-width: 120px;
+    box-shadow: $shadow-lg;
+
+    button {
+      display: flex;
+      align-items: center;
+      gap: $space-sm;
+      width: 100%;
+      padding: $space-sm;
+      font-size: $fs-sm;
+      color: $text-secondary;
+      border-radius: 6px;
+      text-align: left;
+      transition: all $transition-fast;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.06);
+        color: $text-primary;
+      }
+    }
+
+    &-danger {
+      &:hover {
+        color: $accent-primary !important;
+        background: rgba($accent-primary, 0.1) !important;
+      }
     }
   }
 
@@ -117,6 +156,10 @@
 
   @media (max-width: $bp-md) {
     border-radius: $radius-sm;
+
+    &__image {
+      border-radius: $radius-sm $radius-sm 0 0;
+    }
 
     &__info {
       padding: $space-xs $space-sm $space-sm;

@@ -13,7 +13,7 @@ export default function Footer() {
         </div>
 
         <p className="footer__tagline">
-          Curate your collection.
+          Track your collection.
         </p>
 
         <div className="footer__bottom">
