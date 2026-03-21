@@ -1,6 +1,6 @@
-# Collection App
+# Collecto
 
-Build and manage your collections. Store cards, figures, games, music - whatever you're into. Works offline, keeps data in sync across devices.
+Track and manage your collections. Cards, figures, games, music, manga — whatever you collect. Works offline, syncs when you're online.
 
 ## Tech Stack
 
@@ -47,18 +47,16 @@ collection-app/
 npm install
 ```
 
-### Getting Started
+### Run
 
-Run frontend and backend together:
+Frontend and backend together:
 
 ```bash
 npm run dev
 ```
 
-The app will be at:
-
-- **Frontend:** [http://localhost:5173](http://localhost:5173)
-- **Backend:** [http://localhost:5000](http://localhost:5000)
+- **Frontend:** <http://localhost:5173>
+- **Backend:** <http://localhost:5000>
 
 ### Build
 
@@ -75,13 +73,12 @@ npm run build
 
 ## Features
 
-- Create and organize collections
-- Edit collections and items
-- Upload custom cover images
-- Make collections public or keep them private
-- Auto-syncs when you're online
-- Works offline using local storage
-- Share collection links
+- Create and organize collections by category
+- Add items with photos, names, and notes
+- Upload custom cover images for collections
+- Public/private toggle with shareable links
+- Offline-first — works without internet, syncs when back online
+- Friend network with public profile pages
 
 ## Development
 
@@ -112,38 +109,27 @@ PORT=5000
 
 ## Database
 
-Start with PostgreSQL and run migrations:
+Run migrations after setting up PostgreSQL:
 
 ```bash
 npm run migrate --workspace=server
 ```
 
-## How It Works
+## How Sync Works
 
-**Offline-First Sync:**
+1. Every write goes to local IndexedDB immediately
+2. On next online event, changes push to the backend
+3. Backend stores to PostgreSQL
+4. Other devices pull on their next sync
 
-1. Save locally to IndexedDB right away
-2. When online, sync with the backend
-3. Backend stores in PostgreSQL
-4. Other devices get the update on next sync
-
-**Auth:**
-
-- Register with email/password
-- Get a JWT token (expires in 7 days)
-- Protected routes require auth
-- Can manually refresh token
+Auth uses JWT tokens stored in localStorage, expiring after 7 days.
 
 ## Code Style
 
 - BEM naming for CSS
 - React hooks and functional components
 - Single flat Zustand store
-- Keep it simple - don't over-implement
-
-## Notes
-
-This is a personal project for managing collections. Data stays in sync across devices when you're online. Everything works offline too.
+- Don't over-engineer
 
 ## License
 
