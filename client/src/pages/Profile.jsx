@@ -1,4 +1,4 @@
-import { useRef, useState, useMemo, useEffect } from 'react';
+import { useRef, useState, useMemo, useEffect, useCallback } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
@@ -71,13 +71,20 @@ export default function Profile() {
     setAvatarMode(user?.avatarImageUrl ? 'image' : 'icon');
   }, [user]);
 
+  const handleCloseAvatarEditor = useCallback(() => {
+    setAvatarEditorOpen(false);
+    setPendingAvatarFile(null);
+    setUploaderKey((k) => k + 1);
+    setAvatarMode(user?.avatarImageUrl ? 'image' : 'icon');
+  }, [user?.avatarImageUrl]); // eslint-disable-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (!avatarEditorOpen) return undefined;
 
     const handlePointerDown = (event) => {
       if (!avatarEditorRef.current) return;
       if (!avatarEditorRef.current.contains(event.target)) {
-        setAvatarEditorOpen(false);
+        handleCloseAvatarEditor();
       }
     };
 
@@ -87,7 +94,7 @@ export default function Profile() {
       document.removeEventListener('mousedown', handlePointerDown);
       document.removeEventListener('touchstart', handlePointerDown);
     };
-  }, [avatarEditorOpen]);
+  }, [avatarEditorOpen, handleCloseAvatarEditor]);
 
   const stats = useMemo(() => {
     const totalItems = collections.reduce((sum, c) => sum + (c.items?.length || 0), 0);
@@ -156,13 +163,7 @@ export default function Profile() {
   };
 
   const handleIconTabClick = () => {
-    if (pendingAvatarFile) {
-      setPendingAvatarFile(null);
-      setUploaderKey((k) => k + 1);
-      setAvatarMode('icon');
-    } else if (avatarMode !== 'icon') {
-      handleUseIcon();
-    }
+    setAvatarMode('icon');
   };
 
   const handleUseIcon = async () => {
@@ -170,7 +171,10 @@ export default function Profile() {
     try {
       await updateUserProfile({ avatarImageUrl: null });
       setAvatarMode('icon');
-      toast.success('Using icon avatar');
+      setAvatarEditorOpen(false);
+      setPendingAvatarFile(null);
+      setUploaderKey((k) => k + 1);
+      toast.success('Switched to icon avatar');
     } catch {
       toast.error('Unable to update avatar');
     } finally {
@@ -229,7 +233,7 @@ export default function Profile() {
               <button
                 type="button"
                 className="profile__avatar-edit-trigger"
-                onClick={() => setAvatarEditorOpen((open) => !open)}
+                onClick={() => (avatarEditorOpen ? handleCloseAvatarEditor() : setAvatarEditorOpen(true))}
                 disabled={savingProfile || uploadingAvatar}
               >
                 <Edit2 strokeWidth={2} size={13} /> Edit avatar
@@ -263,27 +267,36 @@ export default function Profile() {
                         Icon
                       </button>
                     </div>
-                    {avatarMode === 'image' ? (
-                      <div className="profile__avatar-uploader-wrap">
-                        <ImageUploader
-                          key={uploaderKey}
-                          currentPreview={user?.avatarImageUrl || null}
-                          onFileSelect={handleAvatarFileSelect}
-                          isUploading={uploadingAvatar}
-                          uploadProgress={avatarUploadProgress}
-                          cropShape="circle"
-                        />
-                        {pendingAvatarFile && !uploadingAvatar && (
-                          <button
-                            type="button"
-                            className="btn btn--primary btn--sm profile__avatar-confirm-btn"
-                            onClick={handleAvatarUpload}
-                          >
-                            Set as avatar
-                          </button>
-                        )}
-                      </div>
-                    ) : (
+                    {/* Photo panel — always mounted so ImageUploader preserves its state across tab switches */}
+                    <div
+                      className="profile__avatar-uploader-wrap"
+                      style={{ display: avatarMode === 'image' ? '' : 'none' }}
+                      aria-hidden={avatarMode !== 'image'}
+                    >
+                      <ImageUploader
+                        key={uploaderKey}
+                        currentPreview={user?.avatarImageUrl || null}
+                        onFileSelect={handleAvatarFileSelect}
+                        isUploading={uploadingAvatar}
+                        uploadProgress={avatarUploadProgress}
+                        cropShape="circle"
+                      />
+                      {pendingAvatarFile && !uploadingAvatar && (
+                        <button
+                          type="button"
+                          className="btn btn--primary btn--sm profile__avatar-confirm-btn"
+                          onClick={handleAvatarUpload}
+                        >
+                          Set as avatar
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Icon panel — always mounted, shown when in icon mode */}
+                    <div
+                      style={{ display: avatarMode === 'icon' ? '' : 'none' }}
+                      aria-hidden={avatarMode !== 'icon'}
+                    >
                       <div className="profile__avatar-color-row">
                         <span className="profile__avatar-color-label"><PaintBrush weight="duotone" size={14} /> Icon color</span>
                         <div className="profile__avatar-swatch-list" role="radiogroup" aria-label="Avatar icon color">
@@ -300,7 +313,17 @@ export default function Profile() {
                           ))}
                         </div>
                       </div>
-                    )}
+                      {user?.avatarImageUrl && (
+                        <button
+                          type="button"
+                          className="btn btn--ghost btn--sm profile__avatar-confirm-btn"
+                          onClick={handleUseIcon}
+                          disabled={savingProfile}
+                        >
+                          {savingProfile ? 'Switching...' : 'Use icon avatar'}
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </motion.div>
               )}
