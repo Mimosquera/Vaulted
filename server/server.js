@@ -86,11 +86,11 @@ const uploadLimiter = rateLimit({
   },
 });
 
-// Body parsing with reasonable limits
+// body parsing
 app.use(express.json({ limit: BODY_LIMIT }));
 app.use(express.urlencoded({ limit: BODY_LIMIT, extended: true }));
 
-// Global request timeout guard
+// timeout any request that hangs
 app.use((req, res, next) => {
   const timeout = setTimeout(() => {
     if (!res.headersSent) {
@@ -124,7 +124,7 @@ app.use(
   })
 );
 
-// Structured request/response logs
+// request logs
 app.use(requestLogger);
 
 // In-memory request metrics
@@ -132,7 +132,7 @@ if (METRICS_ENABLED) {
   app.use(metricsMiddleware);
 }
 
-// Apply rate limiters
+// rate limiters
 app.use('/auth', authLimiter);
 app.use('/api/images', uploadLimiter);
 app.use('/api', apiLimiter);

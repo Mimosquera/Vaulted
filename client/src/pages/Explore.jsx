@@ -29,7 +29,6 @@ export default function Explore() {
   const [users, setUsers] = useState([]);
   const [sendingRequestFor, setSendingRequestFor] = useState(null);
 
-  // Fetch public collections when component mounts
   useEffect(() => {
     useStore.getState().fetchPublicCollections();
   }, []);

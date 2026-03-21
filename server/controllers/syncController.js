@@ -40,11 +40,10 @@ export const sync = async (req, res) => {
         }
       }
 
-      // Sync items - verify collection ownership before modifying items
       for (const item of items) {
         const { id, collectionId, name, note, imageUrl, createdAt } = item;
 
-        // Verify the collection belongs to this user
+        // make sure the collection is owned by this user before touching its items
         const ownerCheck = await client.query(
           'SELECT id FROM collections WHERE id = $1 AND user_id = $2',
           [collectionId, userId]
@@ -82,7 +81,7 @@ export const sync = async (req, res) => {
         );
       }
 
-      // Update sync metadata
+      // record last sync time
       const deviceId = req.body.deviceId || 'default';
       await client.query(
         `INSERT INTO sync_metadata (user_id, device_id, last_sync)
@@ -93,7 +92,7 @@ export const sync = async (req, res) => {
 
       await client.query('COMMIT');
 
-      // Return synced state
+      // fetch fresh state to return
       const syncedCollections = await client.query(
         'SELECT * FROM collections WHERE user_id = $1 ORDER BY updated_at DESC',
         [userId]

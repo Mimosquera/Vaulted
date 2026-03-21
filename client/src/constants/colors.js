@@ -5,7 +5,7 @@ export const COLLECTION_COLORS = [
   '#8b5cf6', '#f97316', '#3b82f6', '#10b981', '#f59e0b', '#ef4444'
 ];
 
-// Avatar icon color options: includes app theme colors plus balanced supporting tones.
+// Avatar icon colors
 export const AVATAR_THEME_COLORS = [
   '#dc2626', // red
   '#ef4444',
@@ -59,7 +59,6 @@ export const COLLECTION_GRADIENTS = [
   'linear-gradient(135deg, #ef4444 0%, #f87171 100%)', // Bright Red
 ];
 
-// Function to get gradient for a color
 export function getCollectionGradient(colorHex) {
   const index = COLLECTION_COLORS.indexOf(colorHex);
   return index >= 0 ? COLLECTION_GRADIENTS[index] : COLLECTION_GRADIENTS[0];

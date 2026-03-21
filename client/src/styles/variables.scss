@@ -1,4 +1,4 @@
-// ── Color Palette ── (Purple / Red / Blue - Neon RGB)
+// colors (purple / red / blue - neon RGB)
 $bg-primary: #050509;
 $bg-secondary: #0a0a14;
 $bg-card: #0f0f1e;
@@ -26,7 +26,7 @@ $gradient-sunset: linear-gradient(135deg, $accent-secondary, $accent-primary);
 $gradient-rgb: linear-gradient(135deg, $accent-secondary, $accent-primary, $accent-tertiary);
 $gradient-neon: linear-gradient(90deg, $neon-cyan, $accent-primary, $accent-tertiary);
 
-// ── Spacing ──
+// spacing
 $space-xs: 0.25rem;
 $space-sm: 0.5rem;
 $space-md: 1rem;
@@ -35,14 +35,14 @@ $space-xl: 2rem;
 $space-2xl: 3rem;
 $space-3xl: 4rem;
 
-// ── Border Radius ──
+// border radius
 $radius-sm: 8px;
 $radius-md: 12px;
 $radius-lg: 16px;
 $radius-xl: 24px;
 $radius-full: 9999px;
 
-// ── Shadows ──
+// shadows
 $shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
 $shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
 $shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
@@ -52,7 +52,7 @@ $shadow-glow-red: 0 0 20px rgba($accent-secondary, 0.3);
 $shadow-glow-blue: 0 0 20px rgba($accent-tertiary, 0.3);
 $shadow-glow-neon: 0 0 30px rgba($accent-primary, 0.25), 0 0 60px rgba($neon-violet, 0.1);
 
-// ── Typography ──
+// typography
 $font-body: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
 $font-display: 'Space Grotesk', 'Inter', sans-serif;
 $font-mono: 'JetBrains Mono', 'Fira Code', monospace;
@@ -67,19 +67,19 @@ $fs-3xl: 2.5rem;
 $fs-4xl: 3.5rem;
 $fs-hero: clamp(2.5rem, 6vw, 5rem);
 
-// ── Transitions ──
+// transitions
 $transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-base: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-spring: 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
 
-// ── Breakpoints ──
+// breakpoints
 $bp-sm: 576px;
 $bp-md: 768px;
 $bp-lg: 992px;
 $bp-xl: 1200px;
 
-// ── Z-index ──
+// z-index
 $z-dropdown: 100;
 $z-sticky: 200;
 $z-modal-backdrop: 300;

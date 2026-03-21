@@ -3,7 +3,7 @@
 .home {
   overflow-x: hidden;
 
-  // ── Hero ──
+  // hero
   &__hero {
     position: relative;
     min-height: 100vh;
@@ -166,7 +166,7 @@
     }
   }
 
-  // ── Scrolling categories ──
+  // scrolling categories
   &__categories {
     position: relative;
     padding: $space-2xl 0;
@@ -224,7 +224,7 @@
     white-space: nowrap;
   }
 
-  // ── Features ──
+  // features
   &__features {
     padding: $space-3xl 0;
   }
@@ -295,6 +295,7 @@
     line-height: 1;
     letter-spacing: -0.04em;
     pointer-events: none;
+    -webkit-user-select: none;
     user-select: none;
   }
 
@@ -311,7 +312,7 @@
     box-shadow: 0 0 16px rgba(var(--feat-color-rgb), 0.18);
   }
 
-  // ── Bottom CTA ──
+  // bottom CTA
   &__bottom-cta {
     position: relative;
     padding: $space-3xl 0;
@@ -335,7 +336,7 @@
     }
   }
 
-  // ── Responsive ──
+  // responsive
   @media (max-width: $bp-md) {
     &__title {
       font-size: clamp(2rem, 8vw, 3.5rem);

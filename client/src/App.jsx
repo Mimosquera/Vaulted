@@ -22,8 +22,7 @@ const Login = lazy(() => import('./pages/Login'));
 const Register = lazy(() => import('./pages/Register'));
 const DevPerfPanel = import.meta.env.DEV ? lazy(() => import('./components/UI/DevPerfPanel')) : null;
 
-// Renders only after Suspense resolves (lazy component loaded).
-// Reveals #root so navbar/footer snap visible while the route animates in.
+// adds .ready to #root once the lazy page loads so navbar/footer snap in before the route animation
 function ReadyGate({ children }) {
   useEffect(() => {
     document.getElementById('root').classList.add('ready');
@@ -39,7 +38,7 @@ function AnimatedRoutes() {
     <AnimatePresence
       mode="wait"
       onExitComplete={() => {
-        // Keep browser-managed scroll position on back/forward navigation.
+        // don't scroll to top on back/forward
         if (navigationType === 'POP') return;
         window.scrollTo({ top: 0, behavior: 'auto' });
       }}

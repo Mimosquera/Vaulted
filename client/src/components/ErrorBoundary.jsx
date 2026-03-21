@@ -11,7 +11,6 @@ export default class ErrorBoundary extends Component {
   }
 
   componentDidCatch() {
-    // Log error for monitoring services
     // Sentry.captureException(error);
   }
 

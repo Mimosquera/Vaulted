@@ -78,12 +78,12 @@ const useStore = create((set, get) => ({
   loaded: false,
   username: 'Collector',
 
-  // ── Auth State ──
+  // auth state
   user: null,
   token: api.getToken(),
   isAuthenticated: !!api.getToken(),
 
-  // ── Sync State ──
+  // sync state
   syncing: false,
   syncingVisible: false,
   lastSynced: null,
@@ -94,7 +94,7 @@ const useStore = create((set, get) => ({
   incomingFriendRequests: [],
   outgoingFriendRequests: [],
 
-  // ── Initialize from storage ─
+  // initialize from storage
   init: async () => {
     try {
       const saved = await dataStore.getItem('collections');
@@ -126,7 +126,6 @@ const useStore = create((set, get) => ({
           const data = await api.refreshToken();
           set({ isAuthenticated: true, user: data.user || get().user });
           get().fetchFriends();
-          // Start sync polling for authenticated users
           get().startSyncPolling();
         } catch {
           // Token expired or invalid
@@ -187,13 +186,13 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // ── Persist helper ──
+  // persist helper
   _persist: async () => {
     const { collections } = get();
     await dataStore.setItem('collections', collections);
   },
 
-  // ── Auth Actions ──
+  // auth actions
   login: async (email, password) => {
     const data = await api.login(email, password);
     const user = data.user;
@@ -209,10 +208,9 @@ const useStore = create((set, get) => ({
     await dataStore.setItem('collections', []);
     get().fetchFriends();
 
-    // Sync from cloud after login with small delay to ensure token is ready
+    // short delay so the token cookie is set before the first sync fires
     setTimeout(async () => {
       await get().syncFromCloud();
-      // After sync, migrate any local images to Cloudinary
       await get().migrateLocalImagesToCloud();
     }, 150);
   },
@@ -281,7 +279,7 @@ const useStore = create((set, get) => ({
     set({ authExpiredMessage: null });
   },
 
-  // ── Public Collections ──
+  // public collections
   fetchPublicCollections: async () => {
     if (isOffline()) return;
 
@@ -295,7 +293,7 @@ const useStore = create((set, get) => ({
         })),
       });
     } catch {
-      // Fail silently if public collections can't be fetched
+      // not critical, skip
     }
   },
 
@@ -309,7 +307,7 @@ const useStore = create((set, get) => ({
         outgoingFriendRequests: data.outgoingRequests || [],
       });
     } catch {
-      // silent fail to avoid noisy UI interruptions
+      // not critical
     }
   },
 
@@ -342,7 +340,7 @@ const useStore = create((set, get) => ({
     await get().fetchFriends();
   },
 
-  // ── Sync Polling ──
+  // sync polling
   startSyncPolling: () => {
     get().stopSyncPolling();
 
@@ -371,7 +369,7 @@ const useStore = create((set, get) => ({
     set({ syncError: null });
   },
 
-  // ── Sync Actions ──
+  // sync actions
   syncToCloud: async () => {
     if (!get().isAuthenticated || get().syncing || isOffline()) return;
     set({ syncing: true, syncingVisible: true, syncError: null });
@@ -458,7 +456,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // ── Migrate local images to Cloudinary ──
+  // migrate local images to Cloudinary
   migrateLocalImagesToCloud: async () => {
     if (!get().isAuthenticated) return;
 
@@ -466,7 +464,6 @@ const useStore = create((set, get) => ({
       const { collections } = get();
       let migratedCount = 0;
 
-      // Process all collections and items
       const updatedCollections = await Promise.all(
         collections.map(async (collection) => {
           let updatedCollection = { ...collection };
@@ -515,7 +512,6 @@ const useStore = create((set, get) => ({
         })
       );
 
-      // Update store with migrated collections
       if (migratedCount > 0) {
         set({ collections: updatedCollections });
         await get()._persist();
@@ -527,7 +523,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // ── Collection CRUD ──
+  // collection CRUD
   createCollection: async ({ name, category, description, coverColor, coverImage, visibility = 'private' }, onProgress) => {
     let coverImageUrl = null;
     if (coverImage) {
@@ -535,7 +531,6 @@ const useStore = create((set, get) => ({
       await imageStore.setItem(imageId, coverImage);
       coverImageUrl = imageId;
 
-      // Upload cover image to server if authenticated
       if (get().isAuthenticated) {
         try {
           const uploadResult = await api.uploadImageAPI(coverImage, onProgress);
@@ -597,7 +592,6 @@ const useStore = create((set, get) => ({
       await imageStore.setItem(imageId, updates.coverImage);
       updates.coverImageUrl = imageId;
 
-      // Upload cover image to server if authenticated
       if (get().isAuthenticated) {
         try {
           const uploadResult = await api.uploadImageAPI(updates.coverImage, onProgress);
@@ -716,7 +710,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // ── Item CRUD ──
+  // item CRUD
   addItem: async (collectionId, { name, note, imageFile }, onProgress) => {
     let imageUrl = null;
     if (imageFile) {
@@ -724,7 +718,6 @@ const useStore = create((set, get) => ({
       await imageStore.setItem(imageId, imageFile);
       imageUrl = imageId;
 
-      // Upload image to server if authenticated
       if (get().isAuthenticated) {
         try {
           const uploadResult = await api.uploadImageAPI(imageFile, onProgress);
@@ -786,7 +779,6 @@ const useStore = create((set, get) => ({
       await imageStore.setItem(imageId, updates.imageFile);
       updates.imageUrl = imageId;
 
-      // Upload image to server if authenticated
       if (get().isAuthenticated) {
         try {
           const uploadResult = await api.uploadImageAPI(updates.imageFile, onProgress);
@@ -872,7 +864,7 @@ const useStore = create((set, get) => ({
     }
   },
 
-  // ── Image loading ──
+  // image loading
   getImageUrl: async (imageId) => {
     if (!imageId) return null;
 
@@ -944,18 +936,17 @@ const useStore = create((set, get) => ({
     schedulePrefetch(() => {
       for (const imageId of targets) {
         get().getImageUrl(imageId).catch(() => {
-          // Prefetch should never surface errors to the UI.
+          // prefetch errors should never reach the UI
         });
       }
     });
   },
 
-  // ── Clean up local-only images not synced to cloud ──
+  // clean up local-only images not synced to cloud
   removeItemsWithBrokenImages: async (collectionId) => {
     const col = get().collections.find((c) => c.id === collectionId);
     if (!col) return;
 
-    // Filter out items with local-only image IDs
     const validItems = col.items.filter((item) => !item.imageUrl || isCloudUrl(item.imageUrl));
     const brokenItems = col.items.filter((item) => item.imageUrl && !isCloudUrl(item.imageUrl));
 
@@ -980,7 +971,7 @@ const useStore = create((set, get) => ({
             await api.deleteItemAPI(item.id);
           }
         } catch {
-          // Silent fail - items are already removed locally
+          // already gone locally, doesn't matter
         }
       }
     }

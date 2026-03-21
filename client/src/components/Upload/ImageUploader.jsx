@@ -32,7 +32,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
   const resolvedOriginalMime = originalMime ?? inferMimeFromUrl(currentPreview);
   const isCircleCrop = cropShape === 'circle';
 
-  // Revoke any lingering crop source URL when component unmounts
+  // clean up blob URLs on unmount
   useEffect(() => {
     return () => {
       if (revokeOriginalRef.current) URL.revokeObjectURL(revokeOriginalRef.current);
@@ -107,7 +107,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
 
   return (
     <div className="image-uploader">
-      {/* ── Cropper overlay (shown after file selected, before confirmed) ── */}
+      {/* cropper overlay (shown after file selected, before confirmed) */}
       <AnimatePresence>
         {cropOpen && resolvedOriginalSrc && (
           <ImageCropper
@@ -120,7 +120,7 @@ export default function ImageUploader({ onFileSelect, currentPreview = null, isU
         )}
       </AnimatePresence>
 
-      {/* ── Dropzone / preview (hidden while cropper is open) ── */}
+      {/* dropzone / preview (hidden while cropper is open) */}
       {!cropOpen && (
         <div
           {...getRootProps()}

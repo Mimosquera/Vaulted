@@ -60,7 +60,7 @@ async function ensureVisibilitySchema() {
           WHERE visibility IS NULL OR visibility = '';
         `);
 
-        // Remove any legacy visibility constraints before applying the current canonical one.
+        // drop any old visibility check constraints before adding the new one
         await pool.query(`
           DO $$
           DECLARE constraint_name TEXT;
@@ -104,7 +104,7 @@ async function ensureVisibilitySchema() {
 
       visibilitySchemaAvailable = true;
     } catch (err) {
-      // Degrade gracefully to legacy is_public behavior instead of blocking requests.
+      // schema migration failed - fall back to is_public so requests don't break
       visibilitySchemaAvailable = false;
       logError('visibility.schema.ensure.failed', {
         error: err?.message || String(err),
@@ -452,7 +452,7 @@ export const deleteCollection = async (req, res) => {
       return res.status(403).json({ error: 'Not authorized to delete this collection' });
     }
 
-    // Get all items to clean up their images
+    // collect image URLs before deleting
     const items = await pool.query('SELECT image_url FROM items WHERE collection_id = $1', [id]);
     const imageIdsToDelete = [];
 

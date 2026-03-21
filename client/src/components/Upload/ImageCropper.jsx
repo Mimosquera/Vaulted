@@ -6,7 +6,7 @@ import { CheckIcon as Check } from '@phosphor-icons/react/Check';
 import { X } from 'lucide-react';
 import './ImageCropper.scss';
 
-// ── Canvas helper ──────────────────────────────────────────────────────────
+// canvas helper
 
 async function getCroppedBlob(image, crop, mimeType = 'image/jpeg', cropShape = 'rect') {
   const canvas = document.createElement('canvas');
@@ -41,7 +41,7 @@ async function getCroppedBlob(image, crop, mimeType = 'image/jpeg', cropShape = 
   return new Promise((resolve) => canvas.toBlob(resolve, mimeType, 0.92));
 }
 
-// ── Constants ─────────────────────────────────────────────────────────────
+// constants
 
 const ASPECT_RATIOS = [
   { label: 'Free', value: undefined },
@@ -58,7 +58,6 @@ function makeCenteredCrop(mediaWidth, mediaHeight, aspect) {
   );
 }
 
-// ── Component ─────────────────────────────────────────────────────────────
 
 export default function ImageCropper({ imageSrc, mimeType = 'image/jpeg', onCropDone, onCancel, cropShape = 'rect' }) {
   const imgRef = useRef(null);

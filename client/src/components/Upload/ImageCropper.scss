@@ -6,7 +6,7 @@
   gap: $space-sm;
   width: 100%;
 
-  // ── Topbar ─────────────────────────────────────────────────────────────
+  // topbar
   &__topbar {
     display: flex;
     align-items: center;
@@ -50,7 +50,7 @@
     }
   }
 
-  // ── Crop area ──────────────────────────────────────────────────────────
+  // crop area
   &__canvas {
     border-radius: $radius-md;
     overflow: hidden;
@@ -65,7 +65,7 @@
       max-width: 100%;
     }
 
-    // Constrain the image height
+    // cap image height so tall photos don't overflow
     &__img,
     .ReactCrop img {
       max-width: 100%;
@@ -104,7 +104,7 @@
     }
   }
 
-  // ── Actions ────────────────────────────────────────────────────────────
+  // actions
   &__actions {
     display: flex;
     justify-content: flex-end;

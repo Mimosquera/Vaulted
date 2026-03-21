@@ -43,7 +43,7 @@ body {
   }
 }
 
-// ── Scrollbar ──
+// scrollbar
 @supports (scrollbar-width: thin) {
   * {
     scrollbar-color: #3b0764 $bg-secondary;
@@ -68,13 +68,13 @@ body {
   }
 }
 
-// ── Selection ──
+// selection
 ::selection {
   background: rgba($accent-primary, 0.3);
   color: $text-primary;
 }
 
-// ── Links ──
+// links
 a {
   color: $accent-tertiary;
   text-decoration: none;
@@ -121,7 +121,7 @@ a.btn {
   }
 }
 
-// ── Headings ──
+// headings
 h1, h2, h3, h4, h5, h6 {
   font-family: $font-display;
   font-weight: 700;
@@ -130,7 +130,7 @@ h1, h2, h3, h4, h5, h6 {
   user-select: none;
 }
 
-// ── Buttons ──
+// buttons
 button {
   cursor: pointer;
   border: none;
@@ -146,13 +146,13 @@ button {
   }
 }
 
-// ── Media Safety ──
+// media
 img {
   display: block;
   max-width: 100%;
 }
 
-// ── Inputs ──
+// inputs
 input, textarea, select {
   font-family: $font-body;
   color: $text-primary;
@@ -178,7 +178,7 @@ input, textarea, select {
   }
 }
 
-// ── Glass Effect ──
+// glass effect
 .glass {
   background: $bg-glass;
   -webkit-backdrop-filter: blur(12px);
@@ -186,7 +186,7 @@ input, textarea, select {
   border: 1px solid rgba(255, 255, 255, 0.06);
 }
 
-// ── Gradient Text ──
+// gradient text
 .gradient-text {
   background: $gradient-primary;
   -webkit-background-clip: text;
@@ -201,7 +201,7 @@ input, textarea, select {
   background-clip: text;
 }
 
-// ── Page Container ──
+// page container
 .page {
   flex: 1;
   padding-top: 80px;
@@ -215,7 +215,7 @@ input, textarea, select {
   padding: 0 $space-lg;
 }
 
-// ── Utility ──
+// utility
 .sr-only {
   position: absolute;
   width: 1px;
@@ -228,7 +228,7 @@ input, textarea, select {
   border: 0;
 }
 
-// ── Accessibility: Reduce Motion ──
+// reduce motion
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -237,7 +237,7 @@ input, textarea, select {
   }
 }
 
-// ── Mobile: Remove all :active highlights on touch devices ──
+// mobile: no tap highlights
 @media (hover: none) {
   button:active,
   a:active {

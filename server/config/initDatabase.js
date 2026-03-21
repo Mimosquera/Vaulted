@@ -107,7 +107,6 @@ export const initDatabase = async () => {
       WHERE visibility IS NULL OR visibility = '';
     `).catch(() => {});
 
-    // Check if images table exists
     const tableCheck = await pool.query(`
       SELECT EXISTS (
         SELECT FROM information_schema.tables
@@ -130,7 +129,7 @@ export const initDatabase = async () => {
       `);
       console.log('✓ Created new images table');
     } else {
-      // Table exists, check and migrate schema
+      // table already exists, patch schema if needed
       console.log('Images table exists, checking schema...');
 
       // Make data column nullable if it exists (old schema migration)
@@ -143,7 +142,7 @@ export const initDatabase = async () => {
         // Column might not exist, that's fine
       }
 
-      // Ensure url column exists and is NOT NULL for new uploads
+      // add url column if missing
       try {
         await pool.query(`
           ALTER TABLE images ADD COLUMN url TEXT NOT NULL DEFAULT '';

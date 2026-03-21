@@ -1,6 +1,6 @@
 @use './variables' as *;
 
-// ── Base Button Style ──
+// base
 .btn {
   display: inline-flex;
   align-items: center;
@@ -24,7 +24,7 @@
   }
 }
 
-// ── Primary Button ──
+// .btn--primary
 .btn--primary {
   background: rgba($accent-primary, 0.15);
   border-color: rgba($accent-primary, 0.3);
@@ -40,7 +40,7 @@
   }
 }
 
-// ── Secondary Button ──
+// .btn--secondary
 .btn--secondary {
   background: rgba(255, 255, 255, 0.05);
   border-color: rgba(255, 255, 255, 0.1);
@@ -57,7 +57,7 @@
   }
 }
 
-// ── Ghost Button ──
+// .btn--ghost
 .btn--ghost {
   background: transparent;
   border-color: transparent;
@@ -73,7 +73,7 @@
   }
 }
 
-// ── Danger Button ──
+// .btn--danger
 .btn--danger {
   background: rgba($accent-secondary, 0.15);
   border-color: rgba($accent-secondary, 0.3);
@@ -89,7 +89,7 @@
   }
 }
 
-// ── Sizes ──
+// sizes
 .btn--sm {
   padding: $space-xs $space-sm;
   font-size: $fs-xs;
@@ -100,7 +100,7 @@
   font-size: $fs-md;
 }
 
-// ── Mobile: Reduce padding on large buttons ──
+// mobile: tighten large button padding
 @media (max-width: 768px) {
   .btn--lg {
     padding: $space-sm $space-md;

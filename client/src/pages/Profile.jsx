@@ -153,11 +153,11 @@ export default function Profile() {
     if (file) {
       setPendingAvatarFile(file);
     } else if (pendingAvatarFile) {
-      // User cancelled new selection via X — reset uploader to show existing avatar
+      // user hit X on a new pick, not the saved photo - reset to saved
       setPendingAvatarFile(null);
       setUploaderKey((k) => k + 1);
     } else {
-      // User removed the currently-displayed photo — clear from server
+      // X on the saved photo itself - remove it from the server
       handleUseIcon();
     }
   };
@@ -267,7 +267,7 @@ export default function Profile() {
                         Icon
                       </button>
                     </div>
-                    {/* Photo panel — always mounted so ImageUploader preserves its state across tab switches */}
+                    {/* photo panel - kept mounted so uploader state survives tab switches */}
                     <div
                       className="profile__avatar-uploader-wrap"
                       style={{ display: avatarMode === 'image' ? '' : 'none' }}
@@ -292,7 +292,7 @@ export default function Profile() {
                       )}
                     </div>
 
-                    {/* Icon panel — always mounted, shown when in icon mode */}
+                    {/* icon panel - hidden with display:none, not unmounted */}
                     <div
                       style={{ display: avatarMode === 'icon' ? '' : 'none' }}
                       aria-hidden={avatarMode !== 'icon'}
@@ -397,7 +397,7 @@ export default function Profile() {
           )}
         </motion.div>
 
-        {/* ── Stats Cards ── */}
+        {/* stats cards */}
         <motion.div
           className="profile__stats"
           initial={{ opacity: 0, y: 15 }}
@@ -439,7 +439,7 @@ export default function Profile() {
           </div>
         </motion.div>
 
-        {/* ── Collection Breakdown ── */}
+        {/* collection breakdown */}
         <motion.div
           className="profile__breakdown"
           initial={{ opacity: 0, y: 15 }}

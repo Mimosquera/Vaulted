@@ -4,8 +4,7 @@ import { InitialLoadContext } from './InitialLoadContextValue';
 export function InitialLoadProvider({ children }) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
-  // Disable initial load flag after first render
-  // This prevents entrance animations on navigation
+  // flip this off after the first render so nav transitions don't re-run entrance animations
   const markLoadComplete = () => {
     setIsInitialLoad(false);
   };

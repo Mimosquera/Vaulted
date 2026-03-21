@@ -5,7 +5,7 @@ import { authMiddleware } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Configure multer for in-memory storage
+// multer keeps the file in memory, we pipe it straight to cloudinary
 const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 25 * 1024 * 1024 }, // 25MB limit (within Cloudinary free tier)

@@ -61,7 +61,7 @@ export default function Dashboard() {
       <BlobBackground />
       <div className="container">
 
-        {/* ── Header ── */}
+        {/* header */}
         <motion.div
           className="dashboard__header"
           initial={{ opacity: 0, y: 20 }}
@@ -102,7 +102,7 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* ── Search & Filter ── */}
+        {/* search & filter */}
         <motion.div
           className="dashboard__toolbar"
           initial={{ opacity: 0, y: 15 }}
@@ -146,7 +146,7 @@ export default function Dashboard() {
           </div>
         </motion.div>
 
-        {/* ── Grid ── */}
+        {/* grid */}
         {filtered.length > 0 ? (
           <CollectionGrid collections={filtered} />
         ) : (

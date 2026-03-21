@@ -144,7 +144,7 @@ export default function CollectionView() {
     <div className="collection-view page">
       <BlobBackground />
 
-      {/* ── Cover Banner ── */}
+      {/* cover banner */}
       <motion.div
         className="collection-view__cover"
         initial={{ opacity: 0 }}
@@ -201,9 +201,8 @@ export default function CollectionView() {
         </div>
       </motion.div>
 
-      {/* ── Content ── */}
       <div className="container">
-        {/* ── Toolbar ── */}
+        {/* toolbar */}
         <motion.div
           className="collection-view__toolbar"
           initial={{ opacity: 0, y: 10 }}
@@ -237,7 +236,7 @@ export default function CollectionView() {
           </div>
         </motion.div>
 
-        {/* ── Search ── */}
+        {/* search */}
         {collection.items.length > 3 && (
           <motion.div
             className="collection-view__search"
@@ -255,7 +254,7 @@ export default function CollectionView() {
           </motion.div>
         )}
 
-        {/* ── Items Grid ── */}
+        {/* items grid */}
         <motion.div
           initial={{ opacity: 0, y: 15 }}
           animate={{ opacity: 1, y: 0 }}

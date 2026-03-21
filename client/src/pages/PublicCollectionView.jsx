@@ -159,7 +159,7 @@ export default function PublicCollectionView() {
     <div className="collection-view page">
       <BlobBackground />
 
-      {/* ── Cover Banner ── */}
+      {/* cover banner */}
       <motion.div
         className="collection-view__cover"
         initial={{ opacity: 0 }}
@@ -218,7 +218,6 @@ export default function PublicCollectionView() {
         </div>
       </motion.div>
 
-      {/* ── Content ── */}
       <div className="container">
         {collection.items.length > 3 && (
           <motion.div

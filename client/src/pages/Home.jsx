@@ -83,7 +83,7 @@ export default function Home() {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // Scroll parallax — desktop only
+  // parallax only on desktop
   const { scrollYProgress } = useScroll();
   const heroOpacityProgress = useTransform(
     scrollYProgress,
@@ -100,7 +100,7 @@ export default function Home() {
   return (
     <div className="home">
 
-      {/* ── Hero ── */}
+      {/* hero */}
       <motion.section
         className="home__hero"
         style={isMobile ? undefined : { opacity: heroOpacity, scale: heroScale }}
@@ -173,7 +173,7 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* ── Scrolling Categories ── */}
+      {/* scrolling categories */}
       <section className="home__categories">
         <div className="home__categories-track">
           <div className="home__categories-scroll">
@@ -186,7 +186,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── Features ── */}
+      {/* features */}
       <section className="home__features">
         <div className="container">
           <motion.h2
@@ -222,7 +222,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ── CTA ── */}
+      {/* CTA */}
       <section className="home__bottom-cta">
         <BlobBackground color1="#7c3aed" color2="#dc2626" color3="#2563eb" />
         <div className="container">

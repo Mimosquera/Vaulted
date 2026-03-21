@@ -58,7 +58,6 @@ export default function Navbar() {
   }, [isOpen]);
 
   useEffect(() => {
-    // Mark initial load as complete after first render
     markLoadComplete();
   }, [markLoadComplete]);
 

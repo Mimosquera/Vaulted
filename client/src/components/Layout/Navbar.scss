@@ -492,7 +492,7 @@
   }
 }
 
-// ── Mobile: Remove :active states on touch devices ──
+// mobile: no :active states on touch
 @media (hover: none) {
   .navbar__link:active,
   .navbar__mobile-link:active,

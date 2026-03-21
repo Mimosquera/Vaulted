@@ -116,7 +116,7 @@ async function request(path, options = {}, isRetry = false, attempt = 0) {
   return res.json();
 }
 
-// ── Auth ──
+// auth
 export async function register(email, password, username) {
   const cleanedUsername = typeof username === 'string' ? username.trim() : '';
   const data = await request('/auth/register', {
@@ -150,7 +150,7 @@ export async function refreshToken() {
   return data;
 }
 
-// ── Collections ──
+// collections
 export async function fetchCollections() {
   return request('/api/collections');
 }
@@ -196,7 +196,7 @@ export async function setCollectionVisibilityAPI(id, visibility) {
   });
 }
 
-// ── Users / Friends ──
+// users / friends
 export async function searchUsersAPI(query) {
   return request(`/api/friends/search?q=${encodeURIComponent(query)}`);
 }
@@ -235,7 +235,7 @@ export async function updateMyProfileAPI(payload) {
   });
 }
 
-// ── Items ──
+// items
 export async function fetchItems(collectionId) {
   return request(`/api/collections/${collectionId}/items`);
 }
@@ -258,7 +258,7 @@ export async function deleteItemAPI(id) {
   return request(`/api/items/${id}`, { method: 'DELETE' });
 }
 
-// ── Sync ──
+// sync
 export async function syncData(payload) {
   return request('/api/sync', {
     method: 'POST',
@@ -266,7 +266,7 @@ export async function syncData(payload) {
   });
 }
 
-// ── Images ──
+// images
 export async function uploadImageAPI(file, onProgress) {
   const token = getToken();
   const headers = {};
@@ -327,11 +327,11 @@ export async function uploadImageAPI(file, onProgress) {
 }
 
 export function getImageUrl(id) {
-  // If it's already a full URL (from cloud storage), return it directly
+  // already a full URL, return as-is
   if (id && (id.startsWith('http://') || id.startsWith('https://'))) {
     return id;
   }
-  // Otherwise treat it as a local imageId and use API endpoint
+  // local imageId, hit the API
   return `${API_URL}/api/images/${id}`;
 }
 

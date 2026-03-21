@@ -1,4 +1,3 @@
-// User-friendly error messages for common issues
 export const ERROR_MESSAGES = {
   // Auth errors
   AUTH_REQUIRED: 'Your session has expired. Please sign in again.',
@@ -28,7 +27,7 @@ export const ERROR_MESSAGES = {
   PLEASE_WAIT: 'Please wait a moment and try again.',
 };
 
-// Error message resolver - maps API/system errors to user-friendly messages
+// maps raw errors to something the user can actually read
 export function getUserFriendlyError(error) {
   if (!error) return ERROR_MESSAGES.SOMETHING_WRONG;
 
